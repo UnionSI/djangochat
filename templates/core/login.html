@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ingresar | {% endblock %}
+
+{% block content %}
+
+<main class="vw-100 vh-100 d-flex text-center">
+    <section class="form-signin col-lg-3 m-auto">
+        <img class="mb-4" src="{% static 'img/logo.png' %}" alt="ameport_logo" width="150">
+
+        <form method="POST" class="d-flex flex-column gap-2">
+        {% csrf_token %}
+
+        <div class="form-floating">
+            <input type="text" name="username" class="form-control" id="floatingInput" placeholder=" ">
+            <label for="floatingInput">Usuario</label>
+        </div>
+        <div class="form-floating">
+            <input type="password" name="password" class="form-control" id="floatingPassword" placeholder="Password">
+            <label for="floatingPassword">Contraseña</label>
+        </div>
+
+        <div class="message mb-1">
+            <div class="text-danger text-start">
+              {% for fields, messages in form.errors.items %}
+              <div class="d-flex gap-2">
+                {{ messages }}
+              </div>
+              {% endfor %}
+            </div>
+        </div>
+
+        <button class="btn btn-primary w-100" type="submit">Ingresar</button>
+        </form>
+    </section>
+</main>
+
+{% endblock %}
+
+
