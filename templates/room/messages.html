@@ -23,7 +23,7 @@
     </div>
     
     <div class="bg-body-tertiary p-3">
-        <form class="d-flex justify-content-center align-items-center gap-2" method="POST">
+        <form id="form-chat-submit" class="d-flex justify-content-center align-items-center gap-2" method="POST">
             {% csrf_token %}
             <input type="text" class="form-control" id="chat-message-input" placeholder="Escribe un mensaje...">
             <button id="chat-message-submit" class="btn btn-primary">
