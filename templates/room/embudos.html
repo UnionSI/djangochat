@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %} Embudos | {% endblock %}
+
+{% block content %}
+
+{% include 'navbar.html' %}
+
+<div class="d-flex flex-column align-items-stretch flex-shrink-0 bg-body-tertiary border-end" style="width: 380px;">
+    <a href="/" class="d-flex align-items-center flex-shrink-0 p-3 link-body-emphasis text-decoration-none border-bottom">
+      <svg class="bi pe-none me-2" width="30" height="24"><use xlink:href="#bootstrap"></use></svg>
+      <span class="fs-5 fw-semibold">Embudos</span>
+    </a>
+    <div class="list-group list-group-flush border-bottom overflow-y-scroll">
+
+      {% for embudo in embudos %}
+        <a href="{% url 'room:embudo' embudo.id %}" class="list-group-item list-group-item-action py-3 lh-sm">
+          <div class="d-flex w-100 align-items-center justify-content-between">
+            <strong class="mb-1">{{ embudo.nombre }} </strong>
+            <small class="text-body-secondary"></small>
+          </div>
+          <div class="col-10 mb-1 small">4 mensajes esperando respuesta</div>
+        </a>
+      {% endfor %}
+
+    </div>
+</div>
+
+{% if embudo %}
+  {% include 'room/embudo_por_tarea.html' %}
+{% else %}
+  <div class="flex-grow-1 d-flex align-items-center justify-content-center bg-body-tertiary">
+    <p class="text-secondary">Seleccione un embudo para ver los mensajes</p>
+  </div>
+{% endif %}
+
+{% endblock %}

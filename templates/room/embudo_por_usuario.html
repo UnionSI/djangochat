@@ -1,0 +1,55 @@
+{% load static %}
+{% load humanize %}
+
+
+<div class="d-flex flex-column w-100 bg-body-tertiary">
+    
+    <a href="/" class="d-flex align-items-center gap-3 link-body-emphasis text-decoration-none p-3 border-bottom bg-body-tertiary" style="height: 63px">
+      <div>
+        <h5 class="m-0 fs-5 fw-semibold">{{ embudo.nombre }}</h5>
+      </div>
+    </a>
+
+    
+    <div class="d-flex gap-2 bg-body-tertiary">
+        {% for sector_tarea, rooms in sector_tareas_with_rooms.items %}
+        <div class="d-flex flex-column bg-white px-3 py-4">
+            <h5 class="text-center">{{ sector_tarea }}</h5>
+            <div class="usi-grid">
+                <h6 class="usi-card text-center">Por responder</h6>
+                <h6 class="usi-card text-center">Respondido</h6>
+                {% for room in rooms %}
+                    <a href="{% url 'room:chat' room.slug %}" class="usi-card d-flex gap-2 list-group-item p-2 lh-sm border rounded {% if room.last_message.0.usuario.is_staff or room.last_message.0.usuario.is_superuser %} respondido {% else %} por-responder {% endif %}">
+                                <div>
+                                    <img src="{% static 'img/logo.png' %}" alt="mdo" width="48" height="48" class="rounded-circle border">
+                                </div>
+                    
+                                <div class="w-100">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                    <div class="d-flex flex-column mb-1">
+                                        {% if room.nombre %}
+                                        <strong>{{ room.nombre }} {{ room.apellido}} - {{ room.nro_socio }}</strong>
+                                        {% else %}
+                                        <strong>{{ room.telefono }}</strong>
+                                        {% endif %}
+                                        <small class="text-primary">{{ room.dni }}</small>
+                                    </div>
+                                    <small class="text-body-secondary">
+                                        {% now "d/m/Y" as todays_date %}
+                                        {% if todays_date == room.last_message.0.fecha_hora|date:"d/m/Y" %}
+                                            {{ room.last_message.0.fecha_hora|time:"H:i" }}
+                                        {% else %}
+                                            {{ room.last_message.0.fecha_hora|date:"d/m/Y" }}
+                                        {% endif %}
+                                    </small>
+                                    </div>
+                                    <div class="col-10 mb-1 small fst-italic">{{ room.last_message.0.contenido|truncatechars:50 }}</div>
+                                </div>
+                            </a>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+</div>

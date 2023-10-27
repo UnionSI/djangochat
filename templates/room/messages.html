@@ -5,19 +5,23 @@
     <a href="/" class="d-flex align-items-center gap-3 link-body-emphasis text-decoration-none p-3 border-bottom bg-body-tertiary" style="height: 63px">
       <img src="{% static 'img/logo.png' %}" alt="ameport_logo" width="48" height="48" class="rounded-circle">
       <div>
-        <h6 class="m-0">{{ room.id }} - {{ room.name }}</h6>
+        {% if room.nombre %}
+            <h6 class="m-0">{{ room.nombre }} {{ room.apellido}} - {{ room.nro_socio }}</h6>
+        {% else %}
+            <h6 class="m-0">{{ room.telefono }}</h6>
+        {% endif %}
         <p class="m-0 text-secondary"><small>Seleccione para obtener información del contacto</small></p>
       </div>
     </a>
 
     <div id="chat-messages" class="d-flex flex-column bg-body-secondary p-2 h-100 overflow-y-scroll">
         {% for message in chat_messages %}
-        <div class="{% if message.user.is_staff %} align-self-end {% else %} align-self-start {% endif %} d-flex flex-column p-2 bg-white border rounded">
+        <div style="max-width: 60%;" class="{% if message.usuario.is_staff or message.usuario.is_superuser %} align-self-end {% else %} align-self-start {% endif %} d-flex flex-column p-2 bg-white border rounded">
             <div>
-                <small class="text-secondary">{{ message.date_added|date:"d/m/Y" }} {{ message.date_added|time:"H:i" }} -</small>
-                <small class="text-secondary">{{ message.user }}:</small>
+                <small class="text-secondary">{{ message.fecha_hora|date:"d/m/Y" }} {{ message.fecha_hora|time:"H:i" }} -</small>
+                <small class="text-secondary">{{ message.usuario }}:</small>
             </div>
-            <small style="max-width: 60%;">{{ message.content }}</small>
+            <small>{{ message.contenido }}</small>
         </div>
         {% endfor %}
     </div>

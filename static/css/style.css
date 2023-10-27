@@ -1,0 +1,22 @@
+.messages {
+    height: 400px;
+    overflow-y: auto;
+}
+
+.usi-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px;
+}
+
+.respondido {
+    grid-column: 2;
+}
+
+.por-responder {
+    grid-column: 1;
+}
+
+.usi-card {
+    width: 350px;
+}

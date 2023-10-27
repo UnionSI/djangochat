@@ -20,16 +20,32 @@
           <div>
             <img src="{% static 'img/logo.png' %}" alt="mdo" width="48" height="48" class="rounded-circle border">
           </div>
+
           <div class="w-100">
-            <div class="d-flex align-items-center justify-content-between">
-              <div class="mb-1">
-                <strong>{{ room.name }}</strong>
-                <small>A5472</small>
+            <div class="d-flex justify-content-between">
+              <div class="d-flex flex-column mb-1">
+                {% if room.nombre %}
+                  <strong>{{ room.nombre }} {{ room.apellido}} - {{ room.nro_socio }}</strong>
+                {% else %}
+                  <strong>{{ room.telefono }}</strong>
+                {% endif %}
+                <small class="text-primary">{{ room.dni }}</small>
               </div>
-              <small class="text-body-secondary">{{ room.last_message.0.date_added|naturaltime }}</small>
+              <small class="text-body-secondary">
+                {% now "d/m/Y" as todays_date %}
+                {% if todays_date == room.last_message.0.fecha_hora|date:"d/m/Y" %}
+                    {{ room.last_message.0.fecha_hora|time:"H:i" }}
+                {% else %}
+                    {{ room.last_message.0.fecha_hora|date:"d/m/Y" }}
+                {% endif %}
+              </small>
             </div>
-            <div class="col-10 mb-1 small">{{ room.last_message.0.user }}: {{ room.last_message.0.content|truncatechars:50 }}</div>
+            <div class="col-10 mb-1 small fst-italic">{{ room.last_message.0.contenido|truncatechars:50 }}</div>
+            {% if room.last_message.0.user %}
+              <div>por: room.last_message.0.user </div>
+            {% endif %}
           </div>
+
         </a>
         {% endfor %}
       </div>
@@ -127,4 +143,5 @@
     // Add this below the function to trigger the scroll on load.
     scrollToBottom();
 </script>
+
 {% endblock %}

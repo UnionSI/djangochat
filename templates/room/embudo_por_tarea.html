@@ -1,0 +1,58 @@
+{% load static %}
+{% load humanize %}
+
+
+<div class="d-flex flex-column w-100 bg-body-tertiary">
+    
+    <a href="/" class="d-flex align-items-center gap-3 link-body-emphasis text-decoration-none p-3 border-bottom bg-body-tertiary" style="height: 63px">
+      <div>
+        <h5 class="m-0 fs-5 fw-semibold">{{ embudo.nombre }}</h5>
+      </div>
+    </a>
+
+    
+    <div class="d-flex p-2 gap-2 bg-body-tertiary">
+        {% for sector_tarea, rooms in sector_tareas.items %}
+        <div class="d-flex flex-column bg-white p-3">
+            <h5 class="text-center">{{ sector_tarea }}</h5>
+            <div class="d-flex flex-column gap-2" style="width: 350px;">
+                {% for room in rooms %}
+                    <a href="{% url 'room:chat' room.0.slug %}" class="usi-card d-flex gap-2 list-group-item p-2 lh-sm border rounded position-relative">
+                                
+                                {% if not room.1.0.usuario.is_staff or not room.1.0.usuario.is_superuser %}
+                                    <div style="width: 10px; height: 10px; top:5px; left:5px;" class="bg-primary rounded-circle position-absolute"></div>
+                                {% endif %}
+
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <img src="{% static 'img/logo.png' %}" alt="mdo" width="55" height="55" class="rounded-circle border">
+                                </div>
+                    
+                                <div class="w-100">
+                                    <div class="d-flex justify-content-between">
+                                    <div class="d-flex flex-column mb-1">
+                                        {% if room.0.nombre %}
+                                        <strong>{{ room.0.nombre }} {{ room.0.apellido}} - {{ room.0.nro_socio }}</strong>
+                                        {% else %}
+                                        <strong>{{ room.0.telefono }}</strong>
+                                        {% endif %}
+                                        <small class="text-primary">{{ room.0.dni }}</small>
+                                    </div>
+                                    <small class="text-body-secondary">
+                                        {% now "d/m/Y" as todays_date %}
+                                        {% if todays_date == room.1.0.fecha_hora|date:"d/m/Y" %}
+                                            {{ room.1.0.fecha_hora|time:"H:i" }}
+                                        {% else %}
+                                            {{ room.1.0.fecha_hora|date:"d/m/Y" }}
+                                        {% endif %}
+                                    </small>
+                                    </div>
+                                    <div class="col-10 mb-1 small fst-italic">{{ room.1.0.contenido|truncatechars:50 }}</div>
+                                </div>
+                            </a>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+</div>
