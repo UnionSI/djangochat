@@ -12,11 +12,11 @@ __pycache__/
 *.log
 
 # Media files
-#media/
+media/
 
 # Static files
-#staticfiles/
-#static
+staticfiles/
+static
 
 # Django migration files
 *.py[eo]
@@ -39,4 +39,4 @@ venv/
 env/
 
 # DB
-db.sqlite3
+#db.sqlite3
