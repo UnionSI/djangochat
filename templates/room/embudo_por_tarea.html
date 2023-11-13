@@ -17,19 +17,19 @@
             <h5 class="text-center">{{ sector_tarea }}</h5>
             <div class="d-flex flex-column gap-2" style="width: 350px;">
                 {% for room in rooms %}
-                    <a href="{% url 'room:chat' room.0.slug %}" class="usi-card d-flex gap-2 list-group-item p-2 lh-sm border rounded position-relative">
-                                
-                                {% if not room.1.0.usuario.is_staff or not room.1.0.usuario.is_superuser %}
-                                    <div style="width: 10px; height: 10px; top:5px; left:5px;" class="bg-primary rounded-circle position-absolute"></div>
-                                {% endif %}
+                    <div href="{% url 'room:chat' room.0.slug %}" class="usi-card d-flex gap-2 list-group-item lh-sm border rounded position-relative">
+                        <a href="{% url 'room:chat' room.0.slug %}" class="d-flex gap-2 list-group-item p-2 position-relative w-100">
+                            {% if not room.1.0.usuario.is_staff or not room.1.0.usuario.is_superuser %}
+                                <div style="width: 10px; height: 10px; top:5px; left:5px;" class="bg-primary rounded-circle position-absolute"></div>
+                            {% endif %}
 
-                                <div class="d-flex justify-content-center align-items-center">
-                                    <img src="{% static 'img/logo.png' %}" alt="mdo" width="55" height="55" class="rounded-circle border">
-                                </div>
-                    
-                                <div class="w-100">
-                                    <div class="d-flex justify-content-between">
-                                    <div class="d-flex flex-column mb-1">
+                            <div class="d-flex justify-content-center align-items-center">
+                                <img src="{% static 'img/logo.png' %}" alt="mdo" width="55" height="55" class="rounded-circle border">
+                            </div>
+                
+                            <div class="w-100">
+                                <div class="d-flex justify-content-between">
+                                    <div class="d-flex flex-column pe-2">
                                         {% if room.0.nombre %}
                                         <strong>{{ room.0.nombre }} {{ room.0.apellido}} - {{ room.0.nro_socio }}</strong>
                                         {% else %}
@@ -37,7 +37,10 @@
                                         {% endif %}
                                         <small class="text-primary">{{ room.0.dni }}</small>
                                     </div>
-                                    <small class="text-body-secondary">
+                                </div>
+                                <div class="col-12">
+                                    <p class="mb-0 small fst-italic">{{ room.1.0.contenido|truncatechars:50 }}</p>
+                                    <small class="text-body-secondary flex-end">
                                         {% now "d/m/Y" as todays_date %}
                                         {% if todays_date == room.1.0.fecha_hora|date:"d/m/Y" %}
                                             {{ room.1.0.fecha_hora|time:"H:i" }}
@@ -45,13 +48,23 @@
                                             {{ room.1.0.fecha_hora|date:"d/m/Y" }}
                                         {% endif %}
                                     </small>
-                                    </div>
-                                    <div class="col-10 mb-1 small fst-italic">{{ room.1.0.contenido|truncatechars:50 }}</div>
                                 </div>
-                            </a>
-                    {% endfor %}
-                </div>
+                            </div>
+                        </a>
+                        <div class="dropdown position-absolute top-0 end-0">
+                            <button class="btn py-0 px-2 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
+                            <ul class="dropdown-menu">
+                                <li><span class="dropdown-item">Mover a ...</span></li>
+                                <li><hr class="dropdown-divider"></li>
+                                {% for sector_tarea in sector_tareas %}
+                                    <li><a class="dropdown-item" href="#">{{ sector_tarea }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
+        </div>
         {% endfor %}
     </div>
 
