@@ -1,9 +1,10 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from django.db.models import Prefetch
 from django.db.models import Max, Subquery, OuterRef
 
-from .models import Sector, SectorTarea, Room, Message
+from .models import Sector, SectorTarea, Room, Message, ContactoTarea
 
 @login_required
 def chats(request):
@@ -34,22 +35,34 @@ def embudo(request, id):
     sector = get_object_or_404(Sector, id=id)
     sectores = Sector.objects.all()
     sector_tareas = SectorTarea.objects.filter(sector=sector)
-    rooms = Room.objects.filter(messages__sector_tarea__sector=sector).distinct()
+    contactos = Room.objects.filter(contacto_tarea__sector_tarea__sector=sector).distinct()
 
-    objeto_rooms = {}
-    for room in rooms:
-        ultimo_mensaje = Message.objects.filter(contacto=room).order_by('-fecha_hora')[:1]
-        objeto_rooms[room] = ultimo_mensaje
+    objeto_contactos = {}
+    for contacto in contactos:
+        ultimo_mensaje = Message.objects.filter(contacto=contacto).order_by('-fecha_hora')[:1]
+        sector_tarea = ContactoTarea.objects.get(contacto=contacto)
+        objeto_contactos[contacto] = [sector_tarea, ultimo_mensaje]
 
     objeto_sector_tareas = {}
     for sector_tarea in sector_tareas:
         objeto_sector_tareas[sector_tarea] = []
-        for room, mensaje in objeto_rooms.items():
-            if mensaje[0].sector_tarea == sector_tarea:
-                objeto_sector_tareas[sector_tarea].append([room, mensaje])    
+        for room, lista in objeto_contactos.items():
+            if lista[0].sector_tarea == sector_tarea:
+                objeto_sector_tareas[sector_tarea].append([room, lista[1]])    
 
     return render(request, 'room/embudos.html', {'embudo': sector, 'embudos': sectores, 'sector_tareas':objeto_sector_tareas})
     
+
+@login_required
+@require_POST
+def mover_de_sector(request, room_id, sector_tarea_id):
+    room = get_object_or_404(Room, id=room_id)
+    sector_tarea = get_object_or_404(SectorTarea, id=sector_tarea_id)
+    contacto_tarea = ContactoTarea.objects.get(contacto=room)
+    contacto_tarea.sector_tarea = sector_tarea
+    contacto_tarea.save()
+
+    return redirect('room:embudo', sector_tarea.sector.id)
 
     '''
     # Obtener todas las sector_tareas que pertenecen al embudo actual

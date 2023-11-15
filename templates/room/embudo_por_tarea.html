@@ -52,12 +52,16 @@
                             </div>
                         </a>
                         <div class="dropdown position-absolute top-0 end-0">
-                            <button class="btn py-0 px-2 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
+                            <button class="btn py-0 px-2 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border: none !important; outline: none;"></button>
                             <ul class="dropdown-menu">
                                 <li><span class="dropdown-item">Mover a ...</span></li>
                                 <li><hr class="dropdown-divider"></li>
                                 {% for sector_tarea in sector_tareas %}
-                                    <li><a class="dropdown-item" href="#">{{ sector_tarea }}</a></li>
+                                    <form method="post" action="{% url 'room:mover_de_sector' room.0.id sector_tarea.id %}">
+                                        {% csrf_token %}
+                                        <li><button type="submit" class="dropdown-item">{{ sector_tarea }}</button></li>
+                                        <!-- <li><a class="dropdown-item" href="#"></a></li> -->
+                                    </form>
                                 {% endfor %}
                             </ul>
                         </div>

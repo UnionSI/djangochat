@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import sync_to_async
 
-from .models import Room, Message
+from .models import Room, Message, ContactoTarea
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -59,5 +59,4 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def save_message(self, username, room, message):
         user = User.objects.get(username=username)
         room = Room.objects.get(slug=room)
-
-        Message.objects.create(usuario=user, contacto=room, contenido=message)
+        message = Message.objects.create(usuario=user, contacto=room, contenido=message)

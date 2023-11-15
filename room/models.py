@@ -26,6 +26,7 @@ class SectorTarea(models.Model):
         return self.nombre
 
 
+
 class Room(models.Model):
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)
@@ -45,7 +46,7 @@ class Message(models.Model):
     contacto = models.ForeignKey(Room, related_name='messages', on_delete=models.CASCADE)
     usuario = models.ForeignKey(User, related_name='messages', on_delete=models.CASCADE, null=True)
     contenido = models.TextField()
-    recibido = models.BooleanField(default=True)
+    recibido = models.BooleanField(default=False)
     fecha_hora = models.DateTimeField(auto_now_add=True)
     #sector_tarea = models.ForeignKey(SectorTarea, on_delete=models.CASCADE) # Eliminar
     # chat (Si se saca la cabecera sacar este campo)
@@ -59,9 +60,11 @@ class Message(models.Model):
         return self.contenido
 
 
-class MensajeTarea(models.Model):
+class ContactoTarea(models.Model):
+    contacto = models.ForeignKey(Room, related_name='contacto_tarea', on_delete=models.CASCADE)
     sector_tarea = models.ForeignKey(SectorTarea, on_delete=models.CASCADE)
-    mensaje = models.ForeignKey(Message, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    fecha_hora = models.DateTimeField(auto_now_add=True)
 
 
 class MensajeAdjunto(models.Model):
@@ -81,3 +84,13 @@ id Usuario
 id Sector
 
 '''
+
+# cargar todos los contactos room
+# entra un nuevo mensaje se crea el objeto mensaje
+# busco roomtarea atraves de room y chatbot inicial
+# si esta en cerrado pasa a inicial
+# si no hay nada pasa a inicial
+# si esta en otro sector tarea queda en el que está, sin generar ningun registro
+
+#chat bot cerrado
+#chat bot inicial
