@@ -33,24 +33,19 @@ def embudos(request):
 @login_required
 def embudo(request, id):
     sector = get_object_or_404(Sector, id=id)
-    sectores = Sector.objects.all()
-    sector_tareas = SectorTarea.objects.filter(sector=sector)
-    contactos = Room.objects.filter(contacto_tarea__sector_tarea__sector=sector).distinct()
+    sectores = Sector.objects.prefetch_related('sectortarea_set').all()    
+    sector_tareas = SectorTarea.objects.filter(sector=sector).prefetch_related('contactotarea_set__contacto__messages').all()
 
-    objeto_contactos = {}
-    for contacto in contactos:
-        ultimo_mensaje = Message.objects.filter(contacto=contacto).order_by('-fecha_hora')[:1]
-        sector_tarea = ContactoTarea.objects.get(contacto=contacto)
-        objeto_contactos[contacto] = [sector_tarea, ultimo_mensaje]
-
-    objeto_sector_tareas = {}
+    '''
+    # ¿Mejora la performance si se obtiene el último mensaje en la vista en lugar de pasarle todos los mensajes al template?
+    # Agregar el último mensaje a cada Room
     for sector_tarea in sector_tareas:
-        objeto_sector_tareas[sector_tarea] = []
-        for room, lista in objeto_contactos.items():
-            if lista[0].sector_tarea == sector_tarea:
-                objeto_sector_tareas[sector_tarea].append([room, lista[1]])    
+        for contacto_tarea in sector_tarea.contactotarea_set.all():
+            last_message = contacto_tarea.contacto.messages.order_by('-fecha_hora').first()
+            contacto_tarea.last_message = last_message
+    '''
 
-    return render(request, 'room/embudos.html', {'embudo': sector, 'embudos': sectores, 'sector_tareas':objeto_sector_tareas})
+    return render(request, 'room/embudos.html', {'embudo': sector, 'embudos': sectores, 'sector_tareas': sector_tareas})
     
 
 @login_required
@@ -64,16 +59,37 @@ def mover_de_sector(request, room_id, sector_tarea_id):
 
     return redirect('room:embudo', sector_tarea.sector.id)
 
-    '''
-    # Obtener todas las sector_tareas que pertenecen al embudo actual
-    sector_tareas = SectorTarea.objects.filter(sector=embudo)
-    # Crear una consulta Prefetch para cargar las rooms relacionadas con las sector_tareas
-    rooms_prefetch = Prefetch(
-        'room_set',
-        queryset=Room.objects.prefetch_related(
-            Prefetch('messages', queryset=Message.objects.order_by('-fecha_hora')[:1], to_attr='last_message')
-        ),
-        to_attr='rooms'
-    )
-    sector_tareas = sector_tareas.prefetch_related(rooms_prefetch)
-    '''
+
+'''
+Versión 1:
+# Obtener todas las sector_tareas que pertenecen al embudo actual
+sector_tareas = SectorTarea.objects.filter(sector=embudo)
+# Crear una consulta Prefetch para cargar las rooms relacionadas con las sector_tareas
+rooms_prefetch = Prefetch(
+    'room_set',
+    queryset=Room.objects.prefetch_related(
+        Prefetch('messages', queryset=Message.objects.order_by('-fecha_hora')[:1], to_attr='last_message')
+    ),
+    to_attr='rooms'
+)
+sector_tareas = sector_tareas.prefetch_related(rooms_prefetch)
+
+---
+
+Versión 2:
+sector_tareas = SectorTarea.objects.filter(sector=sector)
+contactos = Room.objects.filter(contacto_tarea__sector_tarea__sector=sector).distinct()
+
+objeto_contactos = {}
+for contacto in contactos:
+    ultimo_mensaje = Message.objects.filter(contacto=contacto).order_by('-fecha_hora')[:1]
+    sector_tarea = ContactoTarea.objects.get(contacto=contacto)
+    objeto_contactos[contacto] = [sector_tarea, ultimo_mensaje]
+
+objeto_sector_tareas = {}
+for sector_tarea in sector_tareas:
+    objeto_sector_tareas[sector_tarea] = []
+    for room, lista in objeto_contactos.items():
+        if lista[0].sector_tarea == sector_tarea:
+            objeto_sector_tareas[sector_tarea].append([room, lista[1]])
+'''
