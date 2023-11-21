@@ -13,7 +13,7 @@
         <svg class="bi pe-none me-2" width="30" height="24"><use xlink:href="#bootstrap"></use></svg>
         <span class="fs-5 fw-semibold">Chats</span>
       </a>
-      <div class="list-group list-group-flush border-bottom overflow-y-scroll">
+      <div id="room-list" class="list-group list-group-flush border-bottom overflow-y-scroll">
 
         {% for room in rooms %}
         <a id="{{ room.nro_socio }}" href="{% url 'room:chat' room.slug %}" class="d-flex gap-2 list-group-item py-3 lh-sm">
@@ -64,6 +64,6 @@
 {% block scripts %}
 {{ room.slug|json_script:"json-roomname" }}
 {{ request.user.username|json_script:"json-username" }}
-<script src="{% static 'js/chatConsumer.js' %}"></script>
+<!-- <script src="{% static 'js/chatConsumer.js' %}"></script> -->
 <script src="{% static 'js/globalConsumer.js' %}"></script>
 {% endblock %}

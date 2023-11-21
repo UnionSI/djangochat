@@ -17,10 +17,14 @@ def chats(request):
 @login_required
 def chat(request, slug):
     room = get_object_or_404(Room, slug=slug)
-    messages = Message.objects.filter(contacto=room)[0:25]
+    messages = Message.objects.filter(contacto=room)
+
     rooms = Room.objects.prefetch_related(
         Prefetch('messages', queryset=Message.objects.order_by('-fecha_hora')[:1], to_attr='last_message')
-    )
+    ).annotate(
+        last_message_date=Max('messages__fecha_hora')
+    ).order_by('-last_message_date')
+
     return render(request, 'room/chats.html', {'room': room, 'chat_messages': messages, 'rooms': rooms,})
 
 

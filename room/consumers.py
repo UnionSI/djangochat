@@ -15,9 +15,35 @@ class GlobalConsumer(AsyncWebsocketConsumer):
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard('global', self.channel_name)
 
-    async def notify_global(self, event):
-        print(f"Sending to {self.channel_name}: {event}")
-        await self.send(text_data=json.dumps(event))
+    async def receive(self, text_data):
+        print(f"Received in {self.room_group_name}: {data}")
+        data = json.loads(text_data)
+        message = data['message']
+        username = data['username']
+        room = data['room']
+
+        # Guardar el mensaje en la base de datos
+        await self.save_message(username, room, message)
+
+        # Enviar mensaje global
+        await self.channel_layer.group_send(
+            'global',
+            {
+                'type': 'chat_message',
+                'room': room,
+                'message': message,
+                'username': username
+            }
+        )
+
+    async def chat_message(self, event):
+        # Enviar mensaje global a la conexión WebSocket
+        await self.send(text_data=json.dumps({
+            'type': event['type'],
+            'room': event['room'],
+            'username': event['username'],
+            'message': event['message']
+        }))
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -33,7 +59,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
     # Receive message from WebSocket
     async def receive(self, text_data):
         data = json.loads(text_data)
-        print(f"Received in {self.room_group_name}: {data}")
         message = data['message']
         username = data['username']
         room = data['room']
