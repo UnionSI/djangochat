@@ -15,10 +15,10 @@
         {% for sector_tarea in sector_tareas %}
         <div class="d-flex flex-column bg-white p-3">
             <h5 class="text-center">{{ sector_tarea }}</h5>
-            <div class="d-flex flex-column gap-2" style="width: 350px;">
+            <div id="{{ sector_tarea.id }}" class="d-flex flex-column gap-2" style="width: 350px;">
                 {% for contacto_tarea in sector_tarea.contactotarea_set.all %}
                     {% with contacto=contacto_tarea.contacto %}
-                        <div href="{% url 'room:chat' contacto.slug %}" class="usi-card d-flex gap-2 list-group-item lh-sm border rounded position-relative">
+                        <div id="{{ contacto.nro_socio }}" class="usi-card d-flex gap-2 list-group-item lh-sm border rounded position-relative">
                             <a href="{% url 'room:chat' contacto.slug %}" class="d-flex gap-2 list-group-item p-2 position-relative w-100">
                                 {% if not contacto.usuario.is_staff or not contacto.usuario.is_superuser %}
                                     <div style="width: 10px; height: 10px; top:5px; left:5px;" class="bg-primary rounded-circle position-absolute"></div>
