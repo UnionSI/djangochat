@@ -40,12 +40,17 @@ def green_api_webhook(request):
         print(data)
         print('\n***\n')
 
+        '''
         receiptId = data['receiptId']
         idMessage = data['idMessage']
         phoneNumberRaw = data['senderData']['chatId']
         phoneNumber = phoneNumberRaw.split('@')[0]
         name = data['senderData']['chatName']
-        message = data['messageData']['extendedTextMessageData']['text']
+        '''
+        if 'receiptId' in data:
+            message = data['messageData']['extendedTextMessageData']['text']
+        else:
+            message = "mensaje en blanco"
 
         # Para test (user)
         user = User.objects.all().first()
