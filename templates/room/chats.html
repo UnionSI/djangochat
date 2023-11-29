@@ -33,16 +33,16 @@
               </div>
               <small class="text-body-secondary">
                 {% now "d/m/Y" as todays_date %}
-                {% if todays_date == room.last_message.0.fecha_hora|date:"d/m/Y" %}
-                    {{ room.last_message.0.fecha_hora|time:"H:i" }}
+                {% if todays_date == room.last_message.fecha_hora|date:"d/m/Y" %}
+                  {{ room.last_message.fecha_hora|time:"H:i" }}
                 {% else %}
-                    {{ room.last_message.0.fecha_hora|date:"d/m/Y" }}
+                  {{ room.last_message.fecha_hora|date:"d/m/Y" }}
                 {% endif %}
               </small>
             </div>
-            <div class="col-10 mb-1 small fst-italic">{{ room.last_message.0.contenido|truncatechars:50 }}</div>
-            {% if room.last_message.0.user %}
-              <div>por: room.last_message.0.user </div>
+            <div class="col-10 mb-1 small fst-italic">{{ room.last_message.contenido|truncatechars:50 }}</div>
+            {% if room.last_message.user %}
+              <div>por: {{ room.last_message.user.username }}</div>
             {% endif %}
           </div>
 

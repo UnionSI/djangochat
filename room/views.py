@@ -10,7 +10,8 @@ from .models import Sector, SectorTarea, Room, Message, ContactoTarea
 def chats(request):
     rooms = Room.objects.annotate(
         last_message=Subquery(
-            Message.objects.filter(contacto=OuterRef('pk')).order_by('-fecha_hora').values('contenido')[:1]
+            Message.objects.filter(contacto=OuterRef('pk')).order_by('-fecha_hora')[:1]
+            .values('contenido', 'fecha_hora', 'user__username')
         )
     )
     return render(request, 'room/chats.html', {'rooms': rooms})
