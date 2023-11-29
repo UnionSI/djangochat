@@ -32,18 +32,23 @@
                 <small class="text-primary">{{ room.dni }}</small>
               </div>
               <small class="text-body-secondary">
+                {% comment %}
                 {% now "d/m/Y" as todays_date %}
                 {% if todays_date == room.last_message.fecha_hora|date:"d/m/Y" %}
                   {{ room.last_message.fecha_hora|time:"H:i" }}
                 {% else %}
                   {{ room.last_message.fecha_hora|date:"d/m/Y" }}
                 {% endif %}
+                {% endcomment %}
+                {{ room.last_message }}
               </small>
             </div>
+            {% comment %}
             <div class="col-10 mb-1 small fst-italic">{{ room.last_message.contenido|truncatechars:50 }}</div>
             {% if room.last_message.user %}
               <div>por: {{ room.last_message.user.username }}</div>
             {% endif %}
+            {% endcomment %}
           </div>
 
         </a>
