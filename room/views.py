@@ -8,8 +8,10 @@ from .models import Sector, SectorTarea, Room, Message, ContactoTarea
 
 @login_required
 def chats(request):
-    rooms = Room.objects.prefetch_related(
-        Prefetch('messages', queryset=Message.objects.order_by('-fecha_hora').first(), to_attr='last_message')
+    rooms = Room.objects.annotate(
+        last_message=Subquery(
+            Message.objects.filter(contacto=OuterRef('pk')).order_by('-fecha_hora').values('contenido')[:1]
+        )
     )
     return render(request, 'room/chats.html', {'rooms': rooms})
 
