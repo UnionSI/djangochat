@@ -18,6 +18,9 @@ def chats(request):
             Message.objects.filter(contacto=OuterRef('pk')).order_by('-fecha_hora')[:1]
         )
     )
+    print(rooms)
+    for room in rooms:
+        print(room.last_message)
     return render(request, 'room/chats.html', {'rooms': rooms})
 
 
