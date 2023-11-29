@@ -9,7 +9,7 @@ from .models import Sector, SectorTarea, Room, Message, ContactoTarea
 @login_required
 def chats(request):
     rooms = Room.objects.prefetch_related(
-        Prefetch('messages', queryset=Message.objects.order_by('-fecha_hora')[:1], to_attr='last_message')
+        Prefetch('messages', queryset=Message.objects.order_by('-fecha_hora').first(), to_attr='last_message')
     )
     return render(request, 'room/chats.html', {'rooms': rooms})
 
@@ -19,7 +19,7 @@ def chat(request, slug):
     room = get_object_or_404(Room, slug=slug)
     room_messages = Message.objects.filter(contacto=room)  # Ver cómo manejar esto si hay muchos mensajes
     rooms = Room.objects.prefetch_related(
-        Prefetch('messages', queryset=Message.objects.order_by('-fecha_hora')[:1], to_attr='last_message')
+        Prefetch('messages', queryset=Message.objects.order_by('-fecha_hora').first(), to_attr='last_message')
     )
     return render(request, 'room/chats.html', {'room': room, 'chat_messages': room_messages, 'rooms': rooms,})
 
