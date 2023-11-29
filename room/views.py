@@ -17,11 +17,11 @@ def chats(request):
 @login_required
 def chat(request, slug):
     room = get_object_or_404(Room, slug=slug)
-    messages = Message.objects.filter(contacto=room)[0:25]
+    room_messages = Message.objects.filter(contacto=room)  # Ver cómo manejar esto si hay muchos mensajes
     rooms = Room.objects.prefetch_related(
         Prefetch('messages', queryset=Message.objects.order_by('-fecha_hora')[:1], to_attr='last_message')
     )
-    return render(request, 'room/chats.html', {'room': room, 'chat_messages': messages, 'rooms': rooms,})
+    return render(request, 'room/chats.html', {'room': room, 'chat_messages': room_messages, 'rooms': rooms,})
 
 
 @login_required
