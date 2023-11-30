@@ -42,7 +42,7 @@ def green_api_webhook(request):
             phoneNumberRaw = data['senderData']['sender']
             phoneNumber = phoneNumberRaw.split('@')[0]
             name = data['senderData']['chatName']
-            message = data['messageData']['extendedTextMessageData']['text']
+            contentMessage = data['messageData']['extendedTextMessageData']['text']
             timestamp = data['timestamp']
 
         #room = Room.objects.all().first()
@@ -52,7 +52,7 @@ def green_api_webhook(request):
         if IntegracionWhatsApp:
             contactoExistente = Room.objects.filter(nombre=name)
             if contactoExistente:
-                message = Message.objects.create(contacto=contactoExistente, contenido=message)
+                message = Message.objects.create(contacto=contactoExistente, contenido=contentMessage)
             else:
                 contactoNuevo = Room.objects.create(
                     nombre = name,
@@ -66,8 +66,8 @@ def green_api_webhook(request):
                     slug = phoneNumber,
                 )
                 sector_chat_inicial = SectorTarea.objects.get(nombre='Chat inicial')
-                message = Message.objects.create(contacto=contactoNuevo, contenido=message)
                 contactoTarea = ContactoTarea.objects.create(contacto=contactoNuevo, sector_tarea=sector_chat_inicial)
+                message = Message.objects.create(contacto=contactoNuevo, contenido=contentMessage)
 
         # Implement your logic here to handle the Green API webhook data
 
