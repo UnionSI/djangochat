@@ -40,9 +40,11 @@
                 {% endif %}
               </small>
             </div>
-            <div class="col-10 mb-1 small fst-italic">{{ room.last_message_content|truncatechars:50 }}</div>
-            {% if room.last_message_user %}
-              <div>por: {{ room.last_message_user }}</div>
+            <div class="col-10 mb-1 small fst-italic">
+              {% if room.last_message_user %}
+              <span>{{ room.last_message_user }}: </span>
+              <span>{{ room.last_message_content|truncatechars:50 }}</span>
+            </div>
             {% endif %}
           </div>
 
