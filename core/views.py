@@ -37,31 +37,31 @@ def green_api_webhook(request):
         data = json.loads(request.body.decode('utf-8'))
 
         if data:
-            receiptId = data['receiptId']
             idMessage = data['idMessage']
-            phoneNumberRaw = data['senderData']['chatId']
+            instanceData = data['instanceData']['typeInstance']
+            phoneNumberRaw = data['senderData']['sender']
             phoneNumber = phoneNumberRaw.split('@')[0]
             name = data['senderData']['chatName']
-            message = data['messageData']['extendedTextMessageData']['text']
-        else:
             message = data['messageData']['textMessageData']['textMessage']
+        else:
+            message = data['messageData']['extendedTextMessageData']['text']
 
         # Para test (user)
         #room = Room.objects.all().first()
 
-        # Nueva room
-        IntegracionWhatsApp = Integracion.objects.all().first()
-        room = Room.objects.create(
-            nombre = name,
-            apellido = name,
-            dni = phoneNumber,
-            telefono = phoneNumber,
-            email = phoneNumberRaw,
-            empresa = name,
-            nro_socio = phoneNumber,
-            integracion = IntegracionWhatsApp,
-            slug = phoneNumber,
-        )
+        IntegracionWhatsApp = Integracion.objects.filter(nombre='whatsapp')
+        if IntegracionWhatsApp.nombre == instanceData:
+            room = Room.objects.create(
+                nombre = name,
+                apellido = name,
+                dni = phoneNumber,
+                telefono = phoneNumber,
+                email = phoneNumberRaw,
+                empresa = name,
+                nro_socio = phoneNumber,
+                integracion = IntegracionWhatsApp,
+                slug = phoneNumber,
+            )
 
         # Implement your logic here to handle the Green API webhook data
         message = Message.objects.create(contacto=room, contenido=message)
