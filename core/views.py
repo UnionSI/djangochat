@@ -47,8 +47,8 @@ def green_api_webhook(request):
         # Para test (user)
         #room = Room.objects.all().first()
 
-        IntegracionWhatsApp = Integracion.objects.filter(nombre='whatsapp')
-        if IntegracionWhatsApp.nombre == instanceData:
+        IntegracionWhatsApp = Integracion.objects.get(nombre=instanceData)
+        if IntegracionWhatsApp:
             room = Room.objects.create(
                 nombre = name,
                 apellido = name,
