@@ -15,7 +15,7 @@ def chats(request):
     '''
     rooms = Room.objects.annotate(
         last_message=Subquery(
-            Message.objects.filter(contacto=OuterRef('pk')).order_by('-fecha_hora')[:1].values()
+            Message.objects.filter(contacto=OuterRef('pk')).order_by('-fecha_hora')[:1].values('id')  # 'usuario', 'contenido', 'fecha_hora'
         )
     )
 
