@@ -42,8 +42,6 @@ def green_api_webhook(request):
             phoneNumberRaw = data['senderData']['sender']
             phoneNumber = phoneNumberRaw.split('@')[0]
             name = data['senderData']['chatName']
-            message = data['messageData']['textMessageData']['textMessage']
-        else:
             message = data['messageData']['extendedTextMessageData']['text']
 
         # Para test (user)
