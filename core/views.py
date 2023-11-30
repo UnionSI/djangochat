@@ -34,30 +34,22 @@ def signup(request):
 @csrf_exempt
 def green_api_webhook(request):
     if request.method == 'POST':
-        # Process the incoming webhook data
         data = json.loads(request.body.decode('utf-8'))
-        print('\n***\n')
-        print(data)
-        print('\n***\n')
 
-        '''
-        receiptId = data['receiptId']
-        idMessage = data['idMessage']
-        phoneNumberRaw = data['senderData']['chatId']
-        phoneNumber = phoneNumberRaw.split('@')[0]
-        name = data['senderData']['chatName']
-        '''
         if data:
+            receiptId = data['receiptId']
+            idMessage = data['idMessage']
+            phoneNumberRaw = data['senderData']['chatId']
+            phoneNumber = phoneNumberRaw.split('@')[0]
+            name = data['senderData']['chatName']
             message = data['messageData']['extendedTextMessageData']['text']
         else:
             message = data['messageData']['textMessageData']['textMessage']
 
         # Para test (user)
-        user = User.objects.all().first()
-        room = Room.objects.all().first()
+        #room = Room.objects.all().first()
 
         # Nueva room
-        '''
         IntegracionWhatsApp = Integracion.objects.all().first()
         room = Room.objects.create(
             nombre = name,
@@ -70,9 +62,9 @@ def green_api_webhook(request):
             integracion = IntegracionWhatsApp,
             slug = phoneNumber,
         )
-        '''
+
         # Implement your logic here to handle the Green API webhook data
-        message = Message.objects.create(usuario=user, contacto=room, contenido=message)
+        message = Message.objects.create(contacto=room, contenido=message)
 
         return JsonResponse({'status': 'success'})
     else:
