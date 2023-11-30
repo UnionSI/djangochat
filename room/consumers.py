@@ -1,4 +1,5 @@
 import json
+import httpx
 
 from django.contrib.auth.models import User
 from channels.generic.websocket import AsyncWebsocketConsumer
@@ -27,7 +28,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
     # Receive message from WebSocket
     async def receive(self, text_data):
         data = json.loads(text_data)
-        print(data)
         message = data['message']
         username = data['username']
         room = data['room']
@@ -43,6 +43,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'username': username
             }
         )
+
+        # Send whatsapp message
+        await self.send_whatsapp_message(chat_id=room, message=message)
 
     # Receive message from room group
     async def chat_message(self, event):
@@ -60,3 +63,24 @@ class ChatConsumer(AsyncWebsocketConsumer):
         user = User.objects.get(username=username)
         room = Room.objects.get(slug=room)
         message = Message.objects.create(usuario=user, contacto=room, contenido=message)
+        return message
+
+    async def send_whatsapp_message(self, chat_id, message):
+        id_instance = "7103880835"
+        api_token_instance = "89bddd8da48246f593916d55b8be98e059a136b7b7e6469291"
+
+        url = f'https://api.greenapi.com/waInstance{id_instance}/sendMessage/{api_token_instance}'
+
+        payload = {
+            "chatId": f"{chat_id}@c.us",
+            "message": message
+        }
+
+        headers = {
+            'Content-Type': 'application/json'
+        }
+
+        async with httpx.AsyncClient() as client:
+            response = await client.post(url, data=json.dumps(payload), headers=headers)
+
+        return response.json()
