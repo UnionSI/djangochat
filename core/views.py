@@ -43,8 +43,8 @@ def green_api_webhook(request):
             phoneNumber = phoneNumberRaw.split('@')[0]
             name = data['senderData']['chatName']
             message = data['messageData']['extendedTextMessageData']['text']
+            timestamp = data['timestamp']
 
-        # Para test (user)
         #room = Room.objects.all().first()
 
         IntegracionWhatsApp = Integracion.objects.get(nombre=instanceData)
@@ -52,7 +52,7 @@ def green_api_webhook(request):
             room = Room.objects.create(
                 nombre = name,
                 apellido = name,
-                dni = phoneNumber[:9],
+                dni = name,
                 telefono = phoneNumber,
                 email = phoneNumberRaw,
                 empresa = name,
