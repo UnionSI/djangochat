@@ -50,7 +50,7 @@ def green_api_webhook(request):
         IntegracionWhatsApp = Integracion.objects.get(nombre=instanceData)
 
         if IntegracionWhatsApp:
-            contactoExistente = Room.objects.filter(nombre=name)
+            contactoExistente = Room.objects.filter(nombre=name).first()
             if contactoExistente:
                 message = Message.objects.create(contacto=contactoExistente, contenido=contentMessage)
             else:
