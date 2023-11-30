@@ -9,6 +9,8 @@ from django.contrib.auth.models import User
 from room.models import Integracion, Room, Message, SectorTarea, ContactoTarea
 from .forms import SignUpForm
 
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 @login_required
 def frontpage(request):
@@ -50,11 +52,11 @@ def green_api_webhook(request):
         IntegracionWhatsApp = Integracion.objects.get(nombre=instanceData)
 
         if IntegracionWhatsApp:
-            contactoExistente = Room.objects.filter(nombre=name).first()
-            if contactoExistente:
-                message = Message.objects.create(contacto=contactoExistente, contenido=contentMessage)
+            contacto = Room.objects.filter(nombre=name).first()
+            if contacto:
+                Message.objects.create(contacto=contacto, contenido=contentMessage)
             else:
-                contactoNuevo = Room.objects.create(
+                contacto = Room.objects.create(
                     nombre = name,
                     apellido = name,
                     dni = phoneNumber[:9],
@@ -66,10 +68,19 @@ def green_api_webhook(request):
                     slug = phoneNumber,
                 )
                 sector_chat_inicial = SectorTarea.objects.get(nombre='Chat inicial')
-                contactoTarea = ContactoTarea.objects.create(contacto=contactoNuevo, sector_tarea=sector_chat_inicial)
-                message = Message.objects.create(contacto=contactoNuevo, contenido=contentMessage)
+                ContactoTarea.objects.create(contacto=contacto, sector_tarea=sector_chat_inicial)
+                Message.objects.create(contacto=contacto, contenido=contentMessage)
 
-        # Implement your logic here to handle the Green API webhook data
+            # Enviar mensaje al canal de WebSocket
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                phoneNumber,
+                {
+                    'type': 'chat.message',
+                    'message': contentMessage,
+                    #'username': contactoNuevo.nombre
+                }
+            )
 
         return JsonResponse({'status': 'success'})
     else:
