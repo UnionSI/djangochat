@@ -74,7 +74,7 @@ def green_api_webhook(request):
             # Enviar mensaje al canal de WebSocket
             channel_layer = get_channel_layer()
             async_to_sync(channel_layer.group_send)(
-                phoneNumber,
+                f'chat_{phoneNumber}',  # Asegúrate de que esta coincida con tu patrón de nombres de sala
                 {
                     'type': 'chat.message',
                     'message': contentMessage,
