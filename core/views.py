@@ -52,11 +52,11 @@ def green_api_webhook(request):
             room = Room.objects.create(
                 nombre = name,
                 apellido = name,
-                dni = name,
+                dni = phoneNumber[:9],
                 telefono = phoneNumber,
                 email = phoneNumberRaw,
                 empresa = name,
-                nro_socio = phoneNumber,
+                nro_socio = int(phoneNumber[:9]),
                 integracion = IntegracionWhatsApp,
                 slug = phoneNumber,
             )
