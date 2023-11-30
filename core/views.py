@@ -6,7 +6,7 @@ from django.http import JsonResponse
 import json
 
 from django.contrib.auth.models import User
-from room.models import Room, Message, Integracion
+from room.models import Integracion, Room, Message, SectorTarea, ContactoTarea
 from .forms import SignUpForm
 
 
@@ -48,21 +48,28 @@ def green_api_webhook(request):
         #room = Room.objects.all().first()
 
         IntegracionWhatsApp = Integracion.objects.get(nombre=instanceData)
+
         if IntegracionWhatsApp:
-            room = Room.objects.create(
-                nombre = name,
-                apellido = name,
-                dni = phoneNumber[:9],
-                telefono = phoneNumber,
-                email = phoneNumberRaw,
-                empresa = name,
-                nro_socio = int(phoneNumber[:9]),
-                integracion = IntegracionWhatsApp,
-                slug = phoneNumber,
-            )
+            contactoExistente = Room.objects.filter(nombre=name)
+            if contactoExistente:
+                message = Message.objects.create(contacto=contactoExistente, contenido=message)
+            else:
+                contactoNuevo = Room.objects.create(
+                    nombre = name,
+                    apellido = name,
+                    dni = phoneNumber[:9],
+                    telefono = phoneNumber,
+                    email = phoneNumberRaw,
+                    empresa = name,
+                    nro_socio = int(phoneNumber[:9]),
+                    integracion = IntegracionWhatsApp,
+                    slug = phoneNumber,
+                )
+                sector_chat_inicial = SectorTarea.objects.get(nombre='Chat inicial')
+                message = Message.objects.create(contacto=contactoNuevo, contenido=message)
+                contactoTarea = ContactoTarea.objects.create(contacto=contactoNuevo, sector_tarea=sector_chat_inicial)
 
         # Implement your logic here to handle the Green API webhook data
-        message = Message.objects.create(contacto=room, contenido=message)
 
         return JsonResponse({'status': 'success'})
     else:
