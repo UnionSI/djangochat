@@ -78,7 +78,7 @@ def green_api_webhook(request):
                 {
                     'type': 'chat.message',
                     'message': contentMessage,
-                    #'username': contactoNuevo.nombre
+                    'username': contacto.nombre
                 }
             )
 
