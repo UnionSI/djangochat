@@ -64,6 +64,7 @@
 {% block scripts %}
 {{ room.id|json_script:"json-roomname" }}
 {{ request.user.username|json_script:"json-username" }}
+{{ room.telefono|json_script:"json-phone-number" }}
 
 <script type="" src="{% static 'js/chatWebSocket.js' %}"></script>
 

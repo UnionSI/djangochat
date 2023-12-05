@@ -1,5 +1,7 @@
 const roomName = JSON.parse(document.getElementById('json-roomname').textContent);
 const userName = JSON.parse(document.getElementById('json-username').textContent);
+const phoneNumber = JSON.parse(document.getElementById('json-phone-number').textContent);
+
 const globalSocket = new WebSocket('wss://' + window.location.host + '/ws/global/');
 
 globalSocket.onopen = function(e) {
@@ -65,14 +67,16 @@ form.addEventListener('submit', function(e) {
         'type': 'chat_message',
         'message': message,
         'username': userName,
-        'room': roomName
+        'room': roomName,
+        'phone': phoneNumber
     })
 
     globalSocket.send(JSON.stringify({
         'type': 'chat_message',
         'message': message,
         'username': userName,
-        'room': roomName
+        'room': roomName,
+        'phone': phoneNumber
     }));
 
     messageInputDom.value = '';

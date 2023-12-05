@@ -25,12 +25,13 @@ class GlobalConsumer(AsyncWebsocketConsumer):
             message = data['message']
             username = data['username']
             room = data['room']
+            phone = data['phone']
 
             # Guardar el mensaje en la base de datos
             await self.save_message(username, room, message)
 
             # Send whatsapp message
-            await self.send_whatsapp_message(chat_id=room, message=message)
+            await self.send_whatsapp_message(chat_id=phone, message=message)
 
             # Enviar mensaje global
             await self.channel_layer.group_send(
