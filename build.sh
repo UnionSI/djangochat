@@ -2,6 +2,7 @@
 # exit on error
 set -o errexit
 
+rm .whitenoise_manifest.json
 pip install -r requirements.txt
 python manage.py collectstatic --no-input
 python manage.py makemigrations
