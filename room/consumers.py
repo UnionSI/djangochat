@@ -29,6 +29,9 @@ class GlobalConsumer(AsyncWebsocketConsumer):
             # Guardar el mensaje en la base de datos
             await self.save_message(username, room, message)
 
+            # Send whatsapp message
+            await self.send_whatsapp_message(chat_id=room, message=message)
+
             # Enviar mensaje global
             await self.channel_layer.group_send(
                 'global',
@@ -119,77 +122,6 @@ class GlobalConsumer(AsyncWebsocketConsumer):
         if contacto_tarea and sector_tarea_destino:
             contacto_tarea.sector_tarea = sector_tarea_destino
             contacto_tarea.save()
-
-
-'''
-class ChatConsumer(AsyncWebsocketConsumer):
-    async def connect(self):
-        self.room_name = self.scope['url_route']['kwargs']['room_name']
-        self.room_group_name = 'chat_%s' % self.room_name
-        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
-        await self.accept()
-
-    async def disconnect(self, close_code):
-        await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
-
-    # Receive message from WebSocket
-    async def receive(self, text_data):
-        data = json.loads(text_data)
-        message = data['message']
-        username = data['username']
-        room = data['room']
-
-        await self.save_message(username, room, message)
-
-        # Send message to room group
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                'type': 'chat_message',
-                'room': room,
-                'message': message,
-                'username': username
-            }
-        )
-
-        # Send whatsapp message
-        await self.send_whatsapp_message(chat_id=room, message=message)
-
-    # Receive message from room group
-    async def chat_message(self, event):
-        print(f"Sending to {self.channel_name}: {event}")
-        type = event['type']
-        room = event['room']
-        message = event['message']
-        username = event['username']
-
-        # Send message to WebSocket
-        await self.send(text_data=json.dumps({
-            'type': type,
-            'room': room,
-            'message': message,
-            'username': username
-        }))
-
-        await self.channel_layer.group_send(
-            'global',
-            {
-                'type': 'room_updated',
-                'room_slug': room,
-                'last_message': {
-                    'message': message,
-                    'username': username,
-                },
-            }
-        )
-
-    @sync_to_async
-    def save_message(self, username, room, message):
-        user = User.objects.get(username=username)
-        room = Room.objects.get(slug=room)
-        message = Message.objects.create(usuario=user, contacto=room, contenido=message)
-'''
-        return message
 
     async def send_whatsapp_message(self, chat_id, message):
         id_instance = "7103880835"
