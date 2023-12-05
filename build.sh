@@ -3,6 +3,7 @@
 set -o errexit
 
 #rm .whitenoise_manifest.json
+rm -r staticfiles
 pip install -r requirements.txt
 python manage.py collectstatic --clear --no-input
 python manage.py makemigrations
