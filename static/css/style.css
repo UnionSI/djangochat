@@ -24,3 +24,7 @@
 .display-none-important {
     display: none !important;
 }
+
+.bg-dark {
+    background-color: red !important;
+}
