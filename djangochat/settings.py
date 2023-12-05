@@ -153,9 +153,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # si no funciona cambiar a 
 
 #STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 #STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'  # Para whitenoise
-WHITENOISE_USE_FINDERS = True
-WHITENOISE_MANIFEST_STRICT = False
-WHITENOISE_ALLOW_ALL_ORIGINS = True
+#WHITENOISE_USE_FINDERS = True
+#WHITENOISE_MANIFEST_STRICT = False
+#WHITENOISE_ALLOW_ALL_ORIGINS = True
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
