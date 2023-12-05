@@ -152,7 +152,8 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # si no funciona cambiar a static_root
 
 #STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
-#STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'  # Para whitenoise
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'  # Para whitenoise
+WHITENOISE_MAX_AGE = 60
 #WHITENOISE_USE_FINDERS = True
 #WHITENOISE_MANIFEST_STRICT = False
 #WHITENOISE_ALLOW_ALL_ORIGINS = True
