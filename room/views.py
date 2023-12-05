@@ -12,8 +12,23 @@ import json
 
 @login_required
 def chats(request):
+    
+    '''
     rooms = Room.objects.prefetch_related(
-        Prefetch('messages', queryset=Message.objects.order_by('-fecha_hora')[:1], to_attr='last_message')
+        Prefetch('messages', queryset=Message.objects.order_by('-fecha_hora').first(), to_attr='last_message')
+    )
+    
+    '''
+    rooms = Room.objects.annotate(
+        last_message_content=Subquery(
+            Message.objects.filter(contacto=OuterRef('pk')).values('contenido')[:1]
+        ),
+        last_message_date=Subquery(
+            Message.objects.filter(contacto=OuterRef('pk')).values('fecha_hora')[:1]
+        ),
+        last_message_user=Subquery(
+            Message.objects.filter(contacto=OuterRef('pk')).values('usuario__username')[:1]
+        )
     )
     return render(request, 'room/chats.html', {'rooms': rooms})
 
@@ -21,15 +36,24 @@ def chats(request):
 @login_required
 def chat(request, slug):
     room = get_object_or_404(Room, slug=slug)
-    messages = Message.objects.filter(contacto=room)
-
+    room_messages = Message.objects.filter(contacto=room)  # Ver cómo manejar esto si hay muchos mensajes
+    '''
     rooms = Room.objects.prefetch_related(
-        Prefetch('messages', queryset=Message.objects.order_by('-fecha_hora')[:1], to_attr='last_message')
-    ).annotate(
-        last_message_date=Max('messages__fecha_hora')
-    ).order_by('-last_message_date')
-
-    return render(request, 'room/chats.html', {'room': room, 'chat_messages': messages, 'rooms': rooms,})
+        Prefetch('messages', queryset=Message.objects.order_by('-fecha_hora').first(), to_attr='last_message')
+    )
+    '''
+    rooms = Room.objects.annotate(
+        last_message_content=Subquery(
+            Message.objects.filter(contacto=OuterRef('pk')).values('contenido')[:1]
+        ),
+        last_message_date=Subquery(
+            Message.objects.filter(contacto=OuterRef('pk')).values('fecha_hora')[:1]
+        ),
+        last_message_user=Subquery(
+            Message.objects.filter(contacto=OuterRef('pk')).values('usuario__username')[:1]
+        )
+    )
+    return render(request, 'room/chats.html', {'room': room, 'chat_messages': room_messages, 'rooms': rooms,})
 
 
 @login_required

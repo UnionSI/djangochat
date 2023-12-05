@@ -29,7 +29,6 @@ class SectorTarea(models.Model):
         return self.nombre
 
 
-
 class Room(models.Model):
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)
