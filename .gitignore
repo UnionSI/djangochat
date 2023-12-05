@@ -16,7 +16,7 @@ media/
 
 # Static files
 staticfiles/
-static
+#static
 
 # Django migration files
 *.py[eo]
