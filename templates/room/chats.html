@@ -62,8 +62,7 @@
 {% endblock %}
 
 {% block scripts %}
-{{ room.slug|json_script:"json-roomname" }}
+{{ room.id|json_script:"json-roomname" }}
 {{ request.user.username|json_script:"json-username" }}
-<!-- <script src="{% static 'js/chatConsumer.js' %}"></script> -->
-<script src="{% static 'js/globalConsumer.js' %}"></script>
+<script src="{% static 'js/chatWebSocket.js' %}"></script>
 {% endblock %}

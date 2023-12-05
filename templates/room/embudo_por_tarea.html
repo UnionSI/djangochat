@@ -11,38 +11,49 @@
     </a>
 
     
-    <div class="d-flex p-2 gap-2 bg-body-tertiary">
+    <div class="d-flex p-2 gap-2 bg-body-tertiary overflow-hidden" data-sector="{{ embudo.id }}" style="height: 90vh;">
         {% for sector_tarea in sector_tareas %}
         <div class="d-flex flex-column bg-white p-3">
             <h5 class="text-center">{{ sector_tarea }}</h5>
-            <div id="{{ sector_tarea.id }}" class="d-flex flex-column gap-2" style="width: 350px;">
+            <div class="d-flex flex-column gap-2" style="width: 350px;" data-sector_tarea="{{ sector_tarea.id }}">
                 {% for contacto_tarea in sector_tarea.contactotarea_set.all %}
                     {% with contacto=contacto_tarea.contacto %}
-                        <div id="{{ contacto.nro_socio }}" class="usi-card d-flex gap-2 list-group-item lh-sm border rounded position-relative">
-                            <a href="{% url 'room:chat' contacto.slug %}" class="d-flex gap-2 list-group-item p-2 position-relative w-100">
-                                {% if not contacto.usuario.is_staff or not contacto.usuario.is_superuser %}
-                                    <div style="width: 10px; height: 10px; top:5px; left:5px;" class="bg-primary rounded-circle position-absolute"></div>
-                                {% endif %}
+                        <div class="usi-card d-flex gap-2 list-group-item lh-sm border rounded position-relative" data-contacto="{{ contacto.id }}">
+                            <a href="{% url 'room:chat' contacto.slug %}" class="d-flex gap-2 list-group-item p-2 position-relative w-100" data-slug>
+
 
                                 <div class="d-flex justify-content-center align-items-center">
-                                    <img src="{% static 'img/logo.png' %}" alt="mdo" width="55" height="55" class="rounded-circle border">
+                                    <img src="{% static 'img/logo.png' %}" alt="mdo" width="55" height="55" class="rounded-circle border" data-thumbnail>
                                 </div>
                     
                                 <div class="w-100">
                                     <div class="d-flex justify-content-between">
                                         <div class="d-flex flex-column pe-2">
                                             {% if contacto.nombre %}
-                                            <strong>{{ contacto.nombre }} {{ contacto.apellido}} - {{ contacto.nro_socio }}</strong>
+                                            <strong data-cabecera>{{ contacto.nombre }} {{ contacto.apellido}} - {{ contacto.nro_socio }}</strong>
                                             {% else %}
-                                            <strong>{{ contacto.telefono }}</strong>
+                                            <strong data-cabecera>{{ contacto.telefono }}</strong>
                                             {% endif %}
-                                            <small class="text-primary">{{ contacto.dni }}</small>
+                                            <small class="text-primary" data-dni>{{ contacto.dni }}</small>
                                         </div>
                                     </div>
                                     {% with ultimo_mensaje=contacto.messages.last %}
+                                    {% if not ultimo_mensaje.usuario %}
+                                        <div style="width: 10px; height: 10px; top:5px; left:5px;" class="bg-primary rounded-circle position-absolute" data-no_leido></div>
+                                    {% endif %}
+
                                     <div class="col-12">
-                                        <p class="mb-0 small fst-italic">{{ ultimo_mensaje.contenido|truncatechars:50 }}</p>
-                                        <small class="text-body-secondary flex-end">
+                                        <p class="mb-0 small fst-italic" >
+                                            <span data-usuario>
+                                                {% if ultimo_mensaje.usuario %}
+                                                    {{ ultimo_mensaje.usuario }}: 
+                                                {% else %}
+                                                    {{ ultimo_mensaje.contacto }}: 
+                                                {% endif %}
+                                            </span>
+                                            <span data-mensaje>{{ ultimo_mensaje.contenido|truncatechars:50 }}</span>
+                                        </p>
+                                        <small class="text-body-secondary flex-end" data-fecha>
                                             {% now "d/m/Y" as todays_date %}
                                             {% if todays_date == ultimo_mensaje.fecha_hora|date:"d/m/Y" %}
                                                 {{ ultimo_mensaje.fecha_hora|time:"H:i" }}
@@ -64,7 +75,7 @@
                                             <span class="dropdown-header">{{ sector }}</span>
                                             <ul class="list-unstyled">
                                             {% for sector_tarea in sector.sectortarea_set.all %}
-                                                    <form method="post" action="{% url 'room:mover_de_sector' contacto.id sector_tarea.id %}">
+                                                    <form class="form-sector-change" action="/" data-sector_destino="{{ sector_tarea.sector.id }}" data-tarea_sector_destino="{{ sector_tarea.id }}">
                                                         {% csrf_token %}
                                                         <li class=""><button type="submit" class="dropdown-item">• {{ sector_tarea }}</button></li>
                                                     </form>
@@ -84,3 +95,9 @@
     </div>
     
 </div>
+
+{% include 'room/tarjeta_default.html' %}
+
+{% block scripts %}
+<script src="{% static 'js/embudoWebSocket.js' %}"></script>
+{% endblock %}

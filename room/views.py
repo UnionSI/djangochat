@@ -6,6 +6,10 @@ from django.db.models import Max, Subquery, OuterRef
 
 from .models import Sector, SectorTarea, Room, Message, ContactoTarea
 
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+import json
+
 @login_required
 def chats(request):
     rooms = Room.objects.prefetch_related(
@@ -56,10 +60,34 @@ def embudo(request, id):
 @require_POST
 def mover_de_sector(request, room_id, sector_tarea_id):
     room = get_object_or_404(Room, id=room_id)
+    #ultimo_mensaje = Message.objects.filter(contacto=room).prefetch_related('contacto', 'usuario').order_by('-fecha_hora').first()
     sector_tarea = get_object_or_404(SectorTarea, id=sector_tarea_id)
     contacto_tarea = ContactoTarea.objects.get(contacto=room)
     contacto_tarea.sector_tarea = sector_tarea
     contacto_tarea.save()
+
+    # Enviar mensaje a través de WebSocket
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)('global', {
+        'type': 'sector_change',
+        'task_sector': sector_tarea.id,
+        'room': room,
+        #'message': ultimo_mensaje.contenido,
+        #'username': ultimo_mensaje.usuario if ultimo_mensaje.usuario else ultimo_mensaje.contacto.nombre,
+    })
+
+    '''
+    message = {
+        'type': '',
+        'room_id': room.id,
+        'sector_tarea_id': sector_tarea.id,
+    }
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)('global', {
+        'type': 'chat.message',
+        'message': json.dumps(message),
+    })
+    '''
 
     return redirect('room:embudo', sector_tarea.sector.id)
 

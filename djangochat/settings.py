@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
-from telnetlib import LOGOUT
+#from telnetlib import LOGOUT
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.

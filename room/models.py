@@ -1,6 +1,9 @@
 from django.contrib.auth.models import User
 from django.db import models
 
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
 
 class Integracion(models.Model):
     nombre = models.CharField(max_length=100)

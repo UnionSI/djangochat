@@ -20,3 +20,7 @@
 .usi-card {
     width: 350px;
 }
+
+.display-none-important {
+    display: none !important;
+}
