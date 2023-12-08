@@ -16,6 +16,8 @@ globalSocket.onmessage = function(e) {
     const data = JSON.parse(e.data);
 
     console.log('globalConsumer onmessage');
+    console.log('data recibida:', data)
+    console.log('esta room.id es:', roomName)
 
     switch (data.type) {
         case 'chat_message':
