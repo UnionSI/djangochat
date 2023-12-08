@@ -21,10 +21,14 @@ globalSocket.onmessage = function(e) {
 
     switch (data.type) {
         case 'chat_message':
+            console.log('es chat_message')
             if (roomName == data.room) {
+                console.log('roomName == data.room', roomName, '=', data.room)
                 handleMessageOnChat(data);
+            } else {
+                console.log('parece roomName != data.room', roomName, '!=', data.room)
             }
-            UpdateMessageOnRoomsList(data);
+            //UpdateMessageOnRoomsList(data);
             break;
         default:
             console.error('Unknown message type: ', data.type);
