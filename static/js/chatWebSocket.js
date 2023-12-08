@@ -37,6 +37,7 @@ globalSocket.onmessage = function(e) {
 };
 
 function handleMessageOnChat(data) {
+    console.log('entró a handleMessageOnChat')
     const formattedDate = formatDate(new Date());
     document.querySelector('#chat-messages').innerHTML += (
         `<div class="{% if user.is_staff %} align-self-end {% else %} align-self-start {% endif %} d-flex flex-column p-2 bg-white border rounded">
@@ -47,6 +48,7 @@ function handleMessageOnChat(data) {
             <small>${data.message}</small>
         </div>`
     );
+    console.log(document.querySelector('#chat-messages'))
 }
 
 function UpdateMessageOnRoomsList(data) {
