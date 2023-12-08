@@ -15,18 +15,12 @@ globalSocket.onclose = function(e) {
 globalSocket.onmessage = function(e) {
     const data = JSON.parse(e.data);
 
-    console.log('globalConsumer onmessage');
-    console.log('data recibida:', data)
-    console.log('esta room.id es:', roomName)
+    console.log('Mensaje recibido:', data);
 
     switch (data.type) {
         case 'chat_message':
-            console.log('es chat_message')
             if (roomName == data.room) {
-                console.log('roomName == data.room', roomName, '=', data.room)
                 handleMessageOnChat(data);
-            } else {
-                console.log('parece roomName != data.room', roomName, '!=', data.room)
             }
             //UpdateMessageOnRoomsList(data);
             break;
@@ -37,10 +31,10 @@ globalSocket.onmessage = function(e) {
 };
 
 function handleMessageOnChat(data) {
-    console.log('entró a handleMessageOnChat')
     const formattedDate = formatDate(new Date());
+    const alignMessage = userName == data.username? 'align-self-end': 'align-self-start'
     document.querySelector('#chat-messages').innerHTML += (
-        `<div class="{% if user.is_staff %} align-self-end {% else %} align-self-start {% endif %} d-flex flex-column p-2 bg-white border rounded">
+        `<div class="${alignMessage} d-flex flex-column p-2 bg-white border rounded">
             <div>
             <small class="text-secondary">${formattedDate} -</small>
             <small class="text-secondary">${data.username}:</small>
@@ -48,7 +42,6 @@ function handleMessageOnChat(data) {
             <small>${data.message}</small>
         </div>`
     );
-    console.log(document.querySelector('#chat-messages'))
 }
 
 function UpdateMessageOnRoomsList(data) {
