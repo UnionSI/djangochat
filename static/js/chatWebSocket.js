@@ -2,7 +2,7 @@ const roomName = JSON.parse(document.getElementById('json-roomname').textContent
 const userName = JSON.parse(document.getElementById('json-username').textContent);
 const phoneNumber = JSON.parse(document.getElementById('json-phone-number').textContent);
 
-const globalSocket = new WebSocket('wss://' + window.location.host + '/ws/global/');
+const globalSocket = new WebSocket('ws://' + window.location.host + '/ws/global/');
 
 globalSocket.onopen = function(e) {
     console.log('Global WebSocket opened');

@@ -33,6 +33,11 @@ def signup(request):
     return render(request, 'core/signup.html', {'form': form})
 
 
+def drawflow(request):
+    nodos = ['Facebook', 'Github', 'Twitter']
+    return render(request, 'core/drawflow.html', {'nodos': nodos})
+
+
 @csrf_exempt
 def green_api_webhook(request):
     if request.method == 'POST':

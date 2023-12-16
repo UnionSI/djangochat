@@ -1,4 +1,4 @@
-const globalSocket = new WebSocket('wss://' + window.location.host + '/ws/global/');
+const globalSocket = new WebSocket('ws://' + window.location.host + '/ws/global/');
 
 globalSocket.onopen = function(e) {
     console.log('Global WebSocket opened');
