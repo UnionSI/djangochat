@@ -66,26 +66,22 @@ form.addEventListener('submit', function(e) {
     const message = messageInputDom.value;
 
     console.log({
-        'type': 'chat_message',
+        'type': 'chat_message_dev',
         'message': message,
         'username': userName,
         'room': roomName,
-        'phone': phoneNumber,
-        'integracion': integracion
+        'phone': phoneNumber
     })
 
     globalSocket.send(JSON.stringify({
-        'type': 'chat_message',
+        'type': 'chat_message_dev',
         'message': message,
         'username': userName,
         'room': roomName,
-        'phone': phoneNumber,
-        'integracion': integracion
+        'phone': phoneNumber
     }));
 
     messageInputDom.value = '';
-
-    console.log("mensaje enviado a la ws")
 
 });
 

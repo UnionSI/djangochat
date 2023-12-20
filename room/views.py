@@ -57,6 +57,42 @@ def chat(request, slug):
 
 
 @login_required
+def chats_dev(request):
+    
+    rooms = Room.objects.annotate(
+        last_message_content=Subquery(
+            Message.objects.filter(contacto=OuterRef('pk')).values('contenido')[:1]
+        ),
+        last_message_date=Subquery(
+            Message.objects.filter(contacto=OuterRef('pk')).values('fecha_hora')[:1]
+        ),
+        last_message_user=Subquery(
+            Message.objects.filter(contacto=OuterRef('pk')).values('usuario__username')[:1]
+        )
+    )
+    return render(request, 'room/chats_dev.html', {'rooms': rooms})
+
+
+@login_required
+def chat_dev(request, slug):
+    room = get_object_or_404(Room, slug=slug)
+    room_messages = Message.objects.filter(contacto=room)  # Ver cómo manejar esto si hay muchos mensajes
+
+    rooms = Room.objects.annotate(
+        last_message_content=Subquery(
+            Message.objects.filter(contacto=OuterRef('pk')).values('contenido')[:1]
+        ),
+        last_message_date=Subquery(
+            Message.objects.filter(contacto=OuterRef('pk')).values('fecha_hora')[:1]
+        ),
+        last_message_user=Subquery(
+            Message.objects.filter(contacto=OuterRef('pk')).values('usuario__username')[:1]
+        )
+    )
+    return render(request, 'room/chats_dev.html', {'room': room, 'chat_messages': room_messages, 'rooms': rooms,})
+
+
+@login_required
 def embudos(request):
     embudos = Sector.objects.all()
     return render(request, 'room/embudos.html', {'embudos': embudos})

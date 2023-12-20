@@ -26,12 +26,35 @@ class GlobalConsumer(AsyncWebsocketConsumer):
             username = data['username']
             room = data['room']
             phone = data['phone']
+            integracion = data['integracion']
 
             # Guardar el mensaje en la base de datos
             await self.save_message(username, room, message)
 
             # Send whatsapp message
-            await self.send_whatsapp_message(chat_id=phone, message=message)
+            if integracion == 'WhatsApp':
+                await self.send_whatsapp_message(chat_id=phone, message=message)
+
+            # Enviar mensaje global
+            await self.channel_layer.group_send(
+                'global',
+                {
+                    'type': 'chat_message',
+                    'room': room,
+                    'message': message,
+                    'username': username
+                }
+            )
+
+        elif message_type == 'chat_message_dev':
+            # Procesar mensaje de chat
+            message = data['message']
+            username = data['username']
+            room = data['room']
+            phone = data['phone']
+
+            # Guardar el mensaje en la base de datos
+            await self.save_message_dev(room, message)
 
             # Enviar mensaje global
             await self.channel_layer.group_send(
@@ -114,6 +137,11 @@ class GlobalConsumer(AsyncWebsocketConsumer):
         message = Message.objects.create(usuario=user, contacto=room, contenido=message)
 
     @sync_to_async
+    def save_message_dev(self, room, message):
+        room = Room.objects.get(id=room)
+        message = Message.objects.create(contacto=room, contenido=message)
+
+    @sync_to_async
     def save_sector_change(self, contacto, sector_tarea):
         print(contacto)
         contacto_tarea = ContactoTarea.objects.filter(contacto_id=contacto).first()
@@ -123,6 +151,7 @@ class GlobalConsumer(AsyncWebsocketConsumer):
         if contacto_tarea and sector_tarea_destino:
             contacto_tarea.sector_tarea = sector_tarea_destino
             contacto_tarea.save()
+
 
     async def send_whatsapp_message(self, chat_id, message):
         id_instance = "7103880835"
@@ -137,6 +166,30 @@ class GlobalConsumer(AsyncWebsocketConsumer):
 
         headers = {
             'Content-Type': 'application/json'
+        }
+
+        async with httpx.AsyncClient() as client:
+            response = await client.post(url, data=json.dumps(payload), headers=headers)
+
+        return response.json()
+    
+
+    async def send_waapi_message(self, chat_id, message):
+        id_instance = "3554"
+        api_name = "ETBu4KVOMXT2KCL1t9SGRIJ7Ra8zEPFM60QINdAp3GjD5Ba"
+        api_token_instance = "XtkLU4toIS8PzXdZGjQIUFOUzhFzxxmcUqoVCRwUd46d9dc9"
+
+        url = f'https://api.greenapi.com/waInstance{id_instance}/sendMessage/{api_token_instance}'
+
+        payload = {
+            "chatId": f"{chat_id}@c.us",
+            "message": message
+        }
+
+        headers = {
+            "accept": "application/json",
+            "content-type": "application/json",
+            "authorization": "Bearer XtkLU4toIS8PzXdZGjQIUFOUzhFzxxmcUqoVCRwUd46d9dc9"
         }
 
         async with httpx.AsyncClient() as client:

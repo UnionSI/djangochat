@@ -16,7 +16,7 @@
 
     <div id="chat-messages" class="d-flex flex-column bg-body-secondary p-2 h-100 overflow-y-scroll">
         {% for message in chat_messages %}
-        <div style="max-width: 60%;" class="{% if message.usuario %} align-self-end {% else %} align-self-start {% endif %} d-flex flex-column p-2 bg-white border rounded">
+        <div style="max-width: 60%;" class="{% if not message.usuario %} align-self-end {% else %} align-self-start {% endif %} d-flex flex-column p-2 bg-white border rounded">
             <div>
                 <small class="text-secondary">{{ message.fecha_hora|date:"d/m/Y" }} {{ message.fecha_hora|time:"H:i" }} -</small>
                 <small class="text-secondary">

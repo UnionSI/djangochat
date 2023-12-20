@@ -8,7 +8,7 @@
 
 {% include 'navbar.html' %}
 
-  <div class="d-flex flex-column align-items-stretch flex-shrink-0 bg-body-tertiary border-end" style="width: 380px;">
+  <div class="d-flex flex-column align-items-stretch flex-shrink-0 bg-primary-subtle border-end" style="width: 380px;">
       <a href="/" class="d-flex align-items-center flex-shrink-0 p-3 link-body-emphasis text-decoration-none border-bottom">
         <svg class="bi pe-none me-2" width="30" height="24"><use xlink:href="#bootstrap"></use></svg>
         <span class="fs-5 fw-semibold">Chats</span>
@@ -16,7 +16,7 @@
       <div id="room-list" class="list-group list-group-flush border-bottom overflow-y-scroll">
 
         {% for room in rooms %}
-        <a id="{{ room.nro_socio }}" href="{% url 'room:chat' room.slug %}" class="d-flex gap-2 list-group-item py-3 lh-sm">
+        <a id="{{ room.nro_socio }}" href="{% url 'room:chat-dev' room.slug %}" class="d-flex gap-2 list-group-item py-3 lh-sm">
           <div>
             <img src="{% static 'img/logo.png' %}" alt="mdo" width="48" height="48" class="rounded-circle border">
           </div>
@@ -63,10 +63,10 @@
 
 {% block scripts %}
 {{ room.id|json_script:"json-roomname" }}
-{{ request.user.username|json_script:"json-username" }}
+{{ room.nombre|json_script:"json-username" }}
 {{ room.telefono|json_script:"json-phone-number" }}
 {{ room.integracion.nombre|json_script:"json-integracion" }}
 
-<script type="" src="{% static 'js/chatWebSocket.js' %}"></script>
+<script type="" src="{% static 'js/chatWebSocketDev.js' %}"></script>
 
 {% endblock %}

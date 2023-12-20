@@ -40,6 +40,9 @@ def drawflow(request):
 
 @csrf_exempt
 def green_api_webhook(request):
+    # WaApi
+    # key: ETBu4KVOMXT2KCL1t9SGRIJ7Ra8zEPFM60QINdAp3GjD5Ba
+    # XtkLU4toIS8PzXdZGjQIUFOUzhFzxxmcUqoVCRwUd46d9dc9
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
 
@@ -57,7 +60,7 @@ def green_api_webhook(request):
         IntegracionWhatsApp = Integracion.objects.get(nombre=instanceData)
 
         if IntegracionWhatsApp:
-            contacto = Room.objects.filter(nombre=name).first()
+            contacto = Room.objects.filter(telefono=phoneNumber).first()
             if contacto:
                 Message.objects.create(contacto=contacto, contenido=contentMessage)
             else:
