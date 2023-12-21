@@ -6,7 +6,7 @@ from django.http import JsonResponse
 import json
 
 from django.contrib.auth.models import User
-from room.models import Integracion, Room, Message, SectorTarea, ContactoTarea
+from chat.models import Integracion, Room, Message, SectorTarea, ContactoTarea
 from .forms import SignUpForm
 
 from channels.layers import get_channel_layer
@@ -78,6 +78,8 @@ def green_api_webhook(request):
                 sector_chat_inicial = SectorTarea.objects.get(nombre='Chat inicial')
                 ContactoTarea.objects.create(contacto=contacto, sector_tarea=sector_chat_inicial)
                 Message.objects.create(contacto=contacto, contenido=contentMessage)
+            
+            ''' Verificar si se tiene que activar un bot si el msg esta en un sector de bot '''
 
             # Enviar mensaje al canal de WebSocket
             channel_layer = get_channel_layer()

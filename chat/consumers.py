@@ -28,12 +28,16 @@ class GlobalConsumer(AsyncWebsocketConsumer):
             phone = data['phone']
             integracion = data['integracion']
 
-            # Guardar el mensaje en la base de datos
-            await self.save_message(username, room, message)
-
             # Send whatsapp message
             if integracion == 'WhatsApp':
                 await self.send_whatsapp_message(chat_id=phone, message=message)
+
+            # Llamar al chatbot si corresponde
+
+            # validar si responde un 200 antes de continuar
+
+            # Guardar el mensaje en la base de datos
+            await self.save_message(username, room, message)
 
             # Enviar mensaje global
             await self.channel_layer.group_send(
