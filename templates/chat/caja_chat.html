@@ -2,32 +2,36 @@
 
 <div class="d-flex flex-column justify-content-between w-100">
     
-    <a href="/" class="d-flex align-items-center gap-3 link-body-emphasis text-decoration-none p-3 border-bottom bg-body-tertiary" style="height: 63px">
+    <div class="d-flex align-items-center gap-3 link-body-emphasis text-decoration-none p-3 border-bottom bg-body-tertiary" style="height: 63px">
       <img src="{% static 'img/logo.png' %}" alt="ameport_logo" width="48" height="48" class="rounded-circle">
       <div>
-        {% if room.nombre %}
-            <h6 class="m-0">{{ room.nombre }} {{ room.apellido}} - {{ room.nro_socio }}</h6>
+        {% if contacto.nombre %}
+            <h6 class="m-0">{{ contacto.nombre }} {{ contacto.apellido}} - {{ contacto.nro_socio }}</h6>
         {% else %}
-            <h6 class="m-0">{{ room.telefono }}</h6>
+            <h6 class="m-0">{{ contacto.telefono }}</h6>
         {% endif %}
         <p class="m-0 text-secondary"><small>Seleccione para obtener información del contacto</small></p>
       </div>
-    </a>
+    </div>
 
     <div id="chat-messages" class="d-flex flex-column bg-body-secondary p-2 h-100 overflow-y-scroll">
-        {% for message in chat_messages %}
-        <div style="max-width: 60%;" class="{% if not message.usuario %} align-self-end {% else %} align-self-start {% endif %} d-flex flex-column p-2 bg-white border rounded">
+        {% for mensaje in contacto_mensajes %}
+        {% if test %}            
+            <div style="max-width: 60%;" class="{% if mensaje.usuario %} align-self-start {% else %} align-self-end {% endif %} d-flex flex-column p-2 bg-white border rounded">
+        {% else %}
+            <div style="max-width: 60%;" class="{% if mensaje.usuario %} align-self-end {% else %} align-self-start {% endif %} d-flex flex-column p-2 bg-white border rounded">
+        {% endif %}
             <div>
-                <small class="text-secondary">{{ message.fecha_hora|date:"d/m/Y" }} {{ message.fecha_hora|time:"H:i" }} -</small>
+                <small class="text-secondary">{{ mensaje.fecha_hora|date:"d/m/Y" }} {{ mensaje.fecha_hora|time:"H:i" }} -</small>
                 <small class="text-secondary">
-                    {% if message.usuario %}
-                        {{ message.usuario }}
+                    {% if mensaje.usuario %}
+                        {{ mensaje.usuario }}
                     {% else %}
-                        {{ room.nombre }}
+                        {{ contacto.nombre }}
                     {% endif %}
                 </small>
             </div>
-            <small>{{ message.contenido }}</small>
+            <small>{{ mensaje.contenido }}</small>
         </div>
         {% endfor %}
     </div>

@@ -2,8 +2,9 @@ const roomName = JSON.parse(document.getElementById('json-roomname').textContent
 const userName = JSON.parse(document.getElementById('json-username').textContent);
 const phoneNumber = JSON.parse(document.getElementById('json-phone-number').textContent);
 const integracion = JSON.parse(document.getElementById('json-integracion').textContent);
+const ambiente = JSON.parse(document.getElementById('json-ambiente').textContent);
 
-const globalSocket = new WebSocket('ws://' + window.location.host + '/ws/global/');
+const globalSocket = new WebSocket('wss://' + window.location.host + '/ws/global/');
 
 globalSocket.onopen = function(e) {
     console.log('Global WebSocket opened');
@@ -33,12 +34,30 @@ globalSocket.onmessage = function(e) {
 
 function handleMessageOnChat(data) {
     const formattedDate = formatDate(new Date());
-    const alignMessage = userName == data.username? 'align-self-end': 'align-self-start'
+    let alignMessage;
+
+    switch (ambiente) {
+        case 'Produccion':
+            if (userName == data.username) {
+                alignMessage = 'align-self-end'
+            } else {
+                alignMessage = 'align-self-start'
+            }
+            break;
+        case 'Homologacion':
+            if (userName == data.username) {
+                alignMessage = 'align-self-start'
+            } else {
+                alignMessage = 'align-self-end'
+            }
+            break;
+    }
+    //const alignMessage = userName == data.username? 'align-self-end': 'align-self-start'
     document.querySelector('#chat-messages').innerHTML += (
         `<div class="${alignMessage} d-flex flex-column p-2 bg-white border rounded">
             <div>
             <small class="text-secondary">${formattedDate} -</small>
-            <small class="text-secondary">${data.username}:</small>
+            <small class="text-secondary">${data.username}</small>
             </div>
             <small>${data.message}</small>
         </div>`
@@ -65,28 +84,27 @@ form.addEventListener('submit', function(e) {
     const messageInputDom = document.querySelector('#chat-message-input');
     const message = messageInputDom.value;
 
-    console.log({
-        'type': 'chat_message',
-        'message': message,
-        'username': userName,
-        'room': roomName,
-        'phone': phoneNumber,
-        'integracion': integracion
-    })
-
     globalSocket.send(JSON.stringify({
         'type': 'chat_message',
         'message': message,
         'username': userName,
         'room': roomName,
         'phone': phoneNumber,
-        'integracion': integracion
+        'integracion': integracion,
+        'ambiente': ambiente
     }));
 
+    console.log('mensaje enviado a la ws: ',{
+        'type': 'chat_message',
+        'message': message,
+        'username': userName,
+        'room': roomName,
+        'phone': phoneNumber,
+        'integracion': integracion,
+        'ambiente': ambiente
+    })
+
     messageInputDom.value = '';
-
-    console.log("mensaje enviado a la ws")
-
 });
 
 function formatDate(date) {

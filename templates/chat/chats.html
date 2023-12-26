@@ -9,50 +9,19 @@
 {% include 'navbar.html' %}
 
   <div class="d-flex flex-column align-items-stretch flex-shrink-0 bg-body-tertiary border-end" style="width: 380px;">
-      <a href="/" class="d-flex align-items-center flex-shrink-0 p-3 link-body-emphasis text-decoration-none border-bottom">
+      <div href="/" class="d-flex align-items-center flex-shrink-0 p-3 link-body-emphasis text-decoration-none border-bottom">
         <svg class="bi pe-none me-2" width="30" height="24"><use xlink:href="#bootstrap"></use></svg>
         <span class="fs-5 fw-semibold">Chats</span>
-      </a>
+      </div>
       <div id="room-list" class="list-group list-group-flush border-bottom overflow-y-scroll">
-
-        {% for room in rooms %}
-        <a id="{{ room.nro_socio }}" href="{% url 'room:chat' room.slug %}" class="d-flex gap-2 list-group-item py-3 lh-sm">
-          <div>
-            <img src="{% static 'img/logo.png' %}" alt="mdo" width="48" height="48" class="rounded-circle border">
-          </div>
-
-          <div class="w-100">
-            <div class="d-flex justify-content-between">
-              <div class="d-flex flex-column mb-1">
-                {% if room.nombre %}
-                  <strong>{{ room.nombre }} {{ room.apellido}} - {{ room.nro_socio }}</strong>
-                {% else %}
-                  <strong>{{ room.telefono }}</strong>
-                {% endif %}
-                <small class="text-primary">{{ room.dni }}</small>
-              </div>
-              <small class="text-body-secondary message-date">
-                {% now "d/m/Y" as todays_date %}
-                {% if todays_date == room.last_message_date|date:"d/m/Y" %}
-                  {{ room.last_message_date|time:"H:i" }}
-                {% else %}
-                  {{ room.last_message_date|date:"d/m/Y" }}
-                {% endif %}
-              </small>
-            </div>
-            <div class="col-10 mb-1 small fst-italic">{{ room.last_message.0.contenido|truncatechars:50 }}</div>
-            {% if room.last_message.0.user %}
-              <div>por: room.last_message.0.user </div>
-            {% endif %}
-          </div>
-        </a>
+        {% for contacto in contactos %}
+          {% include 'chat/tarjeta_contacto.html' %}
         {% endfor %}
-
       </div>
   </div>
 
-  {% if chat_messages %}
-    {% include 'room/messages.html' %}
+  {% if contacto_mensajes %}
+    {% include 'chat/caja_chat.html' %}
   {% else %}
     <div class="flex-grow-1 d-flex align-items-center justify-content-center bg-body-tertiary">
       <p class="text-secondary">Seleccione un chat para enviar mensajes</p>
@@ -62,11 +31,10 @@
 {% endblock %}
 
 {% block scripts %}
-{{ room.id|json_script:"json-roomname" }}
-{{ request.user.username|json_script:"json-username" }}
-{{ room.telefono|json_script:"json-phone-number" }}
-{{ room.integracion.nombre|json_script:"json-integracion" }}
-
-<script type="" src="{% static 'js/chatWebSocket.js' %}"></script>
-
+  {{ contacto.id|json_script:"json-roomname" }}
+  {{ request.user.username|json_script:"json-username" }}
+  {{ contacto.telefono|json_script:"json-phone-number" }}
+  {{ integracion|json_script:"json-integracion" }}
+  <script id="json-ambiente" type="application/json">"Produccion"</script>
+  <script type="" src="{% static 'js/chatWebSocket.js' %}"></script>
 {% endblock %}

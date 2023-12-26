@@ -8,101 +8,71 @@ from .models import Sector, SectorTarea, Room, Message, ContactoTarea
 
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
-import json
+import json, re
+
 
 @login_required
 def chats(request):
-    
-    '''
-    rooms = Room.objects.prefetch_related(
-        Prefetch('messages', queryset=Message.objects.order_by('-fecha_hora').first(), to_attr='last_message')
-    )
-    
-    '''
-    rooms = Room.objects.annotate(
-        last_message_content=Subquery(
-            Message.objects.filter(contacto=OuterRef('pk')).values('contenido')[:1]
-        ),
-        last_message_date=Subquery(
-            Message.objects.filter(contacto=OuterRef('pk')).values('fecha_hora')[:1]
-        ),
-        last_message_user=Subquery(
-            Message.objects.filter(contacto=OuterRef('pk')).values('usuario__username')[:1]
-        )
-    )
-    return render(request, 'room/chats.html', {'rooms': rooms})
-
-
-@login_required
-def chat(request, slug):
-    room = get_object_or_404(Room, slug=slug)
-    room_messages = Message.objects.filter(contacto=room)  # Ver cómo manejar esto si hay muchos mensajes
     '''
     rooms = Room.objects.prefetch_related(
         Prefetch('messages', queryset=Message.objects.order_by('-fecha_hora').first(), to_attr='last_message')
     )
     '''
-    rooms = Room.objects.annotate(
+    contactos = Room.objects.annotate(
         last_message_content=Subquery(
-            Message.objects.filter(contacto=OuterRef('pk')).values('contenido')[:1]
+            Message.objects.filter(contacto_integracion=OuterRef('pk')).values('contenido')[:1]
         ),
         last_message_date=Subquery(
-            Message.objects.filter(contacto=OuterRef('pk')).values('fecha_hora')[:1]
+            Message.objects.filter(contacto_integracion=OuterRef('pk')).values('fecha_hora')[:1]
         ),
         last_message_user=Subquery(
-            Message.objects.filter(contacto=OuterRef('pk')).values('usuario__username')[:1]
+            Message.objects.filter(contacto_integracion=OuterRef('pk')).values('usuario__username')[:1]
         )
     )
-    return render(request, 'room/chats.html', {'room': room, 'chat_messages': room_messages, 'rooms': rooms,})
+
+    # Para Tests
+    if request.path == '/rooms/chats-dev/':
+        return render(request, 'chat/chatsdev.html', {'contactos': contactos})
+
+    return render(request, 'chat/chats.html', {'contactos': contactos})
 
 
 @login_required
-def chats_dev(request):
-    
-    rooms = Room.objects.annotate(
+def chat(request, id):
+    contacto = get_object_or_404(Room.objects.prefetch_related('contacto_integraciones__integracion'), id=id)
+    integracion = contacto.contacto_integraciones.first().integracion.nombre
+    contacto_mensajes = Message.objects.filter(contacto_integracion__contacto=contacto)  # Ver cómo manejar esto si hay muchos mensajes
+
+    contactos = Room.objects.annotate(
         last_message_content=Subquery(
-            Message.objects.filter(contacto=OuterRef('pk')).values('contenido')[:1]
+            Message.objects.filter(contacto_integracion=OuterRef('pk')).values('contenido').order_by('-fecha_hora')[:1]
         ),
         last_message_date=Subquery(
-            Message.objects.filter(contacto=OuterRef('pk')).values('fecha_hora')[:1]
+            Message.objects.filter(contacto_integracion=OuterRef('pk')).values('fecha_hora').order_by('-fecha_hora')[:1]
         ),
         last_message_user=Subquery(
-            Message.objects.filter(contacto=OuterRef('pk')).values('usuario__username')[:1]
+            Message.objects.filter(contacto_integracion=OuterRef('pk')).values('usuario__username').order_by('-fecha_hora')[:1]
         )
     )
-    return render(request, 'room/chats_dev.html', {'rooms': rooms})
+    # Para Tests
+    if re.search('/rooms/chat-dev/', request.path):
+        return render(request, 'chat/chatsdev.html', {'contacto': contacto, 'contacto_mensajes': contacto_mensajes, 'contactos': contactos, 'integracion': integracion})
 
-
-@login_required
-def chat_dev(request, slug):
-    room = get_object_or_404(Room, slug=slug)
-    room_messages = Message.objects.filter(contacto=room)  # Ver cómo manejar esto si hay muchos mensajes
-
-    rooms = Room.objects.annotate(
-        last_message_content=Subquery(
-            Message.objects.filter(contacto=OuterRef('pk')).values('contenido')[:1]
-        ),
-        last_message_date=Subquery(
-            Message.objects.filter(contacto=OuterRef('pk')).values('fecha_hora')[:1]
-        ),
-        last_message_user=Subquery(
-            Message.objects.filter(contacto=OuterRef('pk')).values('usuario__username')[:1]
-        )
-    )
-    return render(request, 'room/chats_dev.html', {'room': room, 'chat_messages': room_messages, 'rooms': rooms,})
+    return render(request, 'chat/chats.html', {'contacto': contacto, 'contacto_mensajes': contacto_mensajes, 'contactos': contactos, 'integracion': integracion})
 
 
 @login_required
 def embudos(request):
     embudos = Sector.objects.all()
-    return render(request, 'room/embudos.html', {'embudos': embudos})
+    return render(request, 'chat/embudos.html', {'embudos': embudos})
 
 
 @login_required
 def embudo(request, id):
     sector = get_object_or_404(Sector, id=id)
     sectores = Sector.objects.prefetch_related('sectortarea_set').all()    
-    sector_tareas = SectorTarea.objects.filter(sector=sector).prefetch_related('contactotarea_set__contacto__messages').all()
+    #sector_tareas = SectorTarea.objects.filter(sector=sector).prefetch_related('contactotarea_set__contacto__messages').all()
+    sector_tareas = SectorTarea.objects.filter(sector=sector).prefetch_related('contactotarea_set__contacto_integracion__messages').all()
 
     '''
     # ¿Mejora la performance si se obtiene el último mensaje en la vista en lugar de pasarle todos los mensajes al template?
@@ -113,7 +83,7 @@ def embudo(request, id):
             contacto_tarea.last_message = last_message
     '''
 
-    return render(request, 'room/embudos.html', {'embudo': sector, 'embudos': sectores, 'sector_tareas': sector_tareas})
+    return render(request, 'chat/embudos.html', {'embudo': sector, 'embudos': sectores, 'sector_tareas': sector_tareas})
     
 
 @login_required

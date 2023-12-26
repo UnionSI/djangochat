@@ -17,9 +17,9 @@
             <h5 class="text-center">{{ sector_tarea }}</h5>
             <div class="d-flex flex-column gap-2" style="width: 350px;" data-sector_tarea="{{ sector_tarea.id }}">
                 {% for contacto_tarea in sector_tarea.contactotarea_set.all %}
-                    {% with contacto=contacto_tarea.contacto %}
-                        <div class="usi-card d-flex gap-2 list-group-item lh-sm border rounded position-relative" data-contacto="{{ contacto.id }}">
-                            <a href="{% url 'room:chat' contacto.slug %}" class="d-flex gap-2 list-group-item p-2 position-relative w-100" data-slug>
+                    {% with contacto_integracion=contacto_tarea.contacto_integracion %}
+                        <div class="usi-card d-flex gap-2 list-group-item lh-sm border rounded position-relative" data-contacto="{{ contacto_integracion.id }}">
+                            <a href="{% url 'room:chat' contacto_integracion.id %}" class="d-flex gap-2 list-group-item p-2 position-relative w-100" data-slug>
 
 
                                 <div class="d-flex justify-content-center align-items-center">
@@ -29,15 +29,15 @@
                                 <div class="w-100">
                                     <div class="d-flex justify-content-between">
                                         <div class="d-flex flex-column pe-2">
-                                            {% if contacto.nombre %}
-                                            <strong data-cabecera>{{ contacto.nombre }} {{ contacto.apellido}} - {{ contacto.nro_socio }}</strong>
+                                            {% if contacto_integracion.contacto.nombre %}
+                                            <strong data-cabecera>{{ contacto_integracion.contacto.nombre }} {{ contacto_integracion.contacto.apellido}} - {{ contacto_integracion.contacto.nro_socio }}</strong>
                                             {% else %}
-                                            <strong data-cabecera>{{ contacto.telefono }}</strong>
+                                            <strong data-cabecera>{{ contacto_integracion.contacto.telefono }}</strong>
                                             {% endif %}
-                                            <small class="text-primary" data-dni>{{ contacto.dni }}</small>
+                                            <small class="text-primary" data-dni>{{ contacto_integracion.contacto.dni }}</small>
                                         </div>
                                     </div>
-                                    {% with ultimo_mensaje=contacto.messages.last %}
+                                    {% with ultimo_mensaje=contacto_integracion.messages.last %}
                                     {% if not ultimo_mensaje.usuario %}
                                         <div style="width: 10px; height: 10px; top:5px; left:5px;" class="bg-primary rounded-circle position-absolute" data-no_leido></div>
                                     {% endif %}
@@ -48,7 +48,8 @@
                                                 {% if ultimo_mensaje.usuario %}
                                                     {{ ultimo_mensaje.usuario }}: 
                                                 {% else %}
-                                                    {{ ultimo_mensaje.contacto }}: 
+                                                    <!-- {{ ultimo_mensaje.contacto }}:  -->
+                                                    {{ contacto_integracion.contacto.nombre }}:
                                                 {% endif %}
                                             </span>
                                             <span data-mensaje>{{ ultimo_mensaje.contenido|truncatechars:50 }}</span>
@@ -96,7 +97,7 @@
     
 </div>
 
-{% include 'room/tarjeta_default.html' %}
+{% include 'chat/tarjeta_default.html' %}
 
 {% block scripts %}
 <script src="{% static 'js/embudoWebSocket.js' %}"></script>

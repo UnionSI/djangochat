@@ -1,0 +1,36 @@
+{% load static %}
+
+<a id="{{ contacto.nro_socio }}" href="{% url 'room:chat' contacto.id %}" class="d-flex gap-2 list-group-item py-3 lh-sm">
+    <div>
+      <img src="{% static 'img/logo.png' %}" alt="mdo" width="48" height="48" class="rounded-circle border">
+    </div>
+
+    <div class="w-100">
+      <div class="d-flex justify-content-between">
+        <div class="d-flex flex-column mb-1">
+          {% if contacto.nombre %}
+            <strong>{{ contacto.nombre }} {{ contacto.apellido}} - {{ contacto.nro_socio }}</strong>
+          {% else %}
+            <strong>{{ contacto.telefono }}</strong>
+          {% endif %}
+          <small class="text-primary">{{ contacto.dni }}</small>
+        </div>
+        <small class="text-body-secondary message-date">
+          {% now "d/m/Y" as todays_date %}
+          {% if todays_date == contacto.last_message_date|date:"d/m/Y" %}
+            {{ contacto.last_message_date|time:"H:i" }}
+          {% else %}
+            {{ contacto.last_message_date|date:"d/m/Y" }}
+          {% endif %}
+        </small>
+      </div>
+      <div class="col-10 mb-1 small">
+        {% if contacto.last_message_user %}
+          {{ contacto.last_message_user }}:
+        {% else %}
+          {{ contacto.nombre }}:
+        {% endif %}
+        {{ contacto.last_message_content|truncatechars:50 }}
+      </div>
+    </div>
+</a>
