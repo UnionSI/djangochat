@@ -29,27 +29,34 @@ class GlobalConsumer(AsyncWebsocketConsumer):
             phone = data['phone']
             integracion = data['integracion']
             ambiente = data['ambiente']
-            
+            status = None
+
             # Send whatsapp message
             if integracion == 'WhatsApp':
-                await send_waapi_message(chat_id=phone, message=message)
+                response = await send_waapi_message(chat_id=phone, message=message)
+                print(response)
+                status = response['status']
                 # validar si responde un 200 antes de continuar
             elif ambiente == 'Homologacion':
                 username = None
+                status = 'success'
 
-            # Guardar el mensaje en la base de datos
-            username = await self.save_message(username, room, message)
+            if status == 'success':
+                # Guardar el mensaje en la base de datos
+                username = await self.save_message(username, room, message)
 
-            # Enviar mensaje global
-            await self.channel_layer.group_send(
-                'global',
-                {
-                    'type': 'chat_message',
-                    'room': room,
-                    'message': message,
-                    'username': username
-                }
-            )
+                # Enviar mensaje global
+                await self.channel_layer.group_send(
+                    'global',
+                    {
+                        'type': 'chat_message',
+                        'room': room,
+                        'message': message,
+                        'username': username
+                    }
+                )
+            else:
+                print('No se pudo enviar el mensaje')
 
         elif message_type == 'sector_change':
             # Procesar cambio de sector

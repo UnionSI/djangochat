@@ -3,7 +3,7 @@ from django.http import JsonResponse
 import json
 
 from django.contrib.auth.models import User
-from chat.models import Integracion, Room, Message, SectorTarea, ContactoTarea
+from chat.models import Integracion, Room, Message, SectorTarea, ContactoTarea, ContactoIntegracion
 
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
@@ -54,16 +54,7 @@ def green_api_webhook(request):
 
             # Enviar mensaje al canal de WebSocket
             channel_layer = get_channel_layer()
-            '''
-            async_to_sync(channel_layer.group_send)(
-                f'chat_{phoneNumber}',  # Asegúrate de que esta coincida con tu patrón de nombres de sala
-                {
-                    'type': 'chat.message',
-                    'message': contentMessage,
-                    'username': contacto.nombre
-                }
-            )
-            '''
+
             async_to_sync(channel_layer.group_send)(
                 'global',
                 {
@@ -78,6 +69,56 @@ def green_api_webhook(request):
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
     
+
+@csrf_exempt
+def waapi_api_webhook(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        print(data)
+
+        if data:
+            evento = data['event']
+            instancia_id = data['instanceId']
+            mensaje_id = data['data']['message']['id']['id']
+            contenido_mensaje = data['data']['message']['body']
+            telefono_crudo = data['data']['message']['from']
+            telefono = telefono_crudo.split('@')[0]
+            nombre = data['data']['message']['_data']['notifyName']
+            timestamp = data['data']['message']['timestamp']
+
+        integracion_whatsapp = Integracion.objects.get(nombre='WhatsApp')
+
+        if integracion_whatsapp:
+            contacto = Room.objects.filter(telefono=telefono).first()
+            if contacto:
+                contacto_integracion = ContactoIntegracion.objects.get(contacto=contacto)
+                Message.objects.create(contacto_integracion=contacto_integracion, contenido=contenido_mensaje, id_integracion=mensaje_id)
+            else:
+                contacto = Room.objects.create(telefono = telefono)
+                contacto_integracion = ContactoIntegracion.objects.create(contacto=contacto, integracion=integracion_whatsapp)
+                sector_chat_inicial = SectorTarea.objects.get(nombre='Chat inicial')
+                ContactoTarea.objects.create(contacto_integracion=contacto_integracion, sector_tarea=sector_chat_inicial)
+                Message.objects.create(contacto_integracion=contacto_integracion, contenido=contenido_mensaje, id_integracion=mensaje_id)            
+            
+            ''' Verificar si se tiene que activar un bot si el msg esta en un sector de bot '''
+
+            # Enviar mensaje al canal de WebSocket
+            channel_layer = get_channel_layer()
+
+            async_to_sync(channel_layer.group_send)(
+                'global',
+                {
+                    'type': 'chat_message',
+                    'room': contacto_integracion.id,
+                    'message': contenido_mensaje,
+                    'username': contacto.nombre if contacto.nombre else contacto.telefono
+                }
+            )
+        print('mensaje recibido a través de webhook -> OK')
+        return JsonResponse({'status': 'success'})
+    else:
+        print('mensaje recibido a través de webhook -> ERROR')
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
 
 '''
 {

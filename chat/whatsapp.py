@@ -1,7 +1,7 @@
 import httpx, json
 
 
-async def send_greenapi_message(self, chat_id, message):
+async def send_greenapi_message(chat_id, message):
     id_instance = "7103880835"
     api_token_instance = "89bddd8da48246f593916d55b8be98e059a136b7b7e6469291"
 
@@ -22,25 +22,28 @@ async def send_greenapi_message(self, chat_id, message):
     return response.json()
 
 
-async def send_waapi_message(self, chat_id, message):
-    id_instance = "3554"
-    api_name = "ETBu4KVOMXT2KCL1t9SGRIJ7Ra8zEPFM60QINdAp3GjD5Ba"
-    api_token_instance = "XtkLU4toIS8PzXdZGjQIUFOUzhFzxxmcUqoVCRwUd46d9dc9"
+async def send_waapi_message(chat_id, message):
+    id_instance = "3901"
+    api_name = "customer-service"
+    api_token_instance = "ipiOhK708cW4DuUHNtd234FnnnsfWyujgjV2S7THeac23b4f"
 
-    url = f'https://api.greenapi.com/waInstance{id_instance}/sendMessage/{api_token_instance}'
+    url = f'https://waapi.app/api/v1/instances/{id_instance}/client/action/send-message'
 
     payload = {
         "chatId": f"{chat_id}@c.us",
         "message": message
     }
 
+    print(payload)
+
     headers = {
         "accept": "application/json",
         "content-type": "application/json",
-        "authorization": "Bearer XtkLU4toIS8PzXdZGjQIUFOUzhFzxxmcUqoVCRwUd46d9dc9"
+        "authorization": f'Bearer {api_token_instance}'
     }
 
     async with httpx.AsyncClient() as client:
-        response = await client.post(url, data=json.dumps(payload), headers=headers)
+        #response = await client.post(url, json=json.dumps(payload), headers=headers)
+        response = await client.post(url, json=payload, headers=headers)
 
     return response.json()
