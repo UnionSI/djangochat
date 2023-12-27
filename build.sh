@@ -11,5 +11,5 @@ python manage.py collectstatic --clear --no-input --traceback
 #python manage.py migrate chat
 if [[ $CREATE_SUPERUSER ]];
 then
-  python config/manage.py createsuperuser --no-input
+  python manage.py createsuperuser --no-input
 fi
