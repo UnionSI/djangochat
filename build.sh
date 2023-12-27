@@ -3,9 +3,10 @@
 set -o errexit
 
 #rm .whitenoise_manifest.json
+python -m pip install --upgrade pip
 pip install -r requirements.txt
 python manage.py collectstatic --clear --no-input --traceback
 python manage.py makemigrations
-python manage.py makemigrations room
-python manage.py migrate room
+python manage.py makemigrations chat
+python manage.py migrate chat
 
