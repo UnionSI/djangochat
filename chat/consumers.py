@@ -31,14 +31,15 @@ class GlobalConsumer(AsyncWebsocketConsumer):
             ambiente = data['ambiente']
             status = None
 
-            # Send whatsapp message
+            # Enviar mensaje whatsapp
             if integracion == 'WhatsApp':
                 response = await send_waapi_message(chat_id=phone, message=message)
                 print(response)
-                status = response['status']
-                # validar si responde un 200 antes de continuar
-            elif ambiente == 'Homologacion':
-                username = None
+                # Validar si responde un 200 antes de continuar
+            elif integracion == 'Test':
+                if ambiente == 'Homologacion':
+                    username = None
+                    # Llamar función chequear_si_se_activa_chatbot
                 status = 'success'
 
             if status == 'success':

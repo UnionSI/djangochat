@@ -1,4 +1,6 @@
-const globalSocket = new WebSocket('wss://' + window.location.host + '/ws/global/');
+const debug = JSON.parse(document.getElementById('json-debug').textContent);
+protocolo = debug == true ? 'ws' : 'wss'
+const globalSocket = new WebSocket(protocolo + '://' + window.location.host + '/ws/global/');
 
 globalSocket.onopen = function(e) {
     console.log('Global WebSocket opened');

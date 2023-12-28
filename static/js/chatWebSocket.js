@@ -3,8 +3,10 @@ const userName = JSON.parse(document.getElementById('json-username').textContent
 const phoneNumber = JSON.parse(document.getElementById('json-phone-number').textContent);
 const integracion = JSON.parse(document.getElementById('json-integracion').textContent);
 const ambiente = JSON.parse(document.getElementById('json-ambiente').textContent);
+const debug = JSON.parse(document.getElementById('json-debug').textContent);
 
-const globalSocket = new WebSocket('wss://' + window.location.host + '/ws/global/');
+protocolo = debug == true ? 'ws' : 'wss'
+const globalSocket = new WebSocket(protocolo + '://' + window.location.host + '/ws/global/');
 
 globalSocket.onopen = function(e) {
     console.log('Global WebSocket opened');

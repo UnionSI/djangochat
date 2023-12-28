@@ -97,8 +97,9 @@
     
 </div>
 
-{% include 'chat/tarjeta_default.html' %}
+{% include 'chat/tarjeta_embudo_default.html' %}
 
 {% block scripts %}
-<script src="{% static 'js/embudoWebSocket.js' %}"></script>
+    {{ debug|json_script:"json-debug" }}
+    <script src="{% static 'js/embudoWebSocket.js' %}"></script>
 {% endblock %}

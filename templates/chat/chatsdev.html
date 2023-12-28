@@ -55,7 +55,7 @@
 
   {% now "d/m/Y" as test %}
   {% if contacto_mensajes %}
-    {% include 'chat/caja_chat.html' %}
+    {% include 'chat/components/caja_chat.html' %}
   {% else %}
     <div class="flex-grow-1 d-flex align-items-center justify-content-center bg-body-tertiary">
       <p class="text-secondary">Seleccione un chat para enviar mensajes</p>
@@ -69,6 +69,7 @@
   {{ request.user.username|json_script:"json-username" }}
   {{ contacto.telefono|json_script:"json-phone-number" }}
   {{ integracion|json_script:"json-integracion" }}
+  {{ debug|json_script:"json-debug" }}
   <script id="json-ambiente" type="application/json">"Homologacion"</script>
   <script type="" src="{% static 'js/chatWebSocket.js' %}"></script>
 {% endblock %}

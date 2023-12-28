@@ -10,6 +10,8 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 import json, re
 
+from config.settings import DEBUG
+
 
 @login_required
 def chats(request):
@@ -30,11 +32,13 @@ def chats(request):
         )
     )
 
+    context = {'contactos': contactos, 'debug': DEBUG}
+
     # Para Tests
     if request.path == '/rooms/chats-dev/':
-        return render(request, 'chat/chatsdev.html', {'contactos': contactos})
+        return render(request, 'chat/chatsdev.html', context)
 
-    return render(request, 'chat/chats.html', {'contactos': contactos})
+    return render(request, 'chat/chats.html', context)
 
 
 @login_required
@@ -54,17 +58,20 @@ def chat(request, id):
             Message.objects.filter(contacto_integracion=OuterRef('pk')).values('usuario__username').order_by('-fecha_hora')[:1]
         )
     )
+
+    context = {'contacto': contacto, 'contacto_mensajes': contacto_mensajes, 'contactos': contactos, 'integracion': integracion, 'debug': DEBUG}
+    
     # Para Tests
     if re.search('/rooms/chat-dev/', request.path):
-        return render(request, 'chat/chatsdev.html', {'contacto': contacto, 'contacto_mensajes': contacto_mensajes, 'contactos': contactos, 'integracion': integracion})
+        return render(request, 'chat/chatsdev.html', context)
 
-    return render(request, 'chat/chats.html', {'contacto': contacto, 'contacto_mensajes': contacto_mensajes, 'contactos': contactos, 'integracion': integracion})
+    return render(request, 'chat/chats.html', context)
 
 
 @login_required
 def embudos(request):
     embudos = Sector.objects.all()
-    return render(request, 'chat/embudos.html', {'embudos': embudos})
+    return render(request, 'chat/embudos.html', {'embudos': embudos, 'debug': DEBUG})
 
 
 @login_required
@@ -83,7 +90,9 @@ def embudo(request, id):
             contacto_tarea.last_message = last_message
     '''
 
-    return render(request, 'chat/embudos.html', {'embudo': sector, 'embudos': sectores, 'sector_tareas': sector_tareas})
+    context = {'embudo': sector, 'embudos': sectores, 'sector_tareas': sector_tareas, 'debug': DEBUG}
+
+    return render(request, 'chat/embudos.html', context)
     
 
 @login_required
