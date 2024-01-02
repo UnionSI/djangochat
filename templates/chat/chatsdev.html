@@ -15,7 +15,7 @@
       </a>
       <div id="room-list" class="list-group list-group-flush border-bottom overflow-y-scroll">
         {% for contacto in contactos %}
-        <a id="{{ contacto.nro_socio }}" href="{% url 'room:chat-dev' contacto.id %}" class="d-flex gap-2 list-group-item py-3 lh-sm">
+        <a id="{{ contacto.nro_socio }}" href="{% url 'contacto:chat-dev' contacto.id %}" class="d-flex gap-2 list-group-item py-3 lh-sm">
           <div>
             <img src="{% static 'img/logo.png' %}" alt="mdo" width="48" height="48" class="rounded-circle border">
           </div>

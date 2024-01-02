@@ -1,3 +1,8 @@
+:root {
+    --primary-color: #2C3E50;
+    --primary-hover-color: #32465A;
+}
+
 .messages {
     height: 400px;
     overflow-y: auto;
@@ -23,4 +28,55 @@
 
 .display-none-important {
     display: none !important;
+}
+
+.bg-union {
+    background-color: var(--primary-color);
+    color: #f5f5f5;
+}
+
+.card-union {
+    background-color: var(--primary-color);
+    color: #f5f5f5;
+}
+
+.card-union:hover {
+    background-color: var(--primary-hover-color);
+}
+
+.list-group-item {
+    border-color: var(--primary-hover-color);
+}
+
+.border-union {
+    border-bottom-color: var(--primary-hover-color) !important;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-hover-color);
+}
+
+/* */
+/* ===== Scrollbar CSS ===== */
+
+/* Firefox */
+.bg-union > * {
+scrollbar-width: auto;
+scrollbar-color: #ccc #ffffff;
+}
+
+/* Chrome, Edge, and Safari */
+.bg-union > *::-webkit-scrollbar {
+width: 10px;
+}
+
+.bg-union > *::-webkit-scrollbar-track {
+background: var(--primary-color);
+}
+
+.bg-union > *::-webkit-scrollbar-thumb {
+background-color: #ccc;
+border-radius: 10px;
+border: 3px solid var(--primary-color);
 }

@@ -23,31 +23,31 @@ globalSocket.onmessage = function(e) {
 
     switch (data.type) {
         case 'chat_message':
-            if (roomName == data.room) {
-                handleMessageOnChat(data);
+            if (roomName == data.contacto) {
+                manejarMensajeRecibido(data);
             }
-            //UpdateMessageOnRoomsList(data);
+            //actualizarListaContactos(data);
             break;
         default:
             console.error('Unknown message type: ', data.type);
     }
-    scrollToBottom()
+    scrollAlFinal()
 };
 
-function handleMessageOnChat(data) {
-    const formattedDate = formatDate(new Date());
+function manejarMensajeRecibido(data) {
+    const formattedDate = formatoFecha(new Date());
     let alignMessage;
 
     switch (ambiente) {
         case 'Produccion':
-            if (userName == data.username) {
+            if (userName == data.usuario) {
                 alignMessage = 'align-self-end'
             } else {
                 alignMessage = 'align-self-start'
             }
             break;
         case 'Homologacion':
-            if (userName == data.username) {
+            if (userName == data.usuario) {
                 alignMessage = 'align-self-start'
             } else {
                 alignMessage = 'align-self-end'
@@ -59,20 +59,20 @@ function handleMessageOnChat(data) {
         `<div class="${alignMessage} d-flex flex-column p-2 bg-white border rounded">
             <div>
             <small class="text-secondary">${formattedDate} -</small>
-            <small class="text-secondary">${data.username}</small>
+            <small class="text-secondary">${data.usuario}</small>
             </div>
-            <small>${data.message}</small>
+            <small>${data.mensaje}</small>
         </div>`
     );
 }
 
-function UpdateMessageOnRoomsList(data) {
+function actualizarListaContactos(data) {
     const roomList = document.getElementById('room-list');
-    const divRoom = document.getElementById(data.room);
+    const divRoom = document.getElementById(data.contacto);
     if (divRoom) {
         const date = new Date();
         divRoom.querySelector(".message-date").innerHTML = `${date.getHours()}:${date.getMinutes()}`;
-        divRoom.querySelector(".message-content").innerHTML = data.message;
+        divRoom.querySelector(".message-content").innerHTML = data.mensaje;
         roomList.insertBefore(divRoom, roomList.firstChild);
     }
 }
@@ -88,20 +88,20 @@ form.addEventListener('submit', function(e) {
 
     globalSocket.send(JSON.stringify({
         'type': 'chat_message',
-        'message': message,
-        'username': userName,
-        'room': roomName,
-        'phone': phoneNumber,
+        'mensaje': message,
+        'usuario': userName,
+        'contacto': roomName,
+        'telefono': phoneNumber,
         'integracion': integracion,
         'ambiente': ambiente
     }));
 
     console.log('mensaje enviado a la ws: ',{
         'type': 'chat_message',
-        'message': message,
-        'username': userName,
-        'room': roomName,
-        'phone': phoneNumber,
+        'mensaje': message,
+        'usuario': userName,
+        'contacto': roomName,
+        'telefono': phoneNumber,
         'integracion': integracion,
         'ambiente': ambiente
     })
@@ -109,18 +109,19 @@ form.addEventListener('submit', function(e) {
     messageInputDom.value = '';
 });
 
-function formatDate(date) {
+function formatoFecha(date) {
     const day = date.getDate();
     const month = date.getMonth() + 1;
     const year = date.getFullYear();
     const hours = date.getHours();
-    const minutes = date.getMinutes();
+    let minutes = date.getMinutes();
+    minutes = minutes < 10 ? "0" + minutes: minutes
     return `${day}/${month}/${year} ${hours}:${minutes}`;
 }
 
-function scrollToBottom() {
+function scrollAlFinal() {
     let objDiv = document.getElementById("chat-messages");
     objDiv.scrollTop = objDiv.scrollHeight;
 }
 
-scrollToBottom();
+scrollAlFinal();

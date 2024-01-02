@@ -3,7 +3,7 @@ from django.http import JsonResponse
 import json
 
 from django.contrib.auth.models import User
-from chat.models import Integracion, Room, Message, SectorTarea, ContactoTarea, ContactoIntegracion
+from chat.models import Integracion, Contacto, Mensaje, SectorTarea, ContactoTarea, ContactoIntegracion
 
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
@@ -26,16 +26,14 @@ def green_api_webhook(request):
             contentMessage = data['messageData']['extendedTextMessageData']['text']
             timestamp = data['timestamp']
 
-        #room = Room.objects.all().first()
-
         IntegracionWhatsApp = Integracion.objects.get(nombre=instanceData)
 
         if IntegracionWhatsApp:
-            contacto = Room.objects.filter(telefono=phoneNumber).first()
+            contacto = Contacto.objects.filter(telefono=phoneNumber).first()
             if contacto:
-                Message.objects.create(contacto=contacto, contenido=contentMessage)
+                Mensaje.objects.create(contacto=contacto, contenido=contentMessage)
             else:
-                contacto = Room.objects.create(
+                contacto = Contacto.objects.create(
                     nombre = name,
                     apellido = name,
                     dni = phoneNumber[:9],
@@ -48,13 +46,12 @@ def green_api_webhook(request):
                 )
                 sector_chat_inicial = SectorTarea.objects.get(nombre='Chat inicial')
                 ContactoTarea.objects.create(contacto=contacto, sector_tarea=sector_chat_inicial)
-                Message.objects.create(contacto=contacto, contenido=contentMessage)
+                Mensaje.objects.create(contacto=contacto, contenido=contentMessage)
             
             ''' Verificar si se tiene que activar un bot si el msg esta en un sector de bot '''
 
             # Enviar mensaje al canal de WebSocket
             channel_layer = get_channel_layer()
-
             async_to_sync(channel_layer.group_send)(
                 'global',
                 {
@@ -74,7 +71,6 @@ def green_api_webhook(request):
 def waapi_api_webhook(request):
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
-        print(data)
 
         if data:
             evento = data['event']
@@ -89,22 +85,21 @@ def waapi_api_webhook(request):
         integracion_whatsapp = Integracion.objects.get(nombre='WhatsApp')
 
         if integracion_whatsapp:
-            contacto = Room.objects.filter(telefono=telefono).first()
+            contacto = Contacto.objects.filter(telefono=telefono).first()
             if contacto:
                 contacto_integracion = ContactoIntegracion.objects.get(contacto=contacto)
-                Message.objects.create(contacto_integracion=contacto_integracion, contenido=contenido_mensaje, id_integracion=mensaje_id)
+                Mensaje.objects.create(contacto_integracion=contacto_integracion, contenido=contenido_mensaje, id_integracion=mensaje_id)
             else:
-                contacto = Room.objects.create(telefono = telefono)
+                contacto = Contacto.objects.create(telefono = telefono)
                 contacto_integracion = ContactoIntegracion.objects.create(contacto=contacto, integracion=integracion_whatsapp)
                 sector_chat_inicial = SectorTarea.objects.get(nombre='Chat inicial')
                 ContactoTarea.objects.create(contacto_integracion=contacto_integracion, sector_tarea=sector_chat_inicial)
-                Message.objects.create(contacto_integracion=contacto_integracion, contenido=contenido_mensaje, id_integracion=mensaje_id)            
+                Mensaje.objects.create(contacto_integracion=contacto_integracion, contenido=contenido_mensaje, id_integracion=mensaje_id)            
             
             ''' Verificar si se tiene que activar un bot si el msg esta en un sector de bot '''
 
             # Enviar mensaje al canal de WebSocket
             channel_layer = get_channel_layer()
-
             async_to_sync(channel_layer.group_send)(
                 'global',
                 {
@@ -114,10 +109,8 @@ def waapi_api_webhook(request):
                     'username': contacto.nombre if contacto.nombre else contacto.telefono
                 }
             )
-        print('mensaje recibido a través de webhook -> OK')
         return JsonResponse({'status': 'success'})
     else:
-        print('mensaje recibido a través de webhook -> ERROR')
         return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
 
 '''

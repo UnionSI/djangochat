@@ -5,7 +5,7 @@ from django.conf import settings
 
 urlpatterns = [
     path('', include('dashboard.urls')),
-    path('rooms/', include('chat.urls')),
+    path('contacto/', include('chat.urls')),
     path('admin/', admin.site.urls),
 ]
 

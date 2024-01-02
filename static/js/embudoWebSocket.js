@@ -17,36 +17,37 @@ globalSocket.onmessage = function(e) {
 
     switch (data.type) {
         case 'chat_message':
-            handleLastMessage(data)
+            manejarUltimoMensaje(data)
             break
         case 'sector_change':
-            handleRoomUpdate(data);
+            manejarActualizacionContacto(data);
             break;
         default:
             console.error('Unknown message type: ', data.type);
     }
 };
 
-function formatDate(date) {
+function formatoFecha(date) {
     const day = date.getDate();
     const month = date.getMonth() + 1;
     const year = date.getFullYear();
     const hours = date.getHours();
-    const minutes = date.getMinutes();
+    let minutes = date.getMinutes();
+    minutes = minutes < 10 ? "0" + minutes: minutes
     return `${day}/${month}/${year} ${hours}:${minutes}`;
 }
 
-function handleLastMessage(data) {
-    const contacto = document.querySelector(`[data-contacto="${data.room}"]`)
-    console.log('recibiendo mensaje de room', data.room, '-', data.message)
+function manejarUltimoMensaje(data) {
+    const contacto = document.querySelector(`[data-contacto="${data.contacto}"]`)
+    console.log('recibiendo mensaje de room', data.contacto, '-', data.mensaje)
     console.log(contacto)
     if (contacto) {
-        contacto.querySelector('[data-usuario]').innerText = `${data.username}: `
-        contacto.querySelector('[data-mensaje]').innerText = data.message;
+        contacto.querySelector('[data-usuario]').innerText = `${data.usuario}: `
+        contacto.querySelector('[data-mensaje]').innerText = data.mensaje;
     }
 }
 
-function handleRoomUpdate(data) {
+function manejarActualizacionContacto(data) {
     // Si existe la tarjeta en este cliente, eliminarla
     const tarjetaContactoExistente = document.querySelector(`[data-contacto="${data.contacto}"]`)
     if (tarjetaContactoExistente) {

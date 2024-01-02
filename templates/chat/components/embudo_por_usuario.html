@@ -19,7 +19,7 @@
                 <h6 class="usi-card text-center">Por responder</h6>
                 <h6 class="usi-card text-center">Respondido</h6>
                 {% for room in rooms %}
-                    <a href="{% url 'room:chat' room.slug %}" class="usi-card d-flex gap-2 list-group-item p-2 lh-sm border rounded {% if room.last_message.0.usuario.is_staff or room.last_message.0.usuario.is_superuser %} respondido {% else %} por-responder {% endif %}">
+                    <a href="{% url 'contacto:chat' room.slug %}" class="usi-card d-flex gap-2 list-group-item p-2 lh-sm border rounded {% if room.last_message.0.usuario.is_staff or room.last_message.0.usuario.is_superuser %} respondido {% else %} por-responder {% endif %}">
                                 <div>
                                     <img src="{% static 'img/logo.png' %}" alt="mdo" width="48" height="48" class="rounded-circle border">
                                 </div>

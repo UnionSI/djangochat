@@ -38,7 +38,7 @@ class SectorTarea(models.Model):
         verbose_name_plural = 'Sectores tareas'
 
 
-class Room(models.Model):
+class Contacto(models.Model):
     nombre = models.CharField(max_length=100, null=True)
     apellido = models.CharField(max_length=100, null=True)
     dni = models.CharField(max_length=11, null=True)
@@ -53,7 +53,7 @@ class Room(models.Model):
 
 
 class ContactoIntegracion(models.Model):
-    contacto = models.ForeignKey(Room, related_name='contacto_integraciones', on_delete=models.CASCADE)
+    contacto = models.ForeignKey(Contacto, related_name='contacto_integraciones', on_delete=models.CASCADE)
     integracion = models.ForeignKey(Integracion, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -77,10 +77,10 @@ class ContactoTarea(models.Model):
         verbose_name_plural = 'Contactos tareas'
 
 
-class Message(models.Model):
+class Mensaje(models.Model):
     #contacto = models.ForeignKey(Room, related_name='messages', on_delete=models.CASCADE)
-    contacto_integracion = models.ForeignKey(ContactoIntegracion, related_name='messages', on_delete=models.CASCADE)
-    usuario = models.ForeignKey(User, related_name='messages', on_delete=models.CASCADE, null=True)
+    contacto_integracion = models.ForeignKey(ContactoIntegracion, related_name='mensajes', on_delete=models.CASCADE)
+    usuario = models.ForeignKey(User, related_name='mensajes', on_delete=models.CASCADE, null=True)
     contenido = models.TextField()
     id_integracion = models.CharField(max_length=25, null=True, blank=True)  # ID del mensaje de la integración para citarlo
     recibido = models.DateTimeField(null=True)  # Verificar con la API
@@ -101,7 +101,7 @@ class Message(models.Model):
 
 class MensajeAdjunto(models.Model):
     url = models.URLField(max_length=200)
-    mensaje = models.ForeignKey(Message, on_delete=models.CASCADE)
+    mensaje = models.ForeignKey(Mensaje, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name_plural = 'Mensajes adjuntos'

@@ -1,7 +1,7 @@
 import httpx, json
 
 
-async def send_greenapi_message(chat_id, message):
+async def enviar_mensaje_greenapi(chat_id, message):
     id_instance = "7103880835"
     api_token_instance = "89bddd8da48246f593916d55b8be98e059a136b7b7e6469291"
 
@@ -22,7 +22,7 @@ async def send_greenapi_message(chat_id, message):
     return response.json()
 
 
-async def send_waapi_message(chat_id, message):
+async def enviar_mensaje_waapi(chat_id, message):
     id_instance = "3901"
     api_name = "customer-service"
     api_token_instance = "ipiOhK708cW4DuUHNtd234FnnnsfWyujgjV2S7THeac23b4f"
@@ -33,8 +33,6 @@ async def send_waapi_message(chat_id, message):
         "chatId": f"{chat_id}@c.us",
         "message": message
     }
-
-    print(payload)
 
     headers = {
         "accept": "application/json",

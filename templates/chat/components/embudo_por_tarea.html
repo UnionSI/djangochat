@@ -4,11 +4,11 @@
 
 <div class="d-flex flex-column w-100 bg-body-tertiary">
     
-    <a href="/" class="d-flex align-items-center gap-3 link-body-emphasis text-decoration-none p-3 border-bottom bg-body-tertiary" style="height: 63px">
+    <div class="d-flex align-items-center gap-3 text-decoration-none p-3 border-bottom bg-body-tertiary" style="height: 63px">
       <div>
         <h5 class="m-0 fs-5 fw-semibold">{{ embudo.nombre }}</h5>
       </div>
-    </a>
+    </div>
 
     
     <div class="d-flex p-2 gap-2 bg-body-tertiary overflow-hidden" data-sector="{{ embudo.id }}" style="height: 90vh;">
@@ -19,7 +19,7 @@
                 {% for contacto_tarea in sector_tarea.contactotarea_set.all %}
                     {% with contacto_integracion=contacto_tarea.contacto_integracion %}
                         <div class="usi-card d-flex gap-2 list-group-item lh-sm border rounded position-relative" data-contacto="{{ contacto_integracion.id }}">
-                            <a href="{% url 'room:chat' contacto_integracion.id %}" class="d-flex gap-2 list-group-item p-2 position-relative w-100" data-slug>
+                            <a href="{% url 'contacto:chat' contacto_integracion.id %}" class="d-flex gap-2 list-group-item p-2 position-relative w-100" data-slug>
 
 
                                 <div class="d-flex justify-content-center align-items-center">

@@ -2,7 +2,7 @@
 
 <div class="d-flex flex-column justify-content-between w-100">
     
-    <div class="d-flex align-items-center gap-3 link-body-emphasis text-decoration-none p-3 border-bottom bg-body-tertiary" style="height: 63px">
+    <div class="d-flex align-items-center gap-3 text-decoration-none p-3 border-bottom bg-body-tertiary" style="height: 63px">
       <img src="{% static 'img/logo.png' %}" alt="ameport_logo" width="48" height="48" class="rounded-circle">
       <div>
         {% if contacto.nombre %}
@@ -10,29 +10,96 @@
         {% else %}
             <h6 class="m-0">{{ contacto.telefono }}</h6>
         {% endif %}
-        <p class="m-0 text-secondary"><small>Seleccione para obtener información del contacto</small></p>
+        <p class="m-0 text-secondary"><small>Ver barra lateral izquierda para más información</small></p>
       </div>
     </div>
 
     <div id="chat-messages" class="d-flex flex-column bg-body-secondary p-2 h-100 overflow-y-scroll">
         {% for mensaje in contacto_mensajes %}
-        {% if test %}            
-            <div style="max-width: 60%;" class="{% if mensaje.usuario %} align-self-start {% else %} align-self-end {% endif %} d-flex flex-column p-2 bg-white border rounded">
-        {% else %}
-            <div style="max-width: 60%;" class="{% if mensaje.usuario %} align-self-end {% else %} align-self-start {% endif %} d-flex flex-column p-2 bg-white border rounded">
-        {% endif %}
-            <div>
-                <small class="text-secondary">{{ mensaje.fecha_hora|date:"d/m/Y" }} {{ mensaje.fecha_hora|time:"H:i" }} -</small>
-                <small class="text-secondary">
-                    {% if mensaje.usuario %}
-                        {{ mensaje.usuario }}
-                    {% else %}
-                        {{ contacto.nombre }}
-                    {% endif %}
-                </small>
-            </div>
-            <small>{{ mensaje.contenido }}</small>
-        </div>
+
+            {% if test %}
+                {% if mensaje.usuario %}      
+                    <div style="max-width: 60%;" class="align-self-start d-flex flex-column">
+                        <div class="d-flex gap-1 ">
+                            <img src="{% static 'img/logo.png' %}" alt="ameport_logo" width="24" height="24" class="mt-1 rounded-circle">
+                            <div class="bg-white p-2 border rounded-3">
+                                <div>
+                                    <small class="text-secondary">{{ mensaje.fecha_hora|date:"d/m/Y" }} {{ mensaje.fecha_hora|time:"H:i" }} -</small>
+                                    <small class="text-secondary">
+                                        {% if mensaje.usuario %}
+                                            {{ mensaje.usuario }}
+                                        {% else %}
+                                            {{ contacto.nombre }}
+                                        {% endif %}
+                                    </small>
+                                </div>
+                                <small>{{ mensaje.contenido }}</small>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}      
+                    <div style="max-width: 60%;" class="align-self-end d-flex flex-column">
+                        <div class="d-flex gap-1 ">
+                            <img src="{% static 'img/logo.png' %}" alt="ameport_logo" width="24" height="24" class="mt-1 rounded-circle">
+                            <div class="bg-union p-2 border rounded-3">
+                                <div>
+                                    <small class="text-white-50">{{ mensaje.fecha_hora|date:"d/m/Y" }} {{ mensaje.fecha_hora|time:"H:i" }} -</small>
+                                    <small class="text-white-50">
+                                        {% if mensaje.usuario %}
+                                            {{ mensaje.usuario }}
+                                        {% else %}
+                                            {{ contacto.nombre }}
+                                        {% endif %}
+                                    </small>
+                                </div>
+                                <small>{{ mensaje.contenido }}</small>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+            {% else %}
+                {% if mensaje.usuario %}
+                    <div style="max-width: 60%;" class="align-self-end d-flex flex-column">
+                        <div class="d-flex flex-row-reverse gap-1 ">
+                        <img src="{% static 'img/logo.png' %}" alt="ameport_logo" width="24" height="24" class="mt-1 rounded-circle">
+                            <div class="bg-union p-2 border rounded-3">
+                                <div>
+                                    <small class="text-white-50">{{ mensaje.fecha_hora|date:"d/m/Y" }} {{ mensaje.fecha_hora|time:"H:i" }} -</small>
+                                    <small class="text-white-50">
+                                        {% if mensaje.usuario %}
+                                            {{ mensaje.usuario }}
+                                        {% else %}
+                                            {{ contacto.nombre }}
+                                        {% endif %}
+                                    </small>
+                                </div>
+                                <small>{{ mensaje.contenido }}</small>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}      
+                    <div style="max-width: 60%;" class="align-self-start d-flex flex-column">
+                        <div class="d-flex gap-1 ">
+                        <img src="{% static 'img/logo.png' %}" alt="ameport_logo" width="24" height="24" class="mt-1 rounded-circle">
+                            <div class="bg-white p-2 border rounded-3">
+                                <div>
+                                    <small class="text-secondary">{{ mensaje.fecha_hora|date:"d/m/Y" }} {{ mensaje.fecha_hora|time:"H:i" }} -</small>
+                                    <small class="text-secondary">
+                                        {% if mensaje.usuario %}
+                                            {{ mensaje.usuario }}
+                                        {% else %}
+                                            {{ contacto.nombre }}
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            <small>{{ mensaje.contenido }}</small>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            {% endif %}
+
         {% endfor %}
     </div>
     

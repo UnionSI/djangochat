@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Integracion, Sector, SectorTarea, Room, ContactoIntegracion, ContactoTarea, Message, MensajeAdjunto
+from .models import Integracion, Sector, SectorTarea, Contacto, ContactoIntegracion, ContactoTarea, Mensaje, MensajeAdjunto
 
 @admin.register(Integracion)
 class AdminIntegracion(admin.ModelAdmin):
@@ -13,8 +13,8 @@ class AdminSector(admin.ModelAdmin):
 class AdminSectorTarea(admin.ModelAdmin):
     list_display = ('nombre', 'sector', 'activo')
 
-@admin.register(Room)
-class AdminRoom(admin.ModelAdmin):
+@admin.register(Contacto)
+class AdminContacto(admin.ModelAdmin):
     list_display = ('nombre',)
 
 @admin.register(ContactoIntegracion)
@@ -25,8 +25,8 @@ class AdminContactoIntegracion(admin.ModelAdmin):
 class AdminContactoTarea(admin.ModelAdmin):
     list_display = ('contacto_integracion', 'sector_tarea', 'usuario', 'fecha_hora')
 
-@admin.register(Message)
-class AdminMessage(admin.ModelAdmin):
+@admin.register(Mensaje)
+class AdminMensaje(admin.ModelAdmin):
     list_display = ('contacto_integracion', 'usuario', 'contenido', 'fecha_hora', 'recibido', 'leido', 'id_integracion')
 
 @admin.register(MensajeAdjunto)
