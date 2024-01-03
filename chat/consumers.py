@@ -38,6 +38,7 @@ class GlobalConsumer(AsyncWebsocketConsumer):
             response = await enviar_mensaje_waapi(chat_id=telefono, message=mensaje)
             print(response)
             # Validar si responde un 200 antes de continuar
+            estado = 'success'
         elif integracion == 'Test':
             if ambiente == 'Homologacion':
                 usuario = None
