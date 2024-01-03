@@ -69,6 +69,7 @@ def green_api_webhook(request):
 
 @csrf_exempt
 def waapi_api_webhook(request):
+    print('Consultando webhook waapi_api_webhook')
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
         print(f'\n***\n{data}\n***\n')
