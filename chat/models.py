@@ -32,7 +32,7 @@ class SectorTarea(models.Model):
     activo = models.BooleanField()  # Para que no se pierda las asignadas a un mensaje anterior si sacan una tarea
 
     def __str__(self):
-        return self.nombre
+        return f'{self.sector} - {self.nombre}'
 
     class Meta:
         verbose_name_plural = 'Sectores tareas'
