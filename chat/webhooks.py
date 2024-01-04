@@ -68,7 +68,7 @@ def green_api_webhook(request):
   
 @csrf_exempt
 def waapi_api_webhook_test(request):
-    return JsonResponse({'status': request.method})
+    return JsonResponse({'status': json.dumps(request.__dict__)})
 
 
 @csrf_exempt
