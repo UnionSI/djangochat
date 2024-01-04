@@ -78,7 +78,7 @@ def waapi_api_webhook(request):
         print(f'\n***\n{data}\n***\n')
         if data:
             evento = data['event']
-            instancia_id = data['data']['instanceId']
+            instancia_id = data['instanceId']
             mensaje_id = data['data']['message']['id']['id']
             contenido_mensaje = data['data']['message']['body']
             telefono_crudo = data['data']['message']['from']
