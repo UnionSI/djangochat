@@ -66,11 +66,7 @@ def green_api_webhook(request):
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
   
-@csrf_exempt
-def waapi_api_webhook_test(request):
-    return JsonResponse({'status': json.dumps(request.__dict__)})
-
-
+  
 @csrf_exempt
 def waapi_api_webhook(request):
     print('Consultando webhook waapi_api_webhook')
@@ -82,7 +78,7 @@ def waapi_api_webhook(request):
         print(f'\n***\n{data}\n***\n')
         if data:
             evento = data['event']
-            instancia_id = data['instanceId']
+            instancia_id = data['data']['instanceId']
             mensaje_id = data['data']['message']['id']['id']
             contenido_mensaje = data['data']['message']['body']
             telefono_crudo = data['data']['message']['from']
