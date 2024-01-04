@@ -2,7 +2,7 @@
 {% load humanize %}
 
 
-<div class="d-flex flex-column w-100 bg-body-tertiary">
+<div class="d-flex flex-column w-100 bg-body-tertiary position-relative">
     
     <div class="d-flex align-items-center gap-3 text-decoration-none p-3 border-bottom bg-body-tertiary" style="height: 63px">
       <div>
@@ -22,7 +22,7 @@
                             <a href="{% url 'contacto:chat' contacto_integracion.id %}" class="d-flex gap-2 list-group-item p-2 position-relative w-100" data-slug>
 
 
-                                <div class="d-flex justify-content-center align-items-center">
+                                <div class="d-flex justify-content-center align-items-center position-relative">
                                     <img src="{% static 'img/logo.png' %}" alt="mdo" width="55" height="55" class="rounded-circle border" data-thumbnail>
                                 </div>
                     
@@ -37,9 +37,14 @@
                                             <small class="text-primary" data-dni>{{ contacto_integracion.contacto.dni }}</small>
                                         </div>
                                     </div>
-                                    {% with ultimo_mensaje=contacto_integracion.messages.last %}
+                                    {% with ultimo_mensaje=contacto_integracion.mensajes.last %}
                                     {% if not ultimo_mensaje.usuario %}
-                                        <div style="width: 10px; height: 10px; top:5px; left:5px;" class="bg-primary rounded-circle position-absolute" data-no_leido></div>
+                                        <div style="width: 10px; height: 10px; top:5px; left:5px;" class="bg-danger rounded-circle position-absolute" data-no_leido></div>
+                                        <!-- 
+                                        <span class="position-absolute top-0 start-0 translate-middle p-2 bg-danger border border-light rounded-circle">
+                                            <span class="visually-hidden">New alerts</span>
+                                        </span>
+                                         -->
                                     {% endif %}
 
                                     <div class="col-12">
@@ -57,9 +62,10 @@
                                         <small class="text-body-secondary flex-end" data-fecha>
                                             {% now "d/m/Y" as todays_date %}
                                             {% if todays_date == ultimo_mensaje.fecha_hora|date:"d/m/Y" %}
-                                                {{ ultimo_mensaje.fecha_hora|time:"H:i" }}
+                                                <!-- {{ ultimo_mensaje.fecha_hora|time:"H:i" }} -->
+                                                {{ ultimo_mensaje.fecha_hora|date:"d/m/Y H:i" }}
                                             {% else %}
-                                                {{ ultimo_mensaje.fecha_hora|date:"d/m/Y" }}
+                                                {{ ultimo_mensaje.fecha_hora|date:"d/m/Y H:i" }}
                                             {% endif %}
                                         </small>
                                     </div>
@@ -95,6 +101,23 @@
         {% endfor %}
     </div>
     
+    <!-- Error  -->
+    <div id="box-error" class="modal-dialog position-absolute z-3 d-flex d-none" role="document" style="width: 350px; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+        <div class="modal-content rounded-4 shadow bg-white m-3 p-3" >
+            <div class="modal-header border-bottom-0">
+            <h1 class="modal-title fs-5">Error de comunicación</h1>
+            <button type="button" class="btn-close" data-bs-close="modal"></button>
+            </div>
+            <div class="modal-body py-0">
+            <p>Es necesario recargar la página para reestablecer la conexión</p>
+            </div>
+            <div class="modal-footer flex-column align-items-stretch w-100 gap-2 pb-3 border-top-0">
+            <a href="{{ request.path }}" class="btn btn-danger">Recargar</a>
+            <!-- <button type="button" class="btn btn-secondary" data-bs-close="modal">Close</button> -->
+            </div>
+        </div>
+    </div>
+
 </div>
 
 {% include 'chat/components/tarjeta_embudo_default.html' %}

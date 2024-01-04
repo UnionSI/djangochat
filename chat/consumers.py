@@ -36,9 +36,7 @@ class GlobalConsumer(AsyncWebsocketConsumer):
 
         if integracion == 'WhatsApp':
             response = await enviar_mensaje_waapi(chat_id=telefono, message=mensaje)
-            print(response)
-            # Validar si responde un 200 antes de continuar
-            estado = 'success'
+            estado = 'success' if response['status'] == 'success' else None
         elif integracion == 'Test':
             if ambiente == 'Homologacion':
                 usuario = None
@@ -58,6 +56,15 @@ class GlobalConsumer(AsyncWebsocketConsumer):
             )
         else:
             print('No se pudo enviar el mensaje')
+            await self.channel_layer.group_send(
+                'global',
+                {
+                    'type': 'message_error',
+                    'contacto': contacto,
+                    'mensaje': 'No se pudo enviar el mensaje. Por favor, recargue la página y vuelva a intentarlo',
+                    'usuario': usuario,
+                }
+            )
 
     async def procesar_cambio_de_sector(self, data):
         sector = data['sector']
@@ -118,6 +125,13 @@ class GlobalConsumer(AsyncWebsocketConsumer):
             'fecha': event['fecha'],
         }))
 
+    async def message_error(self, event):
+        await self.send(text_data=json.dumps({
+            'type': event['type'],
+            'contacto': event['contacto'],
+            'mensaje': event['mensaje'],
+            'usuario': event['usuario']
+        }))
 
     @sync_to_async
     def save_message(self, usuario, contacto, mensaje):

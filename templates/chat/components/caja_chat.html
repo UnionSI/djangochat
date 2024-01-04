@@ -1,6 +1,6 @@
 {% load static %}
 
-<div class="d-flex flex-column justify-content-between w-100">
+<div class="d-flex flex-column justify-content-between w-100 scroll-white position-relative">
     
     <div class="d-flex align-items-center gap-3 text-decoration-none p-3 border-bottom bg-body-tertiary" style="height: 63px">
       <img src="{% static 'img/logo.png' %}" alt="ameport_logo" width="48" height="48" class="rounded-circle">
@@ -39,7 +39,7 @@
                     </div>
                 {% else %}      
                     <div style="max-width: 60%;" class="align-self-end d-flex flex-column">
-                        <div class="d-flex gap-1 ">
+                        <div class="d-flex flex-row-reverse gap-1 ">
                             <img src="{% static 'img/logo.png' %}" alt="ameport_logo" width="24" height="24" class="mt-1 rounded-circle">
                             <div class="bg-union p-2 border rounded-3">
                                 <div>
@@ -113,6 +113,23 @@
                 </svg>
             </button>
         </form>
+    </div>
+
+    <!-- Error  -->
+    <div id="box-error" class="modal-dialog position-absolute z-3 d-flex d-none" role="document" style="width: 350px; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+        <div class="modal-content rounded-4 shadow bg-white m-3 p-3" >
+            <div class="modal-header border-bottom-0">
+            <h2 class="modal-title fs-5">[Titulo del error]</h2>
+            <button type="button" class="btn-close" data-bs-close="modal"></button>
+            </div>
+            <div class="modal-body py-0">
+            <p>[Mensaje del error]</p>
+            </div>
+            <div class="modal-footer flex-column align-items-stretch w-100 gap-2 mt-3 pb-3 border-top-0">
+            <a href="{{ request.path }}" class="btn btn-danger">Recargar</a>
+            <!-- <button type="button" class="btn btn-secondary" data-bs-close="modal">Close</button> -->
+            </div>
+        </div>
     </div>
 
 </div>

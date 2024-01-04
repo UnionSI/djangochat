@@ -1,6 +1,8 @@
 :root {
     --primary-color: #2C3E50;
-    --primary-hover-color: #32465A;
+    --primary-hover-color: #3c5268;
+/*    --primary-hover-color: #32465A;*/
+
 }
 
 .messages {
@@ -61,22 +63,46 @@
 /* ===== Scrollbar CSS ===== */
 
 /* Firefox */
-.bg-union > * {
+.scroll-union > * {
 scrollbar-width: auto;
 scrollbar-color: #ccc #ffffff;
 }
 
 /* Chrome, Edge, and Safari */
-.bg-union > *::-webkit-scrollbar {
+.scroll-union > *::-webkit-scrollbar {
 width: 10px;
 }
 
-.bg-union > *::-webkit-scrollbar-track {
+.scroll-union > *::-webkit-scrollbar-track {
 background: var(--primary-color);
 }
 
-.bg-union > *::-webkit-scrollbar-thumb {
+.scroll-union > *::-webkit-scrollbar-thumb {
 background-color: #ccc;
 border-radius: 10px;
 border: 3px solid var(--primary-color);
+}
+
+/* */
+/* ===== Scrollbar CSS ===== */
+
+/* Firefox */
+.scroll-white > * {
+scrollbar-width: auto;
+scrollbar-color: #ccc var(--primary-color);
+}
+
+/* Chrome, Edge, and Safari */
+.scroll-white > *::-webkit-scrollbar {
+width: 10px;
+}
+
+.scroll-white > *::-webkit-scrollbar-track {
+background: #fff;
+}
+
+.scroll-white > *::-webkit-scrollbar-thumb {
+background-color: #ccc;
+border-radius: 10px;
+border: 3px solid #fff;
 }

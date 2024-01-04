@@ -8,6 +8,7 @@ globalSocket.onopen = function(e) {
 
 globalSocket.onclose = function(e) {
     console.log('Global WebSocket closed');
+    manejarErrores('Error de comunicación', 'Es necesario recargar la página para reestablecer la conexión')
 };
 
 globalSocket.onmessage = function(e) {
@@ -28,13 +29,31 @@ globalSocket.onmessage = function(e) {
 };
 
 function formatoFecha(date) {
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
+    const day = addZero(date.getDate());
+    const month = addZero(date.getMonth() + 1);
     const year = date.getFullYear();
-    const hours = date.getHours();
-    let minutes = date.getMinutes();
-    minutes = minutes < 10 ? "0" + minutes: minutes
+    const hours = addZero(date.getHours());
+    let minutes = addZero(date.getMinutes());
     return `${day}/${month}/${year} ${hours}:${minutes}`;
+}
+
+function addZero(number) {
+    return number < 10 ? "0" + number: number
+}
+
+function manejarErrores(titulo, mensaje) {
+    const boxError = document.querySelector('#box-error')
+    const modalTitle = boxError.querySelector('.modal-title')
+    const modalBody = boxError.querySelector('.modal-body')
+    modalTitle.innerHTML = titulo
+    modalBody.innerHTML = mensaje
+    boxError.classList.remove('d-none')
+    const closeButtons = document.querySelectorAll('[data-bs-close="modal"]')
+    closeButtons.forEach(closeButton => {
+        closeButton.addEventListener('click', () => {
+            boxError.classList.add('d-none')
+        })
+    })
 }
 
 function manejarUltimoMensaje(data) {

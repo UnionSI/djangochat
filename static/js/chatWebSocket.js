@@ -14,6 +14,7 @@ globalSocket.onopen = function(e) {
 
 globalSocket.onclose = function(e) {
     console.log('Global WebSocket closed');
+    manejarErrores('Error de comunicación', 'Es necesario recargar la página para reestablecer la conexión')
 };
 
 globalSocket.onmessage = function(e) {
@@ -27,6 +28,11 @@ globalSocket.onmessage = function(e) {
                 manejarMensajeRecibido(data);
             }
             //actualizarListaContactos(data);
+            break;
+        case 'message_error':
+            if (roomName == data.contacto && userName == data.usuario ) {
+                manejarErrores('Error al enviar mensaje', data.mensaje)
+            }
             break;
         default:
             console.error('Unknown message type: ', data.type);
@@ -42,20 +48,33 @@ function manejarMensajeRecibido(data) {
         case 'Produccion':
             if (userName == data.usuario) {
                 alignMessage = 'align-self-end'
+                alignThumbnail = 'flex-row-reverse'
+                bgColor = 'bg-union'
+                textColor = 'text-white-50'
             } else {
                 alignMessage = 'align-self-start'
+                alignThumbnail = 'flex-row'
+                bgColor = 'bg-white'
+                textColor = 'text-secondary'
             }
             break;
         case 'Homologacion':
             if (userName == data.usuario) {
                 alignMessage = 'align-self-start'
+                alignThumbnail = 'flex-row'
+                bgColor = 'bg-white'
+                textColor = 'text-secondary'
             } else {
                 alignMessage = 'align-self-end'
+                alignThumbnail = 'flex-row-reverse'
+                bgColor = 'bg-union'
+                textColor = 'text-white-50'
             }
             break;
     }
     //const alignMessage = userName == data.username? 'align-self-end': 'align-self-start'
     document.querySelector('#chat-messages').innerHTML += (
+        /*
         `<div class="${alignMessage} d-flex flex-column p-2 bg-white border rounded">
             <div>
             <small class="text-secondary">${formattedDate} -</small>
@@ -63,6 +82,21 @@ function manejarMensajeRecibido(data) {
             </div>
             <small>${data.mensaje}</small>
         </div>`
+        */
+       `
+       <div style="max-width: 60%;" class="${alignMessage} d-flex flex-column">
+            <div class="d-flex ${alignThumbnail} gap-1 ">
+            <img src="/static/img/logo.png" alt="ameport_logo" width="24" height="24" class="mt-1 rounded-circle">
+                <div class="${bgColor} p-2 border rounded-3">
+                    <div>
+                        <small class="${textColor}">${formattedDate} -</small>
+                        <small class="${textColor}">${data.usuario}</small>
+                    </div>
+                    <small>${data.mensaje}</small>
+                </div>
+            </div>
+        </div>
+       `
     );
 }
 
@@ -75,6 +109,21 @@ function actualizarListaContactos(data) {
         divRoom.querySelector(".message-content").innerHTML = data.mensaje;
         roomList.insertBefore(divRoom, roomList.firstChild);
     }
+}
+
+function manejarErrores(titulo, mensaje) {
+    const boxError = document.querySelector('#box-error')
+    const modalTitle = boxError.querySelector('.modal-title')
+    const modalBody = boxError.querySelector('.modal-body')
+    modalTitle.innerHTML = titulo
+    modalBody.innerHTML = mensaje
+    boxError.classList.remove('d-none')
+    const closeButtons = document.querySelectorAll('[data-bs-close="modal"]')
+    closeButtons.forEach(closeButton => {
+        closeButton.addEventListener('click', () => {
+            boxError.classList.add('d-none')
+        })
+    })
 }
 
 document.querySelector('#chat-message-input').focus();
@@ -96,7 +145,7 @@ form.addEventListener('submit', function(e) {
         'ambiente': ambiente
     }));
 
-    console.log('mensaje enviado a la ws: ',{
+    console.log('Mensaje enviado: ',{
         'type': 'chat_message',
         'mensaje': message,
         'usuario': userName,
@@ -110,13 +159,16 @@ form.addEventListener('submit', function(e) {
 });
 
 function formatoFecha(date) {
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
+    const day = addZero(date.getDate());
+    const month = addZero(date.getMonth() + 1);
     const year = date.getFullYear();
-    const hours = date.getHours();
-    let minutes = date.getMinutes();
-    minutes = minutes < 10 ? "0" + minutes: minutes
+    const hours = addZero(date.getHours());
+    let minutes = addZero(date.getMinutes());
     return `${day}/${month}/${year} ${hours}:${minutes}`;
+}
+
+function addZero(number) {
+    return number < 10 ? "0" + number: number
 }
 
 function scrollAlFinal() {
