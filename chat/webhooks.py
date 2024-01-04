@@ -108,9 +108,9 @@ def waapi_api_webhook(request):
                 'global',
                 {
                     'type': 'chat_message',
-                    'room': contacto_integracion.id,
-                    'message': contenido_mensaje,
-                    'username': contacto.nombre if contacto.nombre else contacto.telefono
+                    'contacto': contacto_integracion.id,
+                    'mensaje': contenido_mensaje,
+                    'usuario': contacto.nombre if contacto.nombre else contacto.telefono
                 }
             )
         return JsonResponse({'status': 'success'})
