@@ -65,12 +65,17 @@ def green_api_webhook(request):
         return JsonResponse({'status': 'success'})
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
-    
+  
+@csrf_exempt
+def waapi_api_webhook_test(request):
+    return JsonResponse({'status': request})
+
 
 @csrf_exempt
 def waapi_api_webhook(request):
     print('Consultando webhook waapi_api_webhook')
-    print(f'Request.method: {request.method}')
+    print(request)
+    print(request.method)
     if request.method == 'POST':
         print('entró al POST')
         data = json.loads(request.body.decode('utf-8'))
