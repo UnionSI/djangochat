@@ -18,6 +18,13 @@
 
     </head>
 
+    <script>
+        function manejarArchivoEliminado(elemento) {
+            elemento.onerror = null;
+            elemento.src = '{% static "img/missing-file-1.png" %}';
+        }
+    </script>
+
     <body class="d-flex vh-100 vw-100">
 
         {% block content %}

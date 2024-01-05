@@ -34,6 +34,7 @@ class GlobalConsumer(AsyncWebsocketConsumer):
         integracion = data['integracion']
         ambiente = data['ambiente']
         estado = None
+        subestado = None
         media = data['media']
 
         #contacto = await sync_to_async(Contacto.objects.get)(id=contacto)
@@ -50,14 +51,15 @@ class GlobalConsumer(AsyncWebsocketConsumer):
             print(response)
             # Manejar cuando se envia una foto pero no la puede descargar el whatsapp:
             #{'data': {'status': 'error', 'message': 'failed to download media file', 'instanceId': '4238'}, 'links': {'self': 'https://waapi.app/api/v1/instances/4238/client/action/send-media'}, 'status': 'success'}
-            estado = 'success' if response['status'] == 'success' else None
+            estado = response['status']
+            subestado = response['data']['status']  # Cuando la API no puede descargar el error el estado es 'success' pero el subestado es 'error' 
         elif integracion == 'Test':
             if ambiente == 'Homologacion':
                 usuario = None
                 # Llamar función chequear_si_se_activa_chatbot
             estado = 'success'
 
-        if estado == 'success':
+        if estado == 'success' and subestado == 'success':
             usuario = await self.save_message(usuario, contacto, mensaje, media)
             await self.channel_layer.group_send(
                 'global',

@@ -18,7 +18,7 @@
             <div>
                 {% if mensaje.mensajes_adjuntos.first.url %}
                     <img src="{{ MEDIA_URL }}{{ mensaje.mensajes_adjuntos.first.url }}" alt=""  class="mt-1" style="max-width: 330px; max-height: 330px;"
-                    onerror="this.onerror=null; this.src='http://127.0.0.1:8000/static/img/missing-file-1.png';">
+                    onerror="manejarArchivoEliminado(this)">
                 {% endif %}            
             </div>
             <small>{{ mensaje.contenido }}</small>
