@@ -14,89 +14,20 @@
       </div>
     </div>
 
-    <div id="chat-messages" class="d-flex flex-column bg-body-secondary p-2 h-100 overflow-y-scroll">
+    <div id="chat-messages" class="d-flex flex-column gap-2 bg-body-secondary p-2 h-100 overflow-y-scroll">
         {% for mensaje in contacto_mensajes %}
 
             {% if test %}
-                {% if mensaje.usuario %}      
-                    <div style="max-width: 60%;" class="align-self-start d-flex flex-column">
-                        <div class="d-flex gap-1 ">
-                            <img src="{% static 'img/logo.png' %}" alt="ameport_logo" width="24" height="24" class="mt-1 rounded-circle">
-                            <div class="bg-white p-2 border rounded-3">
-                                <div>
-                                    <small class="text-secondary">{{ mensaje.fecha_hora|date:"d/m/Y" }} {{ mensaje.fecha_hora|time:"H:i" }} -</small>
-                                    <small class="text-secondary">
-                                        {% if mensaje.usuario %}
-                                            {{ mensaje.usuario }}
-                                        {% else %}
-                                            {{ contacto.nombre }}
-                                        {% endif %}
-                                    </small>
-                                </div>
-                                <small>{{ mensaje.contenido }}</small>
-                            </div>
-                        </div>
-                    </div>
-                {% else %}      
-                    <div style="max-width: 60%;" class="align-self-end d-flex flex-column">
-                        <div class="d-flex flex-row-reverse gap-1 ">
-                            <img src="{% static 'img/logo.png' %}" alt="ameport_logo" width="24" height="24" class="mt-1 rounded-circle">
-                            <div class="bg-union p-2 border rounded-3">
-                                <div>
-                                    <small class="text-white-50">{{ mensaje.fecha_hora|date:"d/m/Y" }} {{ mensaje.fecha_hora|time:"H:i" }} -</small>
-                                    <small class="text-white-50">
-                                        {% if mensaje.usuario %}
-                                            {{ mensaje.usuario }}
-                                        {% else %}
-                                            {{ contacto.nombre }}
-                                        {% endif %}
-                                    </small>
-                                </div>
-                                <small>{{ mensaje.contenido }}</small>
-                            </div>
-                        </div>
-                    </div>
+                {% if mensaje.usuario %}
+                    {% include 'chat/components/caja_chat_mensaje_izq.html' %}
+                {% else %}
+                   {% include 'chat/components/caja_chat_mensaje_der.html' %}
                 {% endif %}
-
             {% else %}
                 {% if mensaje.usuario %}
-                    <div style="max-width: 60%;" class="align-self-end d-flex flex-column">
-                        <div class="d-flex flex-row-reverse gap-1 ">
-                        <img src="{% static 'img/logo.png' %}" alt="ameport_logo" width="24" height="24" class="mt-1 rounded-circle">
-                            <div class="bg-union p-2 border rounded-3">
-                                <div>
-                                    <small class="text-white-50">{{ mensaje.fecha_hora|date:"d/m/Y" }} {{ mensaje.fecha_hora|time:"H:i" }} -</small>
-                                    <small class="text-white-50">
-                                        {% if mensaje.usuario %}
-                                            {{ mensaje.usuario }}
-                                        {% else %}
-                                            {{ contacto.nombre }}
-                                        {% endif %}
-                                    </small>
-                                </div>
-                                <small>{{ mensaje.contenido }}</small>
-                            </div>
-                        </div>
-                    </div>
-                {% else %}      
-                    <div style="max-width: 60%;" class="align-self-start d-flex flex-column">
-                        <div class="d-flex gap-1 ">
-                        <img src="{% static 'img/logo.png' %}" alt="ameport_logo" width="24" height="24" class="mt-1 rounded-circle">
-                            <div class="bg-white p-2 border rounded-3">
-                                <div>
-                                    <small class="text-secondary">{{ mensaje.fecha_hora|date:"d/m/Y" }} {{ mensaje.fecha_hora|time:"H:i" }} -</small>
-                                    <small class="text-secondary">
-                                        {% if mensaje.usuario %}
-                                            {{ mensaje.usuario }}
-                                        {% else %}
-                                            {{ contacto.nombre }}
-                                        {% endif %}
-                                    </small>
-                                </div>
-                            <small>{{ mensaje.contenido }}</small>
-                        </div>
-                    </div>
-                </div>
+                    {% include 'chat/components/caja_chat_mensaje_der.html' %}
+                {% else %}
+                    {% include 'chat/components/caja_chat_mensaje_izq.html' %}
                 {% endif %}
             {% endif %}
 
@@ -104,9 +35,10 @@
     </div>
     
     <div class="bg-body-tertiary p-3">
-        <form id="form-chat-submit" class="d-flex justify-content-center align-items-center gap-2" method="POST">
+        <form id="form-chat-submit" class="d-flex justify-content-center align-items-center gap-2" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
-            <input type="text" class="form-control" id="chat-message-input" placeholder="Escribe un mensaje...">
+            <input class="form-control" type="text" id="chat-message-input" placeholder="Escribe un mensaje...">
+            <input class="form-control" type="file" id="file-attached" multiple style="width: 300px;" value="Seleccionar Archivos">
             <button id="chat-message-submit" class="btn btn-primary">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-send-fill" viewBox="0 0 16 16">
                     <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z"/>

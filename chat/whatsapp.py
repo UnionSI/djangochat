@@ -22,7 +22,7 @@ async def enviar_mensaje_greenapi(chat_id, message):
     return response.json()
 
 
-async def enviar_mensaje_waapi(chat_id, message):
+async def enviar_mensaje_waapi(chat_id, mensaje):
     # webhook: https://djangochat-1.onrender.com/contacto/waapi_api_webhook
     id_instance = "4107"
     api_name = "customer-service"
@@ -32,7 +32,7 @@ async def enviar_mensaje_waapi(chat_id, message):
 
     payload = {
         "chatId": f"{chat_id}@c.us",
-        "message": message
+        "message": mensaje
     }
 
     headers = {
@@ -48,7 +48,7 @@ async def enviar_mensaje_waapi(chat_id, message):
     return response.json()
 
 
-async def enviar_adjunto_waapi(chat_id, message, mediafile):
+async def enviar_adjunto_waapi(chat_id, mensaje, url_adjunto):
     # webhook: https://djangochat-1.onrender.com/contacto/waapi_api_webhook
     id_instance = "4107"
     api_name = "customer-service"
@@ -57,11 +57,11 @@ async def enviar_adjunto_waapi(chat_id, message, mediafile):
     url = f'https://waapi.app/api/v1/instances/{id_instance}/client/action/send-media'
 
     payload = {
-        "mediaUrl": "https://www.freepnglogos.com/uploads/google-logo-png/google-logo-png-suite-everything-you-need-know-about-google-newest-0.png",
-        "mediaCaption": "This is a test image",
-        "mediaName": "imageName.png",
+        "mediaUrl": url_adjunto,
+        #"mediaCaption": "This is a test image",
+        #"mediaName": "imageName.png",
         "chatId": f"{chat_id}@c.us",
-        #"message": message
+        "message": mensaje
     }
 
     headers = {

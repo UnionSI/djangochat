@@ -100,8 +100,8 @@ class Mensaje(models.Model):
 
 
 class MensajeAdjunto(models.Model):
-    url = models.URLField(max_length=200)
-    mensaje = models.ForeignKey(Mensaje, on_delete=models.CASCADE)
+    url = models.FilePathField()
+    mensaje = models.ForeignKey(Mensaje, related_name='mensajes_adjuntos', on_delete=models.CASCADE)
 
     class Meta:
         verbose_name_plural = 'Mensajes adjuntos'

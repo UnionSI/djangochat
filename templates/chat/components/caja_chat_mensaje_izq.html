@@ -1,0 +1,27 @@
+{% load static %}
+
+  
+<div style="max-width: 60%;" class="align-self-start d-flex flex-column">
+    <div class="d-flex gap-1 ">
+        <img src="{% static 'img/logo.png' %}" alt="" width="24" height="24" class="mt-1 rounded-circle">
+        <div class="bg-white caja-mensaje-chat">
+            <div>
+                <small class="text-secondary">{{ mensaje.fecha_hora|date:"d/m/Y" }} {{ mensaje.fecha_hora|time:"H:i" }} -</small>
+                <small class="text-secondary">
+                    {% if mensaje.usuario %}
+                        {{ mensaje.usuario }}
+                    {% else %}
+                        {{ contacto.nombre }}
+                    {% endif %}
+                </small>
+            </div>
+            <div>
+                {% if mensaje.mensajes_adjuntos.first.url %}
+                    <img src="{{ MEDIA_URL }}{{ mensaje.mensajes_adjuntos.first.url }}" alt=""  class="mt-1" style="max-width: 330px; max-height: 330px;"
+                    onerror="this.onerror=null; this.src='http://127.0.0.1:8000/static/img/missing-file-1.png';">
+                {% endif %}            
+            </div>
+            <small>{{ mensaje.contenido }}</small>
+        </div>
+    </div>
+</div>

@@ -72,6 +72,9 @@ function manejarMensajeRecibido(data) {
             }
             break;
     }
+
+    const url_adjunto = data.url_adjunto? `<div><img src="${data.url_adjunto}" alt="" class="mt-1" style="max-width: 330px; max-height: 330px;"></div>`: '';
+
     //const alignMessage = userName == data.username? 'align-self-end': 'align-self-start'
     document.querySelector('#chat-messages').innerHTML += (
         /*
@@ -87,11 +90,12 @@ function manejarMensajeRecibido(data) {
        <div style="max-width: 60%;" class="${alignMessage} d-flex flex-column">
             <div class="d-flex ${alignThumbnail} gap-1 ">
             <img src="/static/img/logo.png" alt="ameport_logo" width="24" height="24" class="mt-1 rounded-circle">
-                <div class="${bgColor} p-2 border rounded-3">
+                <div class="${bgColor} caja-mensaje-chat">
                     <div>
                         <small class="${textColor}">${formattedDate} -</small>
                         <small class="${textColor}">${data.usuario}</small>
                     </div>
+                    ${url_adjunto}
                     <small>${data.mensaje}</small>
                 </div>
             </div>
@@ -132,28 +136,56 @@ form = document.querySelector('#form-chat-submit')
 form.addEventListener('submit', function(e) {
     e.preventDefault()
 
-    const messageInputDom = document.querySelector('#chat-message-input');
+    const messageInputDom = document.querySelector('#chat-message-input')
     const message = messageInputDom.value;
+    const files = document.getElementById('file-attached').files;
 
-    globalSocket.send(JSON.stringify({
+    const json_data = {
         'type': 'chat_message',
         'mensaje': message,
         'usuario': userName,
         'contacto': roomName,
         'telefono': phoneNumber,
         'integracion': integracion,
-        'ambiente': ambiente
-    }));
+        'ambiente': ambiente,
+        'media': ''
+    }
 
-    console.log('Mensaje enviado: ',{
-        'type': 'chat_message',
-        'mensaje': message,
-        'usuario': userName,
-        'contacto': roomName,
-        'telefono': phoneNumber,
-        'integracion': integracion,
-        'ambiente': ambiente
-    })
+    if (files.length > 0) {
+        let filesValid = true
+        const maxSize = 10 * 1024 * 1024; // 10 MB en bytes
+        for (var i = 0; i < files.length; i++) {
+            const fileSize = files[i].size; // Tamaño en bytes
+            filesValid =  maxSize >= fileSize
+        }
+        if (filesValid) {
+            for (var i = 0; i < files.length; i++) {
+                let reader = new FileReader();
+                reader.onload = function (e) {
+                    const base64Data = e.target.result;
+                    json_data['media'] = base64Data
+                    globalSocket.send(JSON.stringify(json_data))
+                    console.log(json_data)
+                }
+                reader.readAsDataURL(files[i]);
+            }
+        } else {
+            console.log('El archivo adjunto pesa más de 10mb')
+        }
+    } else {
+        globalSocket.send(JSON.stringify(json_data));
+    }
+
+    /*
+    for (var i = 0; i < files.length; i++) {
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        var base64Data = e.target.result;
+        // Aquí puedes enviar base64Data al servidor
+        console.log('Imagen en base64:', base64Data);
+      };
+      reader.readAsDataURL(files[i]);
+    }*/
 
     messageInputDom.value = '';
 });
@@ -176,4 +208,6 @@ function scrollAlFinal() {
     objDiv.scrollTop = objDiv.scrollHeight;
 }
 
-scrollAlFinal();
+window.addEventListener('load', function() {
+    scrollAlFinal();
+})

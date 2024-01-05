@@ -1,5 +1,5 @@
 :root {
-    --primary-color: #2C3E50;
+    --primary-color: rgb(44, 62, 80);
     --primary-hover-color: #3c5268;
 /*    --primary-hover-color: #32465A;*/
 
@@ -58,6 +58,12 @@
     background-color: var(--primary-color);
     border-color: var(--primary-hover-color);
 }
+
+.caja-mensaje-chat {
+    padding: 10px 15px;
+    border-radius: 20px;
+}
+
 
 /* */
 /* ===== Scrollbar CSS ===== */
