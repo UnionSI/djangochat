@@ -24,7 +24,7 @@ async def enviar_mensaje_greenapi(chat_id, message):
 
 async def enviar_mensaje_waapi(chat_id, mensaje):
     # webhook: https://djangochat-1.onrender.com/contacto/waapi_api_webhook
-    id_instance = "4107"
+    id_instance = "4238"
     api_name = "customer-service"
     api_token_instance = "ipiOhK708cW4DuUHNtd234FnnnsfWyujgjV2S7THeac23b4f"
 
@@ -50,7 +50,7 @@ async def enviar_mensaje_waapi(chat_id, mensaje):
 
 async def enviar_adjunto_waapi(chat_id, mensaje, url_adjunto):
     # webhook: https://djangochat-1.onrender.com/contacto/waapi_api_webhook
-    id_instance = "4107"
+    id_instance = "4238"
     api_name = "customer-service"
     api_token_instance = "ipiOhK708cW4DuUHNtd234FnnnsfWyujgjV2S7THeac23b4f"
 

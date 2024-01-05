@@ -36,7 +36,7 @@ class GlobalConsumer(AsyncWebsocketConsumer):
         estado = None
         media = data['media']
 
-        contacto = await sync_to_async(Contacto.objects.get)(id=contacto)
+        #contacto = await sync_to_async(Contacto.objects.get)(id=contacto)
         
         if media:
             media = await self.guardar_media_servidor(media, contacto)
@@ -44,9 +44,12 @@ class GlobalConsumer(AsyncWebsocketConsumer):
         if integracion == 'WhatsApp':
             response = None
             if media:
-                response = await enviar_adjunto_waapi(chat_id=telefono, message=mensaje, url_adjunto=media)
+                response = await enviar_adjunto_waapi(chat_id=telefono, mensaje=mensaje, url_adjunto=media)
             else:
-                response = await enviar_mensaje_waapi(chat_id=telefono, message=mensaje)
+                response = await enviar_mensaje_waapi(chat_id=telefono, mensaje=mensaje)
+            print(response)
+            # Manejar cuando se envia una foto pero no la puede descargar el whatsapp:
+            #{'data': {'status': 'error', 'message': 'failed to download media file', 'instanceId': '4238'}, 'links': {'self': 'https://waapi.app/api/v1/instances/4238/client/action/send-media'}, 'status': 'success'}
             estado = 'success' if response['status'] == 'success' else None
         elif integracion == 'Test':
             if ambiente == 'Homologacion':
@@ -55,12 +58,12 @@ class GlobalConsumer(AsyncWebsocketConsumer):
             estado = 'success'
 
         if estado == 'success':
-            usuario = await self.save_message(usuario, contacto.id, mensaje, media)
+            usuario = await self.save_message(usuario, contacto, mensaje, media)
             await self.channel_layer.group_send(
                 'global',
                 {
                     'type': 'chat_message',
-                    'contacto': contacto.id,
+                    'contacto': contacto,
                     'mensaje': mensaje,
                     'usuario': usuario,
                     'url_adjunto': media
@@ -155,9 +158,9 @@ class GlobalConsumer(AsyncWebsocketConsumer):
             archivo64 = base64.b64decode(media64)
             extension = mimetypes.guess_extension(mimetype)
             nombre_archivo = f'{str(uuid.uuid4())}{extension}'
-            url_relativa = os.path.join('adjuntos', str(contacto.id), nombre_archivo)
+            url_relativa = os.path.join('adjuntos', str(contacto), nombre_archivo)
             url_absoluta = os.path.join(settings.MEDIA_ROOT, url_relativa)
-            os.makedirs(os.path.join(settings.MEDIA_ROOT, 'adjuntos', str(contacto.id)), exist_ok=True)
+            os.makedirs(os.path.join(settings.MEDIA_ROOT, 'adjuntos', str(contacto)), exist_ok=True)
             with open(url_absoluta, "wb") as f:
                 f.write(archivo64)
             # Obtener el host del servidor
