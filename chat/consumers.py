@@ -58,6 +58,7 @@ class GlobalConsumer(AsyncWebsocketConsumer):
                 usuario = None
                 # Llamar función chequear_si_se_activa_chatbot
             estado = 'success'
+            subestado = 'success'
 
         if estado == 'success' and subestado == 'success':
             usuario = await self.save_message(usuario, contacto, mensaje, media)
