@@ -1,5 +1,5 @@
 import httpx, json
-
+from config import settings
 
 async def enviar_mensaje_greenapi(chat_id, message):
     id_instance = "7103880835"
@@ -24,7 +24,7 @@ async def enviar_mensaje_greenapi(chat_id, message):
 
 async def enviar_mensaje_waapi(chat_id, mensaje):
     # webhook: https://djangochat-1.onrender.com/contacto/waapi_api_webhook
-    id_instance = "4238"
+    id_instance = "4315"
     api_name = "customer-service"
     api_token_instance = "ipiOhK708cW4DuUHNtd234FnnnsfWyujgjV2S7THeac23b4f"
 
@@ -49,15 +49,15 @@ async def enviar_mensaje_waapi(chat_id, mensaje):
 
 
 async def enviar_adjunto_waapi(chat_id, mensaje, url_adjunto):
-    # webhook: https://djangochat-1.onrender.com/contacto/waapi_api_webhook
-    id_instance = "4238"
+    # webhook: https://djangochat-1.onrender.com/contacto/waapi_api_webhook/
+    id_instance = "4315"
     api_name = "customer-service"
     api_token_instance = "ipiOhK708cW4DuUHNtd234FnnnsfWyujgjV2S7THeac23b4f"
 
     url = f'https://waapi.app/api/v1/instances/{id_instance}/client/action/send-media'
 
     payload = {
-        "mediaUrl": url_adjunto,
+        "mediaUrl": url_adjunto if not settings.DEBUG else 'https://assets.stickpng.com/images/580b57fcd9996e24bc43c51f.png',
         #"mediaCaption": "This is a test image",
         #"mediaName": "imageName.png",
         "chatId": f"{chat_id}@c.us",

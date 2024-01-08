@@ -17,9 +17,9 @@
             </div>
             <div>
                 {% if mensaje.mensajes_adjuntos.first.url %}
-                    {{ MEDIA_URL}}
                     <img src="{{ MEDIA_URL }}{{ mensaje.mensajes_adjuntos.first.url }}" alt=""  class="mt-1" style="max-width: 330px; max-height: 330px;"
-                    onerror="manejarArchivoEliminado(this)">
+                    >
+                    <!-- onerror="manejarArchivoEliminado(this)" -->
                 {% endif %}            
             </div>
             <small>{{ mensaje.contenido }}</small>
