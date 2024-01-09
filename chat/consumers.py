@@ -40,7 +40,6 @@ class GlobalConsumer(AsyncWebsocketConsumer):
         respuesta = None
 
         usuario, mensaje, media = await self.guardar_mensaje(usuario, contacto, mensaje, media)
-        #print(dict(media.archivo))
         
         if integracion == 'WhatsApp':
             if media:
@@ -57,7 +56,7 @@ class GlobalConsumer(AsyncWebsocketConsumer):
                 usuario = None
                 # Llamar función chequear_si_se_activa_chatbot
             estado = 'success'
-            subestado = 'success'
+            #subestado = 'success'
 
         if estado == 'success' and subestado == 'success':
             await self.channel_layer.group_send(
@@ -71,9 +70,9 @@ class GlobalConsumer(AsyncWebsocketConsumer):
                 }
             )
         else:
-            mensaje.delete()
             if media:
-                media.delete()
+                await sync_to_async(media.delete)()
+            await sync_to_async(mensaje.delete)()
             await self.channel_layer.group_send(
                 'global',
                 {
@@ -153,7 +152,7 @@ class GlobalConsumer(AsyncWebsocketConsumer):
             'mensaje': event['mensaje'],
             'usuario': event['usuario']
         }))
-
+    '''
     @sync_to_async
     def guardar_adjunto(self, media, contacto):
         try:
@@ -164,7 +163,6 @@ class GlobalConsumer(AsyncWebsocketConsumer):
             nombre_archivo = f'{str(uuid.uuid4())}{extension}'
             url_relativa = os.path.join('adjuntos', str(contacto), nombre_archivo)
             url_absoluta = os.path.join(settings.MEDIA_ROOT, url_relativa)
-            print(url_absoluta)
             os.makedirs(os.path.join(settings.MEDIA_ROOT, 'adjuntos', str(contacto)), exist_ok=True)
             with open(url_absoluta, "wb") as f:
                 f.write(archivo64)
@@ -175,8 +173,7 @@ class GlobalConsumer(AsyncWebsocketConsumer):
             return url_adjunto
         except Exception as e:
             print(str(e))
-            print('No se pudo guardar el archivo en el servidor')
-
+    '''
     @sync_to_async
     def guardar_mensaje(self, usuario, contacto, mensaje, media):
         usuario = User.objects.filter(username=usuario)
