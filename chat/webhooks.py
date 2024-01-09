@@ -115,7 +115,7 @@ def waapi_api_webhook(request):
                     'contacto': contacto_integracion.id,
                     'mensaje': contenido_mensaje,
                     'usuario': contacto.nombre if contacto.nombre else contacto.telefono,
-                    'url_adjunto': archivo.url if archivo else ''
+                    'url_adjunto': archivo.archivo.url if archivo else ''
                 }
             )
         return JsonResponse({'status': 'success'})
@@ -127,9 +127,10 @@ def guardar_archivo_adjunto(request, mensaje, media, contacto):
     try:
         archivo64 = base64.b64decode(media['data'])
         mimetype = media['mimetype']  #"mimetype": "image/jpeg",
+        mimetype, codecs = mimetype.split(';', 1) # a veces, mimetype viene así: "audio/ogg; codecs=opus"
         formato, extension = mimetype.split('/')
-        # a veces, mimetype viene así: "audio/ogg; codecs=opus"
-        nombre_archivo = f'{str(uuid.uuid4())}{extension}'
+        extension = extension.split(';')[0] 
+        nombre_archivo = f'{str(uuid.uuid4())}.{extension}'
         #extension = mimetypes.guess_extension(media['mimetype'])
         #url_relativa = os.path.join('adjuntos', str(contacto.id), nombre_archivo)
         #url_absoluta = os.path.join(settings.MEDIA_ROOT, url_relativa)
