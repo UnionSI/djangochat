@@ -67,7 +67,7 @@ class GlobalConsumer(AsyncWebsocketConsumer):
                     'contacto': contacto,
                     'mensaje': mensaje.contenido,
                     'usuario': usuario,
-                    'url_adjunto': media.archivo.url
+                    'url_adjunto': media.archivo.url if media else ''
                 }
             )
         else:
@@ -81,7 +81,7 @@ class GlobalConsumer(AsyncWebsocketConsumer):
                     'contacto': contacto,
                     'mensaje': 'No se pudo enviar el mensaje. Por favor, recargue la página y vuelva a intentarlo',
                     'usuario': usuario,
-                    'url_adjunto': media.archivo.url
+                    'url_adjunto':  media.archivo.url if media else ''
                 }
             )
 

@@ -80,19 +80,19 @@
       <div class="p-3 border-bottom border-union">
           <div class="row mb-3">
             <div class="col-3 m-0 text-white-50">Nombre: </div>
-            <div class="col-9 m-0">{{ contacto.nombre }}</div>
+            <div class="col-9 m-0">{{ contacto.nombre|default:"-" }}</div>
             <div class="col-3 m-0 text-white-50">Apellido: </div>
-            <div class="col-9 m-0">{{ contacto.apellido }}</div>
+            <div class="col-9 m-0">{{ contacto.apellido|default:"-" }}</div>
             <div class="col-3 m-0 text-white-50">DNI: </div>
-            <div class="col-9 m-0">{{ contacto.dni }}</div>
+            <div class="col-9 m-0">{{ contacto.dni|default:"-" }}</div>
             <div class="col-3 m-0 text-white-50">Teléfono: </div>
             <div class="col-9 m-0">{{ contacto.telefono }}</div>
             <div class="col-3 m-0 text-white-50">Email: </div>
-            <div class="col-9 m-0">{{ contacto.email }}</div>
+            <div class="col-9 m-0">{{ contacto.email|default:"-" }}</div>
             <div class="col-3 m-0 text-white-50">Empresa: </div>
-            <div class="col-9 m-0">{{ contacto.empresa }}</div>
+            <div class="col-9 m-0">{{ contacto.empresa|default:"-" }}</div>
             <div class="col-3 m-0 text-white-50">Nº Socio: </div>
-            <div class="col-9 m-0">{{ contacto.nro_socio }}</div>
+            <div class="col-9 m-0">{{ contacto.nro_socio|default:"-" }}</div>
           </div>
       </div>
 

@@ -22,13 +22,13 @@ def chats(request):
     '''
     contactos = Contacto.objects.annotate(
         last_message_content=Subquery(
-            Mensaje.objects.filter(contacto_integracion=OuterRef('pk')).values('contenido')[:1]
+            Mensaje.objects.filter(contacto_integracion=OuterRef('pk')).values('contenido').order_by('-fecha_hora')[:1]
         ),
         last_message_date=Subquery(
-            Mensaje.objects.filter(contacto_integracion=OuterRef('pk')).values('fecha_hora')[:1]
+            Mensaje.objects.filter(contacto_integracion=OuterRef('pk')).values('fecha_hora').order_by('-fecha_hora')[:1]
         ),
         last_message_user=Subquery(
-            Mensaje.objects.filter(contacto_integracion=OuterRef('pk')).values('usuario__username')[:1]
+            Mensaje.objects.filter(contacto_integracion=OuterRef('pk')).values('usuario__username').order_by('-fecha_hora')[:1]
         )
     )
     context = {'contactos': contactos, 'debug': DEBUG}

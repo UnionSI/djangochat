@@ -11,7 +11,11 @@
                     {% if mensaje.usuario %}
                         {{ mensaje.usuario }}
                     {% else %}
-                        {{ contacto.nombre }}
+                        {% if contacto.nombre %}
+                            {{ contacto.nombre }}
+                        {% else %}
+                            {{ contacto.telefono }}
+                        {% endif %}
                     {% endif %}
                 </small>
             </div>
