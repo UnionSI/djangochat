@@ -73,6 +73,7 @@ def waapi_api_webhook(request):
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
         if data:
+            print(data)
             evento = data['event']
             #instancia_id = data['instanceId']
             mensaje_id = data['data']['message']['id']['id']
@@ -113,13 +114,14 @@ def waapi_api_webhook(request):
                     'contacto': contacto_integracion.id,
                     'mensaje': contenido_mensaje,
                     'usuario': contacto.nombre if contacto.nombre else contacto.telefono,
-                    'url_adjunto': archivo.url
+                    'url_adjunto': archivo.url if archivo else ''
                 }
             )
         return JsonResponse({'status': 'success'})
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
-    
+  
+  
 def guardar_archivo_adjunto(request, mensaje, media, contacto):
     try:
         archivo64 = base64.b64decode(media['data'])
