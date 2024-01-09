@@ -1,5 +1,6 @@
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
+from django.core.files.base import ContentFile
 import json, base64, os, uuid, mimetypes
 
 from django.contrib.auth.models import User
@@ -121,7 +122,7 @@ def waapi_api_webhook(request):
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
   
-  
+
 def guardar_archivo_adjunto(request, mensaje, media, contacto):
     try:
         archivo64 = base64.b64decode(media['data'])
@@ -135,7 +136,9 @@ def guardar_archivo_adjunto(request, mensaje, media, contacto):
         #os.makedirs(os.path.join(settings.MEDIA_ROOT, 'adjuntos', str(contacto.id)), exist_ok=True)
         #with open(url_absoluta, "wb") as f:
         #    f.write(archivo64)
-        archivo = MensajeAdjunto.objects.create(archivo=archivo64, name=nombre_archivo, formato=formato)
+        archivo_temporal = ContentFile(archivo64, name=nombre_archivo)
+        archivo = MensajeAdjunto.objects.create(archivo=archivo_temporal, formato=formato, mensaje=mensaje)
+        print(archivo.archivo.url)
         #url_completa = f'{request.scheme}://{request.get_host()}/media/{url_relativa}'
         #return url_completa
         return archivo
