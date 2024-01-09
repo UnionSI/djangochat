@@ -31,6 +31,7 @@ class AdminMensaje(admin.ModelAdmin):
 
 @admin.register(MensajeAdjunto)
 class AdminMensajeAdjunto(admin.ModelAdmin):
-    list_display = ('url', 'mensaje')
+    #list_display = ('url', 'mensaje')
+    list_display = ('archivo', 'formato', 'mensaje')
 
     

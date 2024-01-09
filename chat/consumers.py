@@ -3,6 +3,7 @@ import httpx, json, mimetypes, base64, os, uuid
 from django.contrib.auth.models import User
 from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import sync_to_async
+from django.core.files.base import ContentFile
 
 from .models import Contacto, Mensaje, ContactoTarea, SectorTarea, ContactoIntegracion, MensajeAdjunto
 from config import settings
@@ -39,10 +40,11 @@ class GlobalConsumer(AsyncWebsocketConsumer):
         respuesta = None
 
         usuario, mensaje, media = await self.guardar_mensaje(usuario, contacto, mensaje, media)
+        #print(dict(media.archivo))
         
         if integracion == 'WhatsApp':
             if media:
-                respuesta = await enviar_adjunto_waapi(chat_id=telefono, mensaje=mensaje.contenido, url_adjunto=media.url)
+                respuesta = await enviar_adjunto_waapi(chat_id=telefono, mensaje=mensaje.contenido, url_adjunto=media.archivo.url)
             else:
                 respuesta = await enviar_mensaje_waapi(chat_id=telefono, mensaje=mensaje.contenido)
             # Manejar cuando se envia una foto pero no la puede descargar el whatsapp:
@@ -63,12 +65,15 @@ class GlobalConsumer(AsyncWebsocketConsumer):
                 {
                     'type': 'chat_message',
                     'contacto': contacto,
-                    'mensaje': mensaje,
+                    'mensaje': mensaje.contenido,
                     'usuario': usuario,
-                    'url_adjunto': media
+                    'url_adjunto': media.archivo.url
                 }
             )
         else:
+            mensaje.delete()
+            if media:
+                media.delete()
             await self.channel_layer.group_send(
                 'global',
                 {
@@ -76,12 +81,10 @@ class GlobalConsumer(AsyncWebsocketConsumer):
                     'contacto': contacto,
                     'mensaje': 'No se pudo enviar el mensaje. Por favor, recargue la página y vuelva a intentarlo',
                     'usuario': usuario,
-                    'url_adjunto': media
+                    'url_adjunto': media.archivo.url
                 }
             )
-            mensaje.delete()
-            if media:
-                media.delete()
+
 
     async def procesar_cambio_de_sector(self, data):
         sector = data['sector']
@@ -189,7 +192,8 @@ class GlobalConsumer(AsyncWebsocketConsumer):
             formato, extension = mimetype.split('/')
             formato = formato.split(':')[1]
             nombre_archivo = f'{str(uuid.uuid4())}.{extension}'
-            media = MensajeAdjunto.objects.create(archivo=media64, name=nombre_archivo, formato=formato)
+            archivo_temporal = ContentFile(base64.b64decode(media64), name=nombre_archivo)
+            media = MensajeAdjunto.objects.create(archivo=archivo_temporal, formato=formato, mensaje=mensaje)
         usuario = usuario.username if usuario else contacto_integracion.contacto.nombre
         return [usuario, mensaje, media]
 
