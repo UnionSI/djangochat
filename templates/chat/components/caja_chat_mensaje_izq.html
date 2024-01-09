@@ -16,11 +16,12 @@
                 </small>
             </div>
             <div>
-                {% if mensaje.mensajes_adjuntos.first.url %}
-                    <img src="{{ MEDIA_URL }}{{ mensaje.mensajes_adjuntos.first.url }}" alt=""  class="mt-1" style="max-width: 330px; max-height: 330px;"
-                    >
+                {% if mensaje.mensajes_adjuntos.first %}
+                    <!-- <img src="{{ MEDIA_URL }}{{ mensaje.mensajes_adjuntos.first.url }}" alt=""  class="mt-1" style="max-width: 330px; max-height: 330px;"
+                    > -->
                     <!-- onerror="manejarArchivoEliminado(this)" -->
-                {% endif %}            
+                    <img src="{{ mensaje.mensajes_adjuntos.first.archivo.url }}" alt=""  class="mt-1" style="max-width: 330px; max-height: 330px;">
+                {% endif %}         
             </div>
             <small>{{ mensaje.contenido }}</small>
         </div>
