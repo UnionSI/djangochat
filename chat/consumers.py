@@ -33,26 +33,23 @@ class GlobalConsumer(AsyncWebsocketConsumer):
         telefono = data['telefono']
         integracion = data['integracion']
         ambiente = data['ambiente']
+        media = data['media']
         estado = None
         subestado = None
-        media = data['media']
+        respuesta = None
 
-        #contacto = await sync_to_async(Contacto.objects.get)(id=contacto)
-        
-        if media:
-            media = await self.guardar_media_servidor(media, contacto)
+        usuario, mensaje, media = await self.guardar_mensaje(usuario, contacto, mensaje, media)
         
         if integracion == 'WhatsApp':
-            response = None
             if media:
-                response = await enviar_adjunto_waapi(chat_id=telefono, mensaje=mensaje, url_adjunto=media)
+                respuesta = await enviar_adjunto_waapi(chat_id=telefono, mensaje=mensaje.contenido, url_adjunto=media.url)
             else:
-                response = await enviar_mensaje_waapi(chat_id=telefono, mensaje=mensaje)
+                respuesta = await enviar_mensaje_waapi(chat_id=telefono, mensaje=mensaje.contenido)
             # Manejar cuando se envia una foto pero no la puede descargar el whatsapp:
             #{'data': {'status': 'error', 'message': 'failed to download media file', 'instanceId': '4238'}, 'links': {'self': 'https://waapi.app/api/v1/instances/4238/client/action/send-media'}, 'status': 'success'}
-            print(response)
-            estado = response['status']
-            subestado = response['data']['status']  # Cuando la API no puede descargar el error el estado es 'success' pero el subestado es 'error' 
+            print(respuesta)
+            estado = respuesta['status']
+            subestado = respuesta['data']['status']  # Cuando la API no puede descargar el error el estado es 'success' pero el subestado es 'error' 
         elif integracion == 'Test':
             if ambiente == 'Homologacion':
                 usuario = None
@@ -61,7 +58,6 @@ class GlobalConsumer(AsyncWebsocketConsumer):
             subestado = 'success'
 
         if estado == 'success' and subestado == 'success':
-            usuario = await self.save_message(usuario, contacto, mensaje, media)
             await self.channel_layer.group_send(
                 'global',
                 {
@@ -73,7 +69,6 @@ class GlobalConsumer(AsyncWebsocketConsumer):
                 }
             )
         else:
-            print('No se pudo enviar el mensaje')
             await self.channel_layer.group_send(
                 'global',
                 {
@@ -84,6 +79,9 @@ class GlobalConsumer(AsyncWebsocketConsumer):
                     'url_adjunto': media
                 }
             )
+            mensaje.delete()
+            if media:
+                media.delete()
 
     async def procesar_cambio_de_sector(self, data):
         sector = data['sector']
@@ -98,7 +96,7 @@ class GlobalConsumer(AsyncWebsocketConsumer):
         mensaje = data['mensaje']
         fecha = data['fecha']
 
-        await self.save_sector_change(contacto, sector_tarea)
+        await self.guardar_cambio_sector(contacto, sector_tarea)
 
         await self.channel_layer.group_send(
             'global',
@@ -154,7 +152,7 @@ class GlobalConsumer(AsyncWebsocketConsumer):
         }))
 
     @sync_to_async
-    def guardar_media_servidor(self, media, contacto):
+    def guardar_adjunto(self, media, contacto):
         try:
             mimetype, media64 = media.split(',', 1)
             mimetype = media.split(';', 1)[0].split(':', 1)[1]
@@ -177,19 +175,26 @@ class GlobalConsumer(AsyncWebsocketConsumer):
             print('No se pudo guardar el archivo en el servidor')
 
     @sync_to_async
-    def save_message(self, usuario, contacto, mensaje, url_adjunto):
-        user = User.objects.filter(username=usuario)
-        user = user.first() if user.exists() else None
+    def guardar_mensaje(self, usuario, contacto, mensaje, media):
+        usuario = User.objects.filter(username=usuario)
+        usuario = usuario.first() if usuario.exists() else None
         contacto = Contacto.objects.get(id=contacto)
         contacto_integracion = ContactoIntegracion.objects.get(contacto=contacto)
-        mensaje = Mensaje.objects.create(usuario=user, contacto_integracion=contacto_integracion, contenido=mensaje)
-        if url_adjunto:
-            url_relativa = url_adjunto.split('/media/', 1)[1]
-            MensajeAdjunto.objects.create(url=url_relativa, mensaje=mensaje)
-        return user.username if user else contacto_integracion.contacto.nombre
+        mensaje = Mensaje.objects.create(usuario=usuario, contacto_integracion=contacto_integracion, contenido=mensaje)
+        if media:
+            #url_relativa = media.split('/media/', 1)[1]
+            #MensajeAdjunto.objects.create(url=url_relativa, mensaje=mensaje)
+            # data:image/png;base64,iVBORw0KGgo...
+            mimetype, media64 = media.split(';base64,')
+            formato, extension = mimetype.split('/')
+            formato = formato.split(':')[1]
+            nombre_archivo = f'{str(uuid.uuid4())}.{extension}'
+            media = MensajeAdjunto.objects.create(archivo=media64, name=nombre_archivo, formato=formato)
+        usuario = usuario.username if usuario else contacto_integracion.contacto.nombre
+        return [usuario, mensaje, media]
 
     @sync_to_async
-    def save_sector_change(self, contacto, sector_tarea):
+    def guardar_cambio_sector(self, contacto, sector_tarea):
         contacto_tarea = ContactoTarea.objects.filter(contacto_integracion_id=contacto).first()
         sector_tarea_destino = SectorTarea.objects.filter(id=sector_tarea).first()
         if contacto_tarea and sector_tarea_destino:

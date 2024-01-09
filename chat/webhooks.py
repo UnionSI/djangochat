@@ -1,6 +1,6 @@
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-import json, base64, os, mimetypes
+import json, base64, os, uuid, mimetypes
 
 from django.contrib.auth.models import User
 from chat.models import Integracion, Contacto, Mensaje, SectorTarea, ContactoTarea, ContactoIntegracion, MensajeAdjunto
@@ -88,7 +88,7 @@ def waapi_api_webhook(request):
         if integracion_whatsapp:
             contacto = Contacto.objects.filter(telefono=telefono).first()
             mensaje = None
-            url_adjunto = None
+            archivo = None
             if contacto:
                 contacto_integracion = ContactoIntegracion.objects.get(contacto=contacto)
                 mensaje = Mensaje.objects.create(contacto_integracion=contacto_integracion, contenido=contenido_mensaje, id_integracion=mensaje_id)
@@ -100,7 +100,7 @@ def waapi_api_webhook(request):
                 mensaje = Mensaje.objects.create(contacto_integracion=contacto_integracion, contenido=contenido_mensaje, id_integracion=mensaje_id)            
             
             if data['data']['message']['hasMedia']:
-                url_adjunto = guardar_archivo_adjunto(request, mensaje, media, contacto)
+                archivo = guardar_archivo_adjunto(request, mensaje, media, contacto)
                 
             ''' Verificar si se tiene que activar un bot si el msg esta en un sector de bot '''
 
@@ -113,13 +113,33 @@ def waapi_api_webhook(request):
                     'contacto': contacto_integracion.id,
                     'mensaje': contenido_mensaje,
                     'usuario': contacto.nombre if contacto.nombre else contacto.telefono,
-                    'url_adjunto': url_adjunto
+                    'url_adjunto': archivo.url
                 }
             )
         return JsonResponse({'status': 'success'})
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
-
+    
+def guardar_archivo_adjunto(request, mensaje, media, contacto):
+    try:
+        archivo64 = base64.b64decode(media['data'])
+        mimetype = media['mimetype']  #"mimetype": "image/jpeg",
+        formato, extension = mimetype.split('/')
+        # a veces, mimetype viene así: "audio/ogg; codecs=opus"
+        nombre_archivo = f'{str(uuid.uuid4())}{extension}'
+        #extension = mimetypes.guess_extension(media['mimetype'])
+        #url_relativa = os.path.join('adjuntos', str(contacto.id), nombre_archivo)
+        #url_absoluta = os.path.join(settings.MEDIA_ROOT, url_relativa)
+        #os.makedirs(os.path.join(settings.MEDIA_ROOT, 'adjuntos', str(contacto.id)), exist_ok=True)
+        #with open(url_absoluta, "wb") as f:
+        #    f.write(archivo64)
+        archivo = MensajeAdjunto.objects.create(archivo=archivo64, name=nombre_archivo, formato=formato)
+        #url_completa = f'{request.scheme}://{request.get_host()}/media/{url_relativa}'
+        #return url_completa
+        return archivo
+    except Exception as e:
+        print(str(e))
+'''
 def guardar_archivo_adjunto(request, mensaje, media, contacto):
     try:
         archivo64 = base64.b64decode(media['data'])
@@ -135,7 +155,7 @@ def guardar_archivo_adjunto(request, mensaje, media, contacto):
         return url_completa
     except Exception as e:
         print(str(e))
-    
+''' 
 
 # **********************
 
