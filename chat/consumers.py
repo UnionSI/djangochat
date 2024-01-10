@@ -56,7 +56,6 @@ class GlobalConsumer(AsyncWebsocketConsumer):
         elif integracion == 'Test':
             if ambiente == 'Homologacion':
                 usuario = None
-                # Llamar función chequear_si_se_activa_chatbot
             estado = 'success'
             subestado = 'success'
 
@@ -72,6 +71,11 @@ class GlobalConsumer(AsyncWebsocketConsumer):
                     'url_adjunto': media
                 }
             )
+            # if Llamar función chequear_si_se_activa_chatbot
+            # responder
+            # guardar en la base
+            # enviar a todos los clientes a través de la ws
+            # cambiar de sector-tarea 
         else:
             print('No se pudo enviar el mensaje')
             await self.channel_layer.group_send(
@@ -84,6 +88,7 @@ class GlobalConsumer(AsyncWebsocketConsumer):
                     'url_adjunto': media
                 }
             )
+
 
     async def procesar_cambio_de_sector(self, data):
         sector = data['sector']
