@@ -56,7 +56,7 @@ class GlobalConsumer(AsyncWebsocketConsumer):
                 usuario = None
                 # Llamar función chequear_si_se_activa_chatbot
             estado = 'success'
-            #subestado = 'success'
+            subestado = 'success'
 
         if estado == 'success' and subestado == 'success':
             await self.channel_layer.group_send(
