@@ -47,7 +47,7 @@ def green_api_webhook(request):
                     slug = phoneNumber,
                 )
                 sector_chat_inicial = SectorTarea.objects.get(nombre='Chat inicial')
-                ContactoTarea.objects.create(contacto=contacto, sector_tarea=sector_chat_inicial)
+                ContactoTarea.objects.create(contacto_integracion=contacto, sector_tarea=sector_chat_inicial)
                 Mensaje.objects.create(contacto=contacto, contenido=contentMessage)
             
             ''' Verificar si se tiene que activar un bot si el msg esta en un sector de bot '''
@@ -58,9 +58,9 @@ def green_api_webhook(request):
                 'global',
                 {
                     'type': 'chat_message',
-                    'room': contacto.id,
-                    'message': contentMessage,
-                    'username': contacto.nombre
+                    'contacto': contacto.id,
+                    'mensaje': contentMessage,
+                    'usuario': contacto.nombre
                 }
             )
 

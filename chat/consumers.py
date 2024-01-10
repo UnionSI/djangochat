@@ -9,7 +9,7 @@ from .models import Contacto, Mensaje, ContactoTarea, SectorTarea, ContactoInteg
 from config import settings
 
 from .whatsapp import enviar_mensaje_greenapi, enviar_mensaje_waapi, enviar_adjunto_waapi
-
+from bot.chatbot import logica_chatbot
 
 class GlobalConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -38,8 +38,9 @@ class GlobalConsumer(AsyncWebsocketConsumer):
         estado = None
         subestado = None
         respuesta = None
+        chequear_chatbot = None
 
-        usuario, contacto, mensaje, media = await self.guardar_mensaje(usuario, contacto, mensaje, media)
+        usuario, contacto, contacto_integracion, mensaje, media = await self.guardar_mensaje(usuario, contacto, mensaje, media)
         url_adjunto = media.archivo.url if media else ''
 
         if integracion == 'WhatsApp':
@@ -52,17 +53,18 @@ class GlobalConsumer(AsyncWebsocketConsumer):
             estado = respuesta['status'] # Cuando la conexión a la API está OK
             subestado = respuesta['data']['status']  # Cuando no puede descargar la imagen, el error del estado es 'success' pero el subestado es 'error'. 
         elif integracion == 'Test':
-            usuario = None if ambiente == 'Homologacion' else usuario
+            if ambiente == 'Homologacion':
+                usuario = contacto.nombre
+                mensaje.usuario = None
+                await sync_to_async(mensaje.save)()
+                chequear_chatbot = True
             estado = 'success'
             subestado = 'success'
 
         if estado == 'success' and subestado == 'success':
             await self.enviar_mensaje_chat_ws(tipo='chat_message', contacto=contacto.id, mensaje=mensaje.contenido, usuario=usuario, url_adjunto=url_adjunto)
-            # if Llamar función chequear_si_se_activa_chatbot
-            # responder
-            # guardar en la base
-            # enviar a todos los clientes a través de la ws
-            # cambiar de sector-tarea 
+            if chequear_chatbot:
+                await logica_chatbot(contacto_integracion, mensaje)
         else:
             if media:
                 await sync_to_async(media.delete)()
@@ -166,7 +168,7 @@ class GlobalConsumer(AsyncWebsocketConsumer):
             archivo_temporal = ContentFile(base64.b64decode(media64), name=nombre_archivo)
             media = MensajeAdjunto.objects.create(archivo=archivo_temporal, formato=formato, mensaje=mensaje)
         usuario = usuario.username if usuario else contacto_integracion.contacto.nombre
-        return [usuario, contacto, mensaje, media]
+        return [usuario, contacto, contacto_integracion, mensaje, media]
 
     @sync_to_async
     def guardar_cambio_sector(self, contacto, sector_tarea):

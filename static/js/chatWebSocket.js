@@ -1,5 +1,7 @@
 const roomName = JSON.parse(document.getElementById('json-roomname').textContent);
 const userName = JSON.parse(document.getElementById('json-username').textContent);
+const usuariosData = document.getElementById('usuarios-data').dataset.usuarios;
+const usuariosArray = JSON.parse(usuariosData.replace(/'/g, "\""));
 const phoneNumber = JSON.parse(document.getElementById('json-phone-number').textContent);
 const integracion = JSON.parse(document.getElementById('json-integracion').textContent);
 const ambiente = JSON.parse(document.getElementById('json-ambiente').textContent);
@@ -46,7 +48,8 @@ function manejarMensajeRecibido(data) {
 
     switch (ambiente) {
         case 'Produccion':
-            if (userName == data.usuario) {
+            //if (userName == data.usuario) {
+            if (usuariosArray.includes(data.usuario)) {
                 alignMessage = 'align-self-end'
                 alignThumbnail = 'flex-row-reverse'
                 bgColor = 'bg-union'
@@ -59,7 +62,8 @@ function manejarMensajeRecibido(data) {
             }
             break;
         case 'Homologacion':
-            if (userName == data.usuario) {
+            //if (userName == data.usuario) {
+            if (usuariosArray.includes(data.usuario)) {
                 alignMessage = 'align-self-start'
                 alignThumbnail = 'flex-row'
                 bgColor = 'bg-white'
@@ -74,6 +78,9 @@ function manejarMensajeRecibido(data) {
     }
 
     const url_adjunto = data.url_adjunto? `<div><img src="${data.url_adjunto}" alt="" class="mt-1" style="max-width: 330px; max-height: 330px;"></div>`: '';
+    console.log(data.mensaje)
+    mensaje_con_espacios = data.mensaje.replaceAll('\n', '<br>')
+    console.log(mensaje_con_espacios)
 
     //const alignMessage = userName == data.username? 'align-self-end': 'align-self-start'
     document.querySelector('#chat-messages').innerHTML += (
@@ -96,7 +103,7 @@ function manejarMensajeRecibido(data) {
                         <small class="${textColor}">${data.usuario}</small>
                     </div>
                     ${url_adjunto}
-                    <small>${data.mensaje}</small>
+                    <small>${mensaje_con_espacios}</small>
                 </div>
             </div>
         </div>

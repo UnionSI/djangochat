@@ -3,8 +3,10 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.db.models import Prefetch
 from django.db.models import Max, Subquery, OuterRef
+from django.core import serializers
 
 from .models import Sector, SectorTarea, Contacto, Mensaje, ContactoTarea, ContactoIntegracion
+from django.contrib.auth.models import User
 
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
@@ -58,6 +60,8 @@ def chat(request, id):
             Mensaje.objects.filter(contacto_integracion=OuterRef('pk')).values('usuario__username').order_by('-fecha_hora')[:1]
         )
     )
+    nombres_usuarios = list(User.objects.values_list('username', flat=True))
+    print(nombres_usuarios)
     context = {
         'contacto': contacto,
         'contacto_mensajes': contacto_mensajes,
@@ -66,6 +70,7 @@ def chat(request, id):
         'sector_tarea': sector_tarea,
         'embudos': sectores, 
         'usuario_asignado': contacto_tarea.usuario,
+        'usuarios': nombres_usuarios,
         'debug': DEBUG
     }
     if re.search('/contacto/chat-dev/', request.path):  # Para Tests
@@ -121,7 +126,7 @@ def mover_de_sector(request, contacto_id, sector_tarea_id):
         'thumbnail': '',
         'cabecera': contacto.nombre,
         'dni': contacto.dni,
-        'usuario': ultimo_mensaje.usuario.username if ultimo_mensaje.usuario.username else contacto.nombre,
+        'usuario': ultimo_mensaje.usuario.username if ultimo_mensaje.usuario else contacto.nombre,
         'mensaje': ultimo_mensaje.contenido,
         'fecha': ultimo_mensaje.fecha_hora.strftime('%Y-%m-%d %H:%M:%S'),
         #'type': 'sector_change',

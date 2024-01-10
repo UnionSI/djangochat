@@ -28,6 +28,7 @@ class AdminContactoTarea(admin.ModelAdmin):
 @admin.register(Mensaje)
 class AdminMensaje(admin.ModelAdmin):
     list_display = ('contacto_integracion', 'usuario', 'contenido', 'fecha_hora', 'recibido', 'leido', 'id_integracion')
+    list_filter = ('contacto_integracion__contacto__nombre', 'contacto_integracion__integracion__nombre')
 
 @admin.register(MensajeAdjunto)
 class AdminMensajeAdjunto(admin.ModelAdmin):

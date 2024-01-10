@@ -27,7 +27,7 @@
                     <img src="{{ mensaje.mensajes_adjuntos.first.archivo.url }}" alt=""  class="mt-1" style="max-width: 330px; max-height: 330px;">
                 {% endif %}            
             </div>
-            <small>{{ mensaje.contenido }}</small>
+            <small>{{ mensaje.contenido|linebreaksbr|safe }}</small>
         </div>
     </div>
 </div>
