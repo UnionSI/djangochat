@@ -39,50 +39,36 @@ class GlobalConsumer(AsyncWebsocketConsumer):
         subestado = None
         respuesta = None
 
-        usuario, mensaje, media = await self.guardar_mensaje(usuario, contacto, mensaje, media)
-        
+        usuario, contacto, mensaje, media = await self.guardar_mensaje(usuario, contacto, mensaje, media)
+        url_adjunto = media.archivo.url if media else ''
+
         if integracion == 'WhatsApp':
-            if media:
-                respuesta = await enviar_adjunto_waapi(chat_id=telefono, mensaje=mensaje.contenido, url_adjunto=media.archivo.url)
+            if url_adjunto:
+                respuesta = await enviar_adjunto_waapi(chat_id=telefono, mensaje=mensaje.contenido, url_adjunto=url_adjunto)
             else:
                 respuesta = await enviar_mensaje_waapi(chat_id=telefono, mensaje=mensaje.contenido)
             # Manejar cuando se envia una foto pero no la puede descargar el whatsapp:
-            #{'data': {'status': 'error', 'message': 'failed to download media file', 'instanceId': '4238'}, 'links': {'self': 'https://waapi.app/api/v1/instances/4238/client/action/send-media'}, 'status': 'success'}
-            print(respuesta)
-            estado = respuesta['status']
-            subestado = respuesta['data']['status']  # Cuando la API no puede descargar el error el estado es 'success' pero el subestado es 'error' 
+            # {'data': {'status': 'error', 'message': 'failed to download media file', 'instanceId': '4238'}, 'links': {'self': 'https://waapi.app/api/v1/instances/4238/client/action/send-media'}, 'status': 'success'}
+            estado = respuesta['status'] # Cuando la conexión a la API está OK
+            subestado = respuesta['data']['status']  # Cuando no puede descargar la imagen, el error del estado es 'success' pero el subestado es 'error'. 
         elif integracion == 'Test':
-            if ambiente == 'Homologacion':
-                usuario = None
-                # Llamar función chequear_si_se_activa_chatbot
+            usuario = None if ambiente == 'Homologacion' else usuario
             estado = 'success'
             subestado = 'success'
 
         if estado == 'success' and subestado == 'success':
-            await self.channel_layer.group_send(
-                'global',
-                {
-                    'type': 'chat_message',
-                    'contacto': contacto,
-                    'mensaje': mensaje.contenido,
-                    'usuario': usuario,
-                    'url_adjunto': media.archivo.url if media else ''
-                }
-            )
+            await self.enviar_mensaje_chat_ws(tipo='chat_message', contacto=contacto.id, mensaje=mensaje.contenido, usuario=usuario, url_adjunto=url_adjunto)
+            # if Llamar función chequear_si_se_activa_chatbot
+            # responder
+            # guardar en la base
+            # enviar a todos los clientes a través de la ws
+            # cambiar de sector-tarea 
         else:
             if media:
                 await sync_to_async(media.delete)()
             await sync_to_async(mensaje.delete)()
-            await self.channel_layer.group_send(
-                'global',
-                {
-                    'type': 'message_error',
-                    'contacto': contacto,
-                    'mensaje': 'No se pudo enviar el mensaje. Por favor, recargue la página y vuelva a intentarlo',
-                    'usuario': usuario,
-                    'url_adjunto':  media.archivo.url if media else ''
-                }
-            )
+            error_mensaje = 'No se pudo enviar el mensaje. Por favor, recargue la página y vuelva a intentarlo'
+            await self.enviar_mensaje_chat_ws(tipo='message_error', contacto=contacto.id, mensaje=error_mensaje, usuario=usuario, url_adjunto=url_adjunto)
 
 
     async def procesar_cambio_de_sector(self, data):
@@ -115,6 +101,18 @@ class GlobalConsumer(AsyncWebsocketConsumer):
                 'usuario': usuario,
                 'mensaje': mensaje,
                 'fecha': fecha,
+            }
+        )
+
+    async def enviar_mensaje_chat_ws(self, tipo, contacto, mensaje, usuario, url_adjunto):
+        await self.channel_layer.group_send(
+            'global',
+            {
+                'type': tipo,
+                'contacto': contacto,
+                'mensaje': mensaje,
+                'usuario': usuario,
+                'url_adjunto': url_adjunto
             }
         )
 
@@ -152,6 +150,32 @@ class GlobalConsumer(AsyncWebsocketConsumer):
             'mensaje': event['mensaje'],
             'usuario': event['usuario']
         }))
+
+    @sync_to_async
+    def guardar_mensaje(self, usuario, contacto, mensaje, media):
+        usuario = User.objects.filter(username=usuario)
+        usuario = usuario.first() if usuario.exists() else None
+        contacto = Contacto.objects.get(id=contacto)
+        contacto_integracion = ContactoIntegracion.objects.get(contacto=contacto)
+        mensaje = Mensaje.objects.create(usuario=usuario, contacto_integracion=contacto_integracion, contenido=mensaje)
+        if media:
+            mimetype, media64 = media.split(';base64,')  # data:image/png;base64,iVBORw0KGgo...
+            formato, extension = mimetype.split('/')
+            formato = formato.split(':')[1]
+            nombre_archivo = f'{str(uuid.uuid4())}.{extension}'
+            archivo_temporal = ContentFile(base64.b64decode(media64), name=nombre_archivo)
+            media = MensajeAdjunto.objects.create(archivo=archivo_temporal, formato=formato, mensaje=mensaje)
+        usuario = usuario.username if usuario else contacto_integracion.contacto.nombre
+        return [usuario, contacto, mensaje, media]
+
+    @sync_to_async
+    def guardar_cambio_sector(self, contacto, sector_tarea):
+        contacto_tarea = ContactoTarea.objects.filter(contacto_integracion_id=contacto).first()
+        sector_tarea_destino = SectorTarea.objects.filter(id=sector_tarea).first()
+        if contacto_tarea and sector_tarea_destino:
+            contacto_tarea.sector_tarea = sector_tarea_destino
+            contacto_tarea.save()
+
     '''
     @sync_to_async
     def guardar_adjunto(self, media, contacto):
@@ -174,33 +198,6 @@ class GlobalConsumer(AsyncWebsocketConsumer):
         except Exception as e:
             print(str(e))
     '''
-    @sync_to_async
-    def guardar_mensaje(self, usuario, contacto, mensaje, media):
-        usuario = User.objects.filter(username=usuario)
-        usuario = usuario.first() if usuario.exists() else None
-        contacto = Contacto.objects.get(id=contacto)
-        contacto_integracion = ContactoIntegracion.objects.get(contacto=contacto)
-        mensaje = Mensaje.objects.create(usuario=usuario, contacto_integracion=contacto_integracion, contenido=mensaje)
-        if media:
-            #url_relativa = media.split('/media/', 1)[1]
-            #MensajeAdjunto.objects.create(url=url_relativa, mensaje=mensaje)
-            # data:image/png;base64,iVBORw0KGgo...
-            mimetype, media64 = media.split(';base64,')
-            formato, extension = mimetype.split('/')
-            formato = formato.split(':')[1]
-            nombre_archivo = f'{str(uuid.uuid4())}.{extension}'
-            archivo_temporal = ContentFile(base64.b64decode(media64), name=nombre_archivo)
-            media = MensajeAdjunto.objects.create(archivo=archivo_temporal, formato=formato, mensaje=mensaje)
-        usuario = usuario.username if usuario else contacto_integracion.contacto.nombre
-        return [usuario, mensaje, media]
-
-    @sync_to_async
-    def guardar_cambio_sector(self, contacto, sector_tarea):
-        contacto_tarea = ContactoTarea.objects.filter(contacto_integracion_id=contacto).first()
-        sector_tarea_destino = SectorTarea.objects.filter(id=sector_tarea).first()
-        if contacto_tarea and sector_tarea_destino:
-            contacto_tarea.sector_tarea = sector_tarea_destino
-            contacto_tarea.save()
 
 '''
 {
