@@ -42,7 +42,7 @@ globalSocket.onmessage = function(e) {
     scrollAlFinal()
 };
 
-function manejarMensajeRecibido(data) {
+async function manejarMensajeRecibido(data) {
     const formattedDate = formatoFecha(new Date());
     let alignMessage;
 
@@ -54,11 +54,13 @@ function manejarMensajeRecibido(data) {
                 alignThumbnail = 'flex-row-reverse'
                 bgColor = 'bg-union'
                 textColor = 'text-white-50'
+                bgSecondaryColor = '#ffffff20'
             } else {
                 alignMessage = 'align-self-start'
                 alignThumbnail = 'flex-row'
                 bgColor = 'bg-white'
                 textColor = 'text-secondary'
+                bgSecondaryColor = '#00000020'
             }
             break;
         case 'Homologacion':
@@ -68,31 +70,63 @@ function manejarMensajeRecibido(data) {
                 alignThumbnail = 'flex-row'
                 bgColor = 'bg-white'
                 textColor = 'text-secondary'
+                bgSecondaryColor = '#00000020'
             } else {
                 alignMessage = 'align-self-end'
                 alignThumbnail = 'flex-row-reverse'
                 bgColor = 'bg-union'
                 textColor = 'text-white-50'
+                bgSecondaryColor = '#ffffff20'
             }
             break;
     }
 
-    const url_adjunto = data.url_adjunto? `<div><img src="${data.url_adjunto}" alt="" class="mt-1" style="max-width: 330px; max-height: 330px;"></div>`: '';
-    console.log(data.mensaje)
+    let adjunto = null
+    if (data.url_adjunto.includes('.')) {
+        const formatosImagenes = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp', 'tiff', 'tif']
+        const formatosAudio = ['mp3', 'ogg', 'acc', 'wav', 'oga']
+        const extension = data.url_adjunto.substring(data.url_adjunto.lastIndexOf('.') + 1);
+        if (formatosImagenes.includes(extension)) {
+            adjunto = `
+                <div>
+                    <a href="${data.url_adjunto}" target="_blank">    
+                        <img src="${data.url_adjunto}" alt="" class="mt-1" style="max-width: 330px; max-height: 330px;" onerror="manejarArchivoEliminadoDer(this)">
+                    </a>
+                </div>
+            `
+        } else if (formatosAudio.includes(extension)) {
+            adjunto = `
+                <div>
+                    <audio controls class="mt-1">
+                        <source src="${data.url_adjunto}" type>
+                            El navegador no soporta el tipo de formato del audio
+                    </audio>
+                </div>
+            `
+        } else {
+            const nombre_archivo = data.url_adjunto.substring(data.url_adjunto.lastIndexOf('/') + 1);
+            peso = await obtenerPesoArchivo(data.url_adjunto)
+            console.log('peso', peso)
+            adjunto = `
+                <div>
+                    <a href="${data.url_adjunto}" class="d-flex justify-content-center align-items-center ${textColor} text-decoration-none rounded-3 my-1 p-2 gap-1" style="background-color: ${bgSecondaryColor};" target="_blank">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" fill="currentColor" class="bi bi-file-earmark-arrow-down-fill" viewBox="0 0 16 16">
+                            <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0M9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1m-1 4v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 0 1 .708-.708L7.5 11.293V7.5a.5.5 0 0 1 1 0"/>
+                        </svg>
+                        <div>
+                            <p class="mb-0">${nombre_archivo}</p>
+                            <small>Tamaño: ${peso.toFixed(2)} KB</small>
+                        </div>
+                    </a>
+                </div>
+            `
+        }
+    } else {
+        adjunto = ''
+    }
+    
     mensaje_con_espacios = data.mensaje.replaceAll('\n', '<br>')
-    console.log(mensaje_con_espacios)
-
-    //const alignMessage = userName == data.username? 'align-self-end': 'align-self-start'
     document.querySelector('#chat-messages').innerHTML += (
-        /*
-        `<div class="${alignMessage} d-flex flex-column p-2 bg-white border rounded">
-            <div>
-            <small class="text-secondary">${formattedDate} -</small>
-            <small class="text-secondary">${data.usuario}</small>
-            </div>
-            <small>${data.mensaje}</small>
-        </div>`
-        */
        `
        <div style="max-width: 60%;" class="${alignMessage} d-flex flex-column">
             <div class="d-flex ${alignThumbnail} gap-1 ">
@@ -102,7 +136,7 @@ function manejarMensajeRecibido(data) {
                         <small class="${textColor}">${formattedDate} -</small>
                         <small class="${textColor}">${data.usuario}</small>
                     </div>
-                    ${url_adjunto}
+                    ${adjunto}
                     <small>${mensaje_con_espacios}</small>
                 </div>
             </div>
@@ -213,6 +247,27 @@ function addZero(number) {
 function scrollAlFinal() {
     let objDiv = document.getElementById("chat-messages");
     objDiv.scrollTop = objDiv.scrollHeight;
+}
+
+async function obtenerPesoArchivo(url) {
+    return fetch(url, {
+        method: 'HEAD'
+    })
+    .then(response => {
+        const contentLengthHeader = response.headers.get('Content-Length');
+        console.log('contentLengthHeader', contentLengthHeader)
+        if (contentLengthHeader) {
+            const tamanioEnBytes = parseInt(contentLengthHeader, 10);
+            console.log('tamanioEnBytes', tamanioEnBytes)
+            const tamanioEnKB = tamanioEnBytes / 1024;
+            return tamanioEnKB;
+        } else {
+            throw new Error('No se pudo obtener el tamaño del archivo.');
+        }
+    })
+    .catch(error => {
+        console.error('Error al obtener el tamaño del archivo:', error);
+    });
 }
 
 window.addEventListener('load', function() {

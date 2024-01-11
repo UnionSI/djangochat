@@ -61,7 +61,6 @@ def chat(request, id):
         )
     )
     nombres_usuarios = list(User.objects.values_list('username', flat=True))
-    print(nombres_usuarios)
     context = {
         'contacto': contacto,
         'contacto_mensajes': contacto_mensajes,

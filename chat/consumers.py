@@ -161,10 +161,16 @@ class GlobalConsumer(AsyncWebsocketConsumer):
         contacto_integracion = ContactoIntegracion.objects.get(contacto=contacto)
         mensaje = Mensaje.objects.create(usuario=usuario, contacto_integracion=contacto_integracion, contenido=mensaje)
         if media:
-            mimetype, media64 = media.split(';base64,')  # data:image/png;base64,iVBORw0KGgo...
-            formato, extension = mimetype.split('/')
-            formato = formato.split(':')[1]
-            nombre_archivo = f'{str(uuid.uuid4())}.{extension}'
+            _, media = media.split(':', 1)  # data:image/png;base64,iVBORw0KGgo... -> data | image/png;base64,iVBORw0KGgo...
+            mimetype, media64 = media.split(';base64,')  # image/png;base64,iVBORw0KGgo... -> image/png | iVBORw0KGgo...
+            formato, extension_temp = mimetype.split('/')  # -> image/png -> image | png
+            extension = mimetypes.guess_extension(mimetype)
+            if not extension:
+                extension = f'.{extension_temp}'
+            nombre_archivo = f'{str(uuid.uuid4())}{extension}'
+            print(mimetype)
+            print(extension)
+            print(nombre_archivo)
             archivo_temporal = ContentFile(base64.b64decode(media64), name=nombre_archivo)
             media = MensajeAdjunto.objects.create(archivo=archivo_temporal, formato=formato, mensaje=mensaje)
         usuario = usuario.username if usuario else contacto_integracion.contacto.nombre

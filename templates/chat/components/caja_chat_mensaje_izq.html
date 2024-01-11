@@ -21,10 +21,35 @@
             </div>
             <div>
                 {% if mensaje.mensajes_adjuntos.first %}
-                    <!-- <img src="{{ MEDIA_URL }}{{ mensaje.mensajes_adjuntos.first.url }}" alt=""  class="mt-1" style="max-width: 330px; max-height: 330px;"
-                    > -->
-                    <!-- onerror="manejarArchivoEliminado(this)" -->
-                    <img src="{{ mensaje.mensajes_adjuntos.first.archivo.url }}" alt=""  class="mt-1" style="max-width: 330px; max-height: 330px;">
+                    {% if mensaje.mensajes_adjuntos.first.formato == 'image' %}
+                        <a href="{{ mensaje.mensajes_adjuntos.first.archivo.url }}" target="_blank">
+                            <img src="{{ mensaje.mensajes_adjuntos.first.archivo.url }}" alt=""  class="mt-1" style="max-width: 330px; max-height: 330px;" onerror="manejarArchivoEliminadoIzq(this)">
+                        </a>
+                    {% elif mensaje.mensajes_adjuntos.first.formato == 'audio' %}
+                        <audio controls class="mt-1">
+                            <source src="{{ mensaje.mensajes_adjuntos.first.archivo.url }}" type="{{ mensaje.mensajes_adjuntos.first.archivo.get_mimetype }}">
+                            El navegador no soporta el tipo de formato del audio
+                        </audio>
+                    {% else %}
+                        <a href="{{ mensaje.mensajes_adjuntos.first.archivo.url }}" class="d-flex justify-content-center align-items-center text-secondary text-decoration-none rounded-3 my-1 p-2 gap-1" style="background-color: #00000020;" target="_blank">
+                            <!--                        
+                            <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" fill="currentColor" class="bi bi-file-earmark-x-fill" viewBox="0 0 16 16">
+                                <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0M9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1M6.854 7.146 8 8.293l1.146-1.147a.5.5 0 1 1 .708.708L8.707 9l1.147 1.146a.5.5 0 0 1-.708.708L8 9.707l-1.146 1.147a.5.5 0 0 1-.708-.708L7.293 9 6.146 7.854a.5.5 0 1 1 .708-.708"/>
+                            </svg>
+                            <div>
+                                <p class="mb-0">ARCHIVO ELIMINADO</p>
+                                <small>Solicite a la persona que vuelva a enviarlo.</small>
+                            </div>
+                            -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" fill="currentColor" class="bi bi-file-earmark-arrow-down-fill" viewBox="0 0 16 16">
+                                <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0M9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1m-1 4v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 0 1 .708-.708L7.5 11.293V7.5a.5.5 0 0 1 1 0"/>
+                            </svg>
+                            <div>
+                                <p class="mb-0">{{ mensaje.mensajes_adjuntos.first.archivo.name|slice:"9:" }}</p>
+                                <small>Tamaño: {{ mensaje.mensajes_adjuntos.first.archivo.size|stringformat:"d"|slice:":-3"|default:"0" }} KB</small>
+                            </div>
+                        </a>
+                    {% endif %}
                 {% endif %}         
             </div>
             <small>{{ mensaje.contenido|linebreaksbr|safe }}</small>

@@ -19,9 +19,13 @@
     </head>
 
     <script>
-        function manejarArchivoEliminado(elemento) {
+        function manejarArchivoEliminadoIzq(elemento) {
             elemento.onerror = null;
-            elemento.src = '{% static "img/missing-file-1.png" %}';
+            elemento.src = '{% static "img/missing-file-izq.png" %}';
+        }
+        function manejarArchivoEliminadoDer(elemento) {
+            elemento.onerror = null;
+            elemento.src = '{% static "img/missing-file-der.png" %}';
         }
     </script>
 
