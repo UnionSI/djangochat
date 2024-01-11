@@ -106,7 +106,6 @@ async function manejarMensajeRecibido(data) {
         } else {
             const nombre_archivo = data.url_adjunto.substring(data.url_adjunto.lastIndexOf('/') + 1);
             peso = await obtenerPesoArchivo(data.url_adjunto)
-            console.log('peso', peso)
             adjunto = `
                 <div>
                     <a href="${data.url_adjunto}" class="d-flex justify-content-center align-items-center ${textColor} text-decoration-none rounded-3 my-1 p-2 gap-1" style="background-color: ${bgSecondaryColor};" target="_blank">
@@ -171,66 +170,6 @@ function manejarErrores(titulo, mensaje) {
     })
 }
 
-document.querySelector('#chat-message-input').focus();
-
-form = document.querySelector('#form-chat-submit')
-form.addEventListener('submit', function(e) {
-    e.preventDefault()
-
-    const messageInputDom = document.querySelector('#chat-message-input')
-    const message = messageInputDom.value;
-    const files = document.getElementById('file-attached').files;
-
-    const json_data = {
-        'type': 'chat_message',
-        'mensaje': message,
-        'usuario': userName,
-        'contacto': roomName,
-        'telefono': phoneNumber,
-        'integracion': integracion,
-        'ambiente': ambiente,
-        'media': ''
-    }
-
-    if (files.length > 0) {
-        let filesValid = true
-        const maxSize = 10 * 1024 * 1024; // 10 MB en bytes
-        for (var i = 0; i < files.length; i++) {
-            const fileSize = files[i].size; // Tamaño en bytes
-            filesValid =  maxSize >= fileSize
-        }
-        if (filesValid) {
-            for (var i = 0; i < files.length; i++) {
-                let reader = new FileReader();
-                reader.onload = function (e) {
-                    const base64Data = e.target.result;
-                    json_data['media'] = base64Data
-                    globalSocket.send(JSON.stringify(json_data))
-                    console.log(json_data)
-                }
-                reader.readAsDataURL(files[i]);
-            }
-        } else {
-            console.log('El archivo adjunto pesa más de 10mb')
-        }
-    } else {
-        globalSocket.send(JSON.stringify(json_data));
-    }
-
-    /*
-    for (var i = 0; i < files.length; i++) {
-      var reader = new FileReader();
-      reader.onload = function (e) {
-        var base64Data = e.target.result;
-        // Aquí puedes enviar base64Data al servidor
-        console.log('Imagen en base64:', base64Data);
-      };
-      reader.readAsDataURL(files[i]);
-    }*/
-
-    messageInputDom.value = '';
-});
-
 function formatoFecha(date) {
     const day = addZero(date.getDate());
     const month = addZero(date.getMonth() + 1);
@@ -255,10 +194,8 @@ async function obtenerPesoArchivo(url) {
     })
     .then(response => {
         const contentLengthHeader = response.headers.get('Content-Length');
-        console.log('contentLengthHeader', contentLengthHeader)
         if (contentLengthHeader) {
             const tamanioEnBytes = parseInt(contentLengthHeader, 10);
-            console.log('tamanioEnBytes', tamanioEnBytes)
             const tamanioEnKB = tamanioEnBytes / 1024;
             return tamanioEnKB;
         } else {
@@ -270,6 +207,57 @@ async function obtenerPesoArchivo(url) {
     });
 }
 
+form = document.querySelector('#form-chat-submit')
+form.addEventListener('submit', function(e) {
+    e.preventDefault()
+
+    const messageInputDom = document.querySelector('#chat-message-input')
+    const message = messageInputDom.value;
+    const inputFilesDom = document.getElementById('file-attached')
+    const files = inputFilesDom.files;
+
+    if (message || files.length > 0) {
+        const json_data = {
+            'type': 'chat_message',
+            'mensaje': message,
+            'usuario': userName,
+            'contacto': roomName,
+            'telefono': phoneNumber,
+            'integracion': integracion,
+            'ambiente': ambiente,
+            'media': ''
+        }
+
+        if (files.length > 0) {
+            let filesValid = true
+            const maxSize = 10 * 1024 * 1024; // 10 MB en bytes
+            for (var i = 0; i < files.length; i++) {
+                const fileSize = files[i].size; // Tamaño en bytes
+                filesValid =  maxSize >= fileSize
+            }
+            if (filesValid) {
+                for (var i = 0; i < files.length; i++) {
+                    let reader = new FileReader();
+                    reader.onload = function (e) {
+                        const base64Data = e.target.result;
+                        json_data['media'] = base64Data
+                        globalSocket.send(JSON.stringify(json_data))
+                    }
+                    reader.readAsDataURL(files[i]);
+                }
+            } else {
+                console.log('El archivo adjunto pesa más de 10mb')
+            }
+        } else {
+            globalSocket.send(JSON.stringify(json_data));
+        }
+
+        messageInputDom.value = '';
+        inputFilesDom.value = ''
+    }
+});
+
 window.addEventListener('load', function() {
+    document.querySelector('#chat-message-input').focus();
     scrollAlFinal();
 })
