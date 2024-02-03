@@ -1,6 +1,7 @@
 :root {
     --primary-color: rgb(44, 62, 80);
     --primary-hover-color: #3c5268;
+    --secondary-color: rgb(156, 177, 197);
 /*    --primary-hover-color: #32465A;*/
 
 }
@@ -37,6 +38,10 @@
     color: #f5f5f5;
 }
 
+.text-union {
+    color: var(--primary-color);
+}
+
 .card-union {
     background-color: var(--primary-color);
     color: #f5f5f5;
@@ -57,6 +62,10 @@
 .btn-primary {
     background-color: var(--primary-color);
     border-color: var(--primary-hover-color);
+}
+
+.btn-light {
+    color: #5C636A;
 }
 
 .caja-mensaje-chat {
