@@ -67,6 +67,7 @@
 {% block scripts %}
   {{ contacto.id|json_script:"json-roomname" }}
   {{ request.user.username|json_script:"json-username" }}
+  <div id="usuarios-data" data-usuarios="{{ usuarios|safe }}"></div>
   {{ contacto.telefono|json_script:"json-phone-number" }}
   {{ integracion|json_script:"json-integracion" }}
   {{ debug|json_script:"json-debug" }}

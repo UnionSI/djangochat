@@ -80,19 +80,19 @@
       <div class="p-3 border-bottom border-union">
           <div class="row mb-3">
             <div class="col-3 m-0 text-white-50">Nombre: </div>
-            <div class="col-9 m-0">{{ contacto.nombre }}</div>
+            <div class="col-9 m-0">{{ contacto.nombre|default:"-" }}</div>
             <div class="col-3 m-0 text-white-50">Apellido: </div>
-            <div class="col-9 m-0">{{ contacto.apellido }}</div>
+            <div class="col-9 m-0">{{ contacto.apellido|default:"-" }}</div>
             <div class="col-3 m-0 text-white-50">DNI: </div>
-            <div class="col-9 m-0">{{ contacto.dni }}</div>
+            <div class="col-9 m-0">{{ contacto.dni|default:"-" }}</div>
             <div class="col-3 m-0 text-white-50">Teléfono: </div>
             <div class="col-9 m-0">{{ contacto.telefono }}</div>
             <div class="col-3 m-0 text-white-50">Email: </div>
-            <div class="col-9 m-0">{{ contacto.email }}</div>
+            <div class="col-9 m-0">{{ contacto.email|default:"-" }}</div>
             <div class="col-3 m-0 text-white-50">Empresa: </div>
-            <div class="col-9 m-0">{{ contacto.empresa }}</div>
+            <div class="col-9 m-0">{{ contacto.empresa|default:"-" }}</div>
             <div class="col-3 m-0 text-white-50">Nº Socio: </div>
-            <div class="col-9 m-0">{{ contacto.nro_socio }}</div>
+            <div class="col-9 m-0">{{ contacto.nro_socio|default:"-" }}</div>
           </div>
       </div>
 
@@ -120,9 +120,12 @@
 {% block scripts %}
   {{ contacto.id|json_script:"json-roomname" }}
   {{ request.user.username|json_script:"json-username" }}
+  <div id="usuarios-data" data-usuarios="{{ usuarios|safe }}"></div>
   {{ contacto.telefono|json_script:"json-phone-number" }}
   {{ integracion|json_script:"json-integracion" }}
   {{ debug|json_script:"json-debug" }}
   <script id="json-ambiente" type="application/json">"Produccion"</script>
   <script type="" src="{% static 'js/chatWebSocket.js' %}"></script>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
+  <script type="" src="{% static 'js/chatFuncionalidades.js' %}"></script>
 {% endblock %}

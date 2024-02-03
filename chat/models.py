@@ -100,7 +100,9 @@ class Mensaje(models.Model):
 
 
 class MensajeAdjunto(models.Model):
-    url = models.FilePathField()
+    #url = models.FilePathField()
+    archivo = models.FileField(upload_to='adjuntos')
+    formato = models.CharField(max_length=25)
     mensaje = models.ForeignKey(Mensaje, related_name='mensajes_adjuntos', on_delete=models.CASCADE)
 
     class Meta:

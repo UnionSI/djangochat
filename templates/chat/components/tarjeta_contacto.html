@@ -13,7 +13,13 @@
           {% else %}
             <strong>{{ contacto.telefono }}</strong>
           {% endif %}
-          <small class="text-white-50">{{ contacto.dni }}</small>
+          <small class="text-white-50">
+            {% if contacto.dni %}
+              {{ contacto.dni }}
+            {% else %}
+              Sin información
+            {% endif %}
+          </small>
         </div>
         <small class="text-white-50 message-date">
           {% now "d/m/Y" as todays_date %}
@@ -28,9 +34,13 @@
         {% if contacto.last_message_user %}
           {{ contacto.last_message_user }}:
         {% else %}
-          {{ contacto.nombre }}:
+          {% if contacto.nombre %}
+            {{ contacto.nombre }}:
+          {% else %}
+            {{ contacto.telefono }}:
+          {% endif %}
         {% endif %}
-        {{ contacto.last_message_content|truncatechars:50 }}
+        {{ contacto.last_message_content|truncatechars:50|default:"[Archivo]" }}
       </div>
     </div>
 </a>
