@@ -4,6 +4,7 @@ from django.views.decorators.http import require_POST
 from django.db.models import Prefetch
 from django.db.models import Max, Subquery, OuterRef
 from django.core import serializers
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from .models import Sector, SectorTarea, Contacto, Mensaje, ContactoTarea, ContactoIntegracion
 from django.contrib.auth.models import User
@@ -14,6 +15,7 @@ import json, re
 
 from config.settings import DEBUG
 
+MENSAJES_POR_PAGINA = 10
 
 @login_required
 def chats(request):
@@ -48,7 +50,9 @@ def chat(request, id):
     contacto_tarea = contacto_integracion.contacto_tareas.first()
     sector_tarea = contacto_tarea.sector_tarea
     sectores = Sector.objects.prefetch_related('sectortarea_set').all()    
-    contacto_mensajes = Mensaje.objects.filter(contacto_integracion__contacto=contacto)  # Ver cómo manejar esto si hay muchos mensajes
+    contacto_mensajes = Mensaje.objects.filter(contacto_integracion__contacto=contacto).order_by('-fecha_hora')[:MENSAJES_POR_PAGINA]  # Ver cómo manejar esto si hay muchos mensajes
+    contacto_mensajes = sorted(contacto_mensajes, key=lambda x: x.fecha_hora)
+
     contactos = Contacto.objects.annotate(
         last_message_content=Subquery(
             Mensaje.objects.filter(contacto_integracion=OuterRef('pk')).values('contenido').order_by('-fecha_hora')[:1]
@@ -135,3 +139,29 @@ def mover_de_sector(request, contacto_id, sector_tarea_id):
         #'username': ultimo_mensaje.usuario if ultimo_mensaje.usuario else ultimo_mensaje.contacto.nombre,
     })
     return redirect('contacto:chat', contacto_id)
+
+
+from django.http import JsonResponse
+
+def load_more_messages(request, id, page):
+    contacto = get_object_or_404(Contacto.objects.prefetch_related('contacto_integraciones__integracion'), id=id)
+    contacto_mensajes = Mensaje.objects.filter(contacto_integracion__contacto=contacto)
+    
+    # Paginación
+    paginator = Paginator(contacto_mensajes.order_by('-fecha_hora'), MENSAJES_POR_PAGINA)
+    try:
+        mensajes_pagina = paginator.page(page)
+    except Exception as error:
+        return JsonResponse({'status': str(error)})
+
+    # Preparar datos de mensajes para la respuesta JSON
+    mensajes_data = []
+    for mensaje in mensajes_pagina:
+        mensajes_data.append({
+            'mensaje': mensaje.contenido,
+            'fecha_hora': mensaje.fecha_hora.strftime('%d/%m/%Y %H:%M'),
+            'usuario': mensaje.usuario.username if mensaje.usuario else mensaje.contacto_integracion.contacto.nombre,
+            'url_adjunto': mensaje.mensajes_adjuntos.first().archivo.url if mensaje.mensajes_adjuntos.first() else ''
+        })
+
+    return JsonResponse({'status': 'success', 'mensajes': mensajes_data})

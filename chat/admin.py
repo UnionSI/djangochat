@@ -27,8 +27,16 @@ class AdminContactoTarea(admin.ModelAdmin):
 
 @admin.register(Mensaje)
 class AdminMensaje(admin.ModelAdmin):
-    list_display = ('contacto_integracion', 'usuario', 'contenido', 'fecha_hora', 'recibido', 'leido', 'id_integracion')
+    list_display = ('contacto_integracion', 'usuario', 'contenido', 'fecha_hora', 'recibido', 'leido', 'id_integracion', 'mostrar_mensaje_adjunto')
     list_filter = ('contacto_integracion__contacto__nombre', 'contacto_integracion__integracion__nombre')
+
+    def mostrar_mensaje_adjunto(self, obj):
+        # Obtener el primer mensaje adjunto asociado a este mensaje
+        primer_adjunto = obj.mensajes_adjuntos.first()
+        # Mostrar el nombre del archivo si hay un adjunto, de lo contrario, mostrar None
+        return primer_adjunto.archivo.name if primer_adjunto else None
+
+    mostrar_mensaje_adjunto.short_description = 'Mensaje Adjunto'
 
 @admin.register(MensajeAdjunto)
 class AdminMensajeAdjunto(admin.ModelAdmin):

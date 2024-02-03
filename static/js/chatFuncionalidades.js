@@ -22,15 +22,14 @@ botonBorrarAdjunto.addEventListener('click', () => {
   toastAdjuntos.innerHTML = 'Se eliminaron todos los adjuntos'
   toastBootstrap.show()
   botonAdjuntar.classList.add('btn-light')
-  botonAdjuntar.classList.remove('btn-dark')
+  botonAdjuntar.classList.remove('btn-secondary')
 })
 
 // Borra los archivos adjuntos al enviar mensaje
 enviarMensaje.addEventListener('click', () => {
-  adjuntos.value = '';
   cantidadAdjuntos.innerHTML = 'Sin archivos adjuntos'
-  toastAdjuntos.innerHTML =  'Se eliminaron todos los adjuntos'
-  toastBootstrap.show()
+  botonAdjuntar.classList.add('btn-light')
+  botonAdjuntar.classList.remove('btn-secondary')
 })
 
 // Informa la cantidad de adjuntos
@@ -43,7 +42,6 @@ adjuntos.addEventListener('change', () => {
     botonAdjuntar.classList.remove('btn-light')
     botonAdjuntar.classList.add('btn-secondary')
   })
-
 
 /* 
 const emojiButton = document.querySelector('#emoji-button');
@@ -76,4 +74,3 @@ document.querySelector('emoji-picker')
       emojiContainer.style.display = 'none';
   }
 }); */
-
