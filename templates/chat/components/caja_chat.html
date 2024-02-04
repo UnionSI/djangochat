@@ -34,9 +34,10 @@
         {% endfor %}
     </div>
 
-    <div class="bg-body-tertiary p-3">
+    <div class="bg-body-tertiary p-3 border-top">
         <form id="form-chat-submit" class="d-flex justify-content-center align-items-center gap-2" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
+            <input class="form-control" type="hidden" id="chat-mentioned" value="">
             <input class="form-control" type="text" id="chat-message-input" placeholder="Escribe un mensaje...">
             <!-- <input class="form-control" type="file" id="file-attached" multiple style="width: 300px;"> -->
 

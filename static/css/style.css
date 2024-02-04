@@ -3,8 +3,12 @@
     --primary-hover-color: #3c5268;
     --secondary-color: rgb(156, 177, 197);
 /*    --primary-hover-color: #32465A;*/
-
 }
+
+* {
+    scroll-behavior: smooth;
+}
+
 
 .messages {
     height: 400px;
@@ -69,10 +73,13 @@
 }
 
 .caja-mensaje-chat {
-    padding: 10px 15px;
+    padding: 10px 30px 10px 15px;
     border-radius: 20px;
 }
 
+.animacion-mensaje-citado {
+    background-color: aqua; 
+}
 
 /* */
 /* ===== Scrollbar CSS ===== */

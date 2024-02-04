@@ -80,9 +80,10 @@ class ContactoTarea(models.Model):
 class Mensaje(models.Model):
     #contacto = models.ForeignKey(Room, related_name='messages', on_delete=models.CASCADE)
     contacto_integracion = models.ForeignKey(ContactoIntegracion, related_name='mensajes', on_delete=models.CASCADE)
-    usuario = models.ForeignKey(User, related_name='mensajes', on_delete=models.CASCADE, null=True)
+    usuario = models.ForeignKey(User, related_name='mensajes', on_delete=models.CASCADE, blank=True, null=True)
     contenido = models.TextField()
     id_integracion = models.CharField(max_length=25, null=True, blank=True)  # ID del mensaje de la integración para citarlo
+    mensaje_citado = models.ForeignKey('self', related_name='mensajes_citados', on_delete=models.CASCADE, blank=True, null=True)
     recibido = models.DateTimeField(null=True)  # Verificar con la API
     leido = models.DateTimeField(null=True)  # Verificar con la API
     fecha_hora = models.DateTimeField(auto_now_add=True)
@@ -97,6 +98,11 @@ class Mensaje(models.Model):
 
     def __str__(self):
         return self.contenido
+    
+    def save(self, *args, **kwargs):
+         if not self.usuario:
+              self.usuario = None
+         super(Mensaje, self).save(*args, **kwargs)
 
 
 class MensajeAdjunto(models.Model):

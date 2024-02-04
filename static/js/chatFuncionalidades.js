@@ -35,7 +35,6 @@ enviarMensaje.addEventListener('click', () => {
 // Informa la cantidad de adjuntos
 adjuntos.addEventListener('change', () => {
     const numArchivos = adjuntos.files.length;
-    console.log(numArchivos)
     cantidadAdjuntos.innerHTML = `Archivos adjuntos: ${numArchivos}`
     toastAdjuntos.innerHTML = `Archivos adjuntos: ${numArchivos}`
     toastBootstrap.show()

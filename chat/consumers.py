@@ -35,6 +35,8 @@ class GlobalConsumer(AsyncWebsocketConsumer):
         integracion = data['integracion']
         ambiente = data['ambiente']
         media = data['media']
+        mencion = data['mencion']
+
         estado = None
         subestado = None
         respuesta = None
@@ -62,7 +64,7 @@ class GlobalConsumer(AsyncWebsocketConsumer):
             subestado = 'success'
 
         if estado == 'success' and subestado == 'success':
-            await self.enviar_mensaje_chat_ws(tipo='chat_message', contacto=contacto.id, mensaje=mensaje.contenido, usuario=usuario, url_adjunto=url_adjunto)
+            await self.enviar_mensaje_chat_ws(tipo='chat_message', contacto=contacto.id, mensaje=mensaje.contenido, usuario=usuario, url_adjunto=url_adjunto, mencion=mencion)
             if chequear_chatbot:
                 await logica_chatbot(contacto_integracion, mensaje)
         else:
@@ -70,7 +72,7 @@ class GlobalConsumer(AsyncWebsocketConsumer):
                 await sync_to_async(media.delete)()
             await sync_to_async(mensaje.delete)()
             error_mensaje = 'No se pudo enviar el mensaje. Por favor, recargue la página y vuelva a intentarlo'
-            await self.enviar_mensaje_chat_ws(tipo='message_error', contacto=contacto.id, mensaje=error_mensaje, usuario=usuario, url_adjunto=url_adjunto)
+            await self.enviar_mensaje_chat_ws(tipo='message_error', contacto=contacto.id, mensaje=error_mensaje, usuario=usuario, url_adjunto=url_adjunto, mencion=mencion)
 
 
 
@@ -107,7 +109,7 @@ class GlobalConsumer(AsyncWebsocketConsumer):
             }
         )
 
-    async def enviar_mensaje_chat_ws(self, tipo, contacto, mensaje, usuario, url_adjunto):
+    async def enviar_mensaje_chat_ws(self, tipo, contacto, mensaje, usuario, url_adjunto, mencion):
         await self.channel_layer.group_send(
             'global',
             {
@@ -115,7 +117,8 @@ class GlobalConsumer(AsyncWebsocketConsumer):
                 'contacto': contacto,
                 'mensaje': mensaje,
                 'usuario': usuario,
-                'url_adjunto': url_adjunto
+                'url_adjunto': url_adjunto,
+                'mencion': mencion,
             }
         )
 
@@ -126,7 +129,8 @@ class GlobalConsumer(AsyncWebsocketConsumer):
             'contacto': event['contacto'],
             'mensaje': event['mensaje'],
             'usuario': event['usuario'],
-            'url_adjunto': event['url_adjunto']
+            'url_adjunto': event['url_adjunto'],
+            'mencion': event['mencion']
         }))
 
     async def sector_change(self, event):

@@ -1,10 +1,10 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from django.db.models import Prefetch
-from django.db.models import Max, Subquery, OuterRef
+from django.db.models import Max, Prefetch, Subquery, OuterRef
 from django.core import serializers
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.http import JsonResponse
 
 from .models import Sector, SectorTarea, Contacto, Mensaje, ContactoTarea, ContactoIntegracion
 from django.contrib.auth.models import User
@@ -131,7 +131,7 @@ def mover_de_sector(request, contacto_id, sector_tarea_id):
         'dni': contacto.dni,
         'usuario': ultimo_mensaje.usuario.username if ultimo_mensaje.usuario else contacto.nombre,
         'mensaje': ultimo_mensaje.contenido,
-        'fecha': ultimo_mensaje.fecha_hora.strftime('%Y-%m-%d %H:%M:%S'),
+        'fecha': ultimo_mensaje.fecha_hora.strftime('%d-%m-%Y %H:%M'),
         #'type': 'sector_change',
         #'task_sector': sector_tarea.id,
         #'contacto': contacto,
@@ -140,8 +140,6 @@ def mover_de_sector(request, contacto_id, sector_tarea_id):
     })
     return redirect('contacto:chat', contacto_id)
 
-
-from django.http import JsonResponse
 
 def load_more_messages(request, id, page):
     contacto = get_object_or_404(Contacto.objects.prefetch_related('contacto_integraciones__integracion'), id=id)
