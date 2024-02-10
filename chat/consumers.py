@@ -42,12 +42,13 @@ class GlobalConsumer(AsyncWebsocketConsumer):
         respuesta = None
         chequear_chatbot = None
 
-        usuario, contacto, contacto_integracion, mensaje, media = await self.guardar_mensaje(usuario, contacto, mensaje, media)
+        usuario, contacto, contacto_integracion, mensaje, media, mencion = await self.guardar_mensaje(usuario, contacto, mensaje, media, mencion)
         url_adjunto = media.archivo.url if media else ''
 
         if integracion == 'WhatsApp':
             if url_adjunto:
                 respuesta = await enviar_adjunto_waapi(chat_id=telefono, mensaje=mensaje.contenido, url_adjunto=url_adjunto)
+                mensaje.id_integración = respuesta['data']['data']['id']['id']
             else:
                 respuesta = await enviar_mensaje_waapi(chat_id=telefono, mensaje=mensaje.contenido)
             # Manejar cuando se envia una foto pero no la puede descargar el whatsapp:
@@ -55,16 +56,19 @@ class GlobalConsumer(AsyncWebsocketConsumer):
             estado = respuesta['status'] # Cuando la conexión a la API está OK
             subestado = respuesta['data']['status']  # Cuando no puede descargar la imagen, el error del estado es 'success' pero el subestado es 'error'. 
         elif integracion == 'Test':
+            mensaje.id_integracion = str(uuid.uuid4())
             if ambiente == 'Homologacion':
                 usuario = contacto.nombre
                 mensaje.usuario = None
-                await sync_to_async(mensaje.save)()
                 chequear_chatbot = True
+            await sync_to_async(mensaje.save)()
             estado = 'success'
             subestado = 'success'
 
+
+
         if estado == 'success' and subestado == 'success':
-            await self.enviar_mensaje_chat_ws(tipo='chat_message', contacto=contacto.id, mensaje=mensaje.contenido, usuario=usuario, url_adjunto=url_adjunto, mencion=mencion)
+            await self.enviar_mensaje_chat_ws(tipo='chat_message', contacto=contacto.id, mensaje=mensaje.contenido, usuario=usuario, url_adjunto=url_adjunto, id_integracion= mensaje.id_integracion, mencion=mencion)
             if chequear_chatbot:
                 await logica_chatbot(contacto_integracion, mensaje)
         else:
@@ -72,7 +76,7 @@ class GlobalConsumer(AsyncWebsocketConsumer):
                 await sync_to_async(media.delete)()
             await sync_to_async(mensaje.delete)()
             error_mensaje = 'No se pudo enviar el mensaje. Por favor, recargue la página y vuelva a intentarlo'
-            await self.enviar_mensaje_chat_ws(tipo='message_error', contacto=contacto.id, mensaje=error_mensaje, usuario=usuario, url_adjunto=url_adjunto, mencion=mencion)
+            await self.enviar_mensaje_chat_ws(tipo='message_error', contacto=contacto.id, mensaje=error_mensaje, usuario=usuario, url_adjunto=url_adjunto, id_integracion= mensaje.id_integracion, mencion=mencion)
 
 
 
@@ -109,7 +113,7 @@ class GlobalConsumer(AsyncWebsocketConsumer):
             }
         )
 
-    async def enviar_mensaje_chat_ws(self, tipo, contacto, mensaje, usuario, url_adjunto, mencion):
+    async def enviar_mensaje_chat_ws(self, tipo, contacto, mensaje, usuario, url_adjunto, id_integracion, mencion):
         await self.channel_layer.group_send(
             'global',
             {
@@ -118,7 +122,8 @@ class GlobalConsumer(AsyncWebsocketConsumer):
                 'mensaje': mensaje,
                 'usuario': usuario,
                 'url_adjunto': url_adjunto,
-                'mencion': mencion,
+                'id_integracion': id_integracion,
+                'mencion': mencion
             }
         )
 
@@ -130,6 +135,7 @@ class GlobalConsumer(AsyncWebsocketConsumer):
             'mensaje': event['mensaje'],
             'usuario': event['usuario'],
             'url_adjunto': event['url_adjunto'],
+            'id_integracion': event['id_integracion'],
             'mencion': event['mencion']
         }))
 
@@ -159,12 +165,26 @@ class GlobalConsumer(AsyncWebsocketConsumer):
         }))
 
     @sync_to_async
-    def guardar_mensaje(self, usuario, contacto, mensaje, media):
+    def guardar_mensaje(self, usuario, contacto, mensaje, media, mencion):
         usuario = User.objects.filter(username=usuario)
         usuario = usuario.first() if usuario.exists() else None
         contacto = Contacto.objects.get(id=contacto)
         contacto_integracion = ContactoIntegracion.objects.get(contacto=contacto)
-        mensaje = Mensaje.objects.create(usuario=usuario, contacto_integracion=contacto_integracion, contenido=mensaje)
+
+        if mencion:
+            mensaje_citado = Mensaje.objects.get(id_integracion=mencion)
+            mencion = {
+                'id': mensaje_citado.id_integracion,
+                'fecha_hora': mensaje_citado.fecha_hora.strftime('%d/%m/%Y %H:%M'),
+                'usuario': mensaje_citado.usuario.username if mensaje_citado.usuario else mensaje_citado.contacto_integracion.contacto.nombre,
+                'url_adjunto': mensaje_citado.mensajes_adjuntos.first().archivo.url if mensaje_citado.mensajes_adjuntos.first() else '',
+                'mensaje': mensaje_citado.contenido,
+            }
+        else:
+            mensaje_citado = None
+            mencion = ''
+
+        mensaje = Mensaje.objects.create(usuario=usuario, contacto_integracion=contacto_integracion, contenido=mensaje, mensaje_citado=mensaje_citado)
         if media:
             _, media = media.split(':', 1)  # data:image/png;base64,iVBORw0KGgo... -> data | image/png;base64,iVBORw0KGgo...
             mimetype, media64 = media.split(';base64,')  # image/png;base64,iVBORw0KGgo... -> image/png | iVBORw0KGgo...
@@ -179,7 +199,7 @@ class GlobalConsumer(AsyncWebsocketConsumer):
             archivo_temporal = ContentFile(base64.b64decode(media64), name=nombre_archivo)
             media = MensajeAdjunto.objects.create(archivo=archivo_temporal, formato=formato, mensaje=mensaje)
         usuario = usuario.username if usuario else contacto_integracion.contacto.nombre
-        return [usuario, contacto, contacto_integracion, mensaje, media]
+        return [usuario, contacto, contacto_integracion, mensaje, media, mencion]
 
     @sync_to_async
     def guardar_cambio_sector(self, contacto, sector_tarea):

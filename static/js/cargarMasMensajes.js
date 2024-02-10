@@ -1,5 +1,8 @@
 import { manejarMensajeRecibido } from './manejarMensajeRecibido.js'
+import { responderMensajes } from './chatWebSocket.js'
 
+
+let cajaChat = document.getElementById("chat-messages");
 let loading = false;
 
 async function cargarMasMensajes() {
@@ -7,31 +10,34 @@ async function cargarMasMensajes() {
         return;
     }
 
-    let objDiv = document.getElementById("chat-messages");
+    let cajaChat = document.getElementById("chat-messages");
+    const ambiente = JSON.parse(document.getElementById('json-ambiente').textContent);
+    const usuariosData = document.getElementById('usuarios-data').dataset.usuarios;
+    const usuariosArray = JSON.parse(usuariosData.replace(/'/g, "\""));
 
-    if (objDiv.scrollTop === 0 && objDiv.scrollHeight > objDiv.clientHeight) {
+    if (cajaChat.scrollTop === 0 && cajaChat.scrollHeight > cajaChat.clientHeight) {
         loading = true;
-        const alturaOriginal = objDiv.scrollHeight + 100
+        const alturaOriginal = cajaChat.scrollHeight + 100
 
         // Obtener el número de la próxima página
-        let nextPage = parseInt(objDiv.getAttribute('data-next-page')) || 2;
+        let nextPage = parseInt(cajaChat.getAttribute('data-next-page')) || 2;
 
         // Realizar una solicitud AJAX al servidor para obtener más mensajes
-        fetch(`ajax/${nextPage}/`)
+        fetch(`cargar-mas-mensajes/${nextPage}/`)
         .then(response => response.json())
         .then(data => {
             if (data.status == 'success') {
                 data.mensajes.forEach(async dataMensaje => {
-                    const elemento = await manejarMensajeRecibido(dataMensaje, false)
-                    objDiv.scrollTop = elemento.scrollHeight - alturaOriginal
+                    const elemento = await manejarMensajeRecibido(dataMensaje, ambiente, cajaChat, false, usuariosArray)
+                    cajaChat.scrollTop = elemento.scrollHeight - alturaOriginal
                 })
     
                 // Actualizar el número de la próxima página
-                objDiv.setAttribute('data-next-page', nextPage + 1);
+                cajaChat.setAttribute('data-next-page', nextPage + 1);
     
             } else {
                 console.log(data.status)
-                objDiv.removeEventListener('scroll', cargarMasMensajes);
+                cajaChat.removeEventListener('scroll', cargarMasMensajes);
             }
         })
         .catch(error => {
@@ -39,10 +45,10 @@ async function cargarMasMensajes() {
         })
         .finally(() => {
             loading = false;
+            responderMensajes()
         });
     }
 }
 
 // Agregar el manejador de eventos al contenedor de mensajes
-let objDiv = document.getElementById("chat-messages");
-objDiv.addEventListener('scroll', cargarMasMensajes);
+cajaChat.addEventListener('scroll', cargarMasMensajes);

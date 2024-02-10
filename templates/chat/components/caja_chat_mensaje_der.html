@@ -4,7 +4,7 @@
 <div style="max-width: 60%;" class="align-self-end d-flex flex-column">
     <div class="d-flex flex-row-reverse gap-1 ">
         <img src="{% static 'img/logo.png' %}" alt="" width="24" height="24" class="mt-1 rounded-circle">
-        <div id="{{ mensaje.id_integracion }}" class="bg-union caja-mensaje-chat position-relative">
+        <div id="{{ mensaje.id_integracion }}" class="bg-union caja-mensaje-chat position-relative" data-side="right">
             <div class="mensaje-cabecera">
                 <small class="text-white-50">{{ mensaje.fecha_hora|date:"d/m/Y" }} {{ mensaje.fecha_hora|time:"H:i" }} -</small>
                 <small class="text-white-50">
@@ -19,6 +19,37 @@
                     {% endif %}
                 </small>
             </div>
+
+            {% if mensaje.mensaje_citado %}
+            <div class="bg-union-light rounded p-2 my-1">
+                <a href="#{{ mensaje.mensaje_citado.id_integracion }}" data-mentioned="{{ mensaje.mensaje_citado.id_integracion }}" class="referencia-citada d-flex flex-column text-white-50 text-decoration-none" style="font-size: 15px;">
+                    <small class="fw-medium ">
+                        {{ mensaje.mensaje_citado.fecha_hora|date:"d/m/Y" }} {{ mensaje.mensaje_citado.fecha_hora|time:"H:i" }} -
+                        {% if mensaje.mensaje_citado.usuario %}
+                            {{ mensaje.mensaje_citado.usuario }}
+                        {% else %}
+                            {% if contacto.nombre %}
+                                {{ contacto.nombre }}
+                            {% else %}
+                                {{ contacto.telefono }}
+                            {% endif %}
+                        {% endif %}
+                    </small>
+                    <small>{{ mensaje.mensaje_citado.contenido|linebreaksbr|safe }}</small>
+                    
+                    {% if mensaje.mensaje_citado.mensajes_adjuntos.first %}
+                    <div class="mt-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-text" viewBox="0 0 16 16">
+                            <path d="M5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1zM5 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5"></path>
+                            <path d="M9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.5zm0 1v2A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z"></path>
+                        </svg>
+                        <small>Archivo</small>
+                    </div>
+                    {% endif %}
+                </a>
+            </div>
+            {% endif %}
+
             <div class="mensaje-adjunto">
                 {% if mensaje.mensajes_adjuntos.first %}
                     {% if mensaje.mensajes_adjuntos.first.formato == 'image' %}

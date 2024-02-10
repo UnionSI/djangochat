@@ -82,7 +82,7 @@ class Mensaje(models.Model):
     contacto_integracion = models.ForeignKey(ContactoIntegracion, related_name='mensajes', on_delete=models.CASCADE)
     usuario = models.ForeignKey(User, related_name='mensajes', on_delete=models.CASCADE, blank=True, null=True)
     contenido = models.TextField()
-    id_integracion = models.CharField(max_length=25, null=True, blank=True)  # ID del mensaje de la integración para citarlo
+    id_integracion = models.CharField(max_length=36, null=True, blank=True)  # ID del mensaje de la integración para citarlo
     mensaje_citado = models.ForeignKey('self', related_name='mensajes_citados', on_delete=models.CASCADE, blank=True, null=True)
     recibido = models.DateTimeField(null=True)  # Verificar con la API
     leido = models.DateTimeField(null=True)  # Verificar con la API

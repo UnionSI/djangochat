@@ -15,7 +15,7 @@ import json, re
 
 from config.settings import DEBUG
 
-MENSAJES_POR_PAGINA = 10
+MENSAJES_POR_PAGINA = 15
 
 @login_required
 def chats(request):
@@ -141,7 +141,7 @@ def mover_de_sector(request, contacto_id, sector_tarea_id):
     return redirect('contacto:chat', contacto_id)
 
 
-def load_more_messages(request, id, page):
+def cargar_mas_mensajes(request, id, page):
     contacto = get_object_or_404(Contacto.objects.prefetch_related('contacto_integraciones__integracion'), id=id)
     contacto_mensajes = Mensaje.objects.filter(contacto_integracion__contacto=contacto)
     
@@ -155,11 +155,23 @@ def load_more_messages(request, id, page):
     # Preparar datos de mensajes para la respuesta JSON
     mensajes_data = []
     for mensaje in mensajes_pagina:
+        mencion = ''
+        if mensaje.mensaje_citado:
+            mencion = {
+                'id': mensaje.mensaje_citado.id_integracion,
+                'fecha_hora': mensaje.mensaje_citado.fecha_hora.strftime('%d/%m/%Y %H:%M'),
+                'usuario': mensaje.mensaje_citado.usuario.username if mensaje.mensaje_citado.usuario else mensaje.mensaje_citado.contacto_integracion.contacto.nombre,
+                'url_adjunto': mensaje.mensaje_citado.mensajes_adjuntos.first().archivo.url if mensaje.mensaje_citado.mensajes_adjuntos.first() else '',
+                'mensaje': mensaje.mensaje_citado.contenido,
+            }
         mensajes_data.append({
             'mensaje': mensaje.contenido,
             'fecha_hora': mensaje.fecha_hora.strftime('%d/%m/%Y %H:%M'),
             'usuario': mensaje.usuario.username if mensaje.usuario else mensaje.contacto_integracion.contacto.nombre,
-            'url_adjunto': mensaje.mensajes_adjuntos.first().archivo.url if mensaje.mensajes_adjuntos.first() else ''
+            'contacto_id': contacto.id,
+            'url_adjunto': mensaje.mensajes_adjuntos.first().archivo.url if mensaje.mensajes_adjuntos.first() else '',
+            'id_integracion': mensaje.id_integracion,
+            'mencion': mencion
         })
 
     return JsonResponse({'status': 'success', 'mensajes': mensajes_data})

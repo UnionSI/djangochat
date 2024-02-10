@@ -1,3 +1,5 @@
+import { manejarMensajeRecibido } from './manejarMensajeRecibido.js'
+
 const roomName = JSON.parse(document.getElementById('json-roomname').textContent);
 const userName = JSON.parse(document.getElementById('json-username').textContent);
 const usuariosData = document.getElementById('usuarios-data').dataset.usuarios;
@@ -9,9 +11,9 @@ const debug = JSON.parse(document.getElementById('json-debug').textContent);
 const sector = document.getElementById('sector')
 const sectorTarea = document.getElementById('sector-tarea')
 const form = document.querySelector('#form-chat-submit')
-const responderMensajes = document.querySelectorAll('.responder-mensaje')
+const cajaChat = document.getElementById("chat-messages");
 
-protocolo = debug == true ? 'ws' : 'wss'
+const protocolo = debug == true ? 'ws' : 'wss'
 const globalSocket = new WebSocket(protocolo + '://' + window.location.host + '/ws/global/');
 
 globalSocket.onopen = function(e) {
@@ -31,7 +33,7 @@ globalSocket.onmessage = function(e) {
     switch (data.type) {
         case 'chat_message':
             if (roomName == data.contacto) {
-                manejarMensajeRecibido(data, true);
+                manejarMensajeRecibido(data, ambiente, cajaChat, true, usuariosArray)
             }
             //actualizarListaContactos(data);
             break;
@@ -48,6 +50,7 @@ globalSocket.onmessage = function(e) {
             console.error('Unknown message type: ', data.type);
     }
     scrollAlFinal()
+    responderMensajes()
 };
 
 
@@ -78,53 +81,64 @@ function manejarErrores(titulo, mensaje) {
 }
 
 function scrollAlFinal() {
-    let objDiv = document.getElementById("chat-messages");
     setTimeout(() => {
-        objDiv.scrollTop = objDiv.scrollHeight
+        cajaChat.scrollTop = cajaChat.scrollHeight
       }, "250")
 }
 
-responderMensajes.forEach(responderMensaje => {
-    responderMensaje.addEventListener('click', (e) => {
-        // Verificar si ya hay mensajes citados y eliminarlos
-        const mensajeCitados = form.parentElement.querySelectorAll('.caja-citar-chat')
-        if (mensajeCitados.length > 0) {
-            mensajeCitados.forEach(mensajeCitado => mensajeCitado.remove())
-        }
-        // Crear el mensaje citado
-        const cajaMensaje = e.target.closest('.caja-mensaje-chat');
-        const cabeceraMensaje = cajaMensaje.querySelector('.mensaje-cabecera').textContent
-        const contenidoMensaje = cajaMensaje.querySelector('.mensaje-contenido').textContent
-        let adjuntoMensaje = cajaMensaje.querySelector('.mensaje-adjunto')
-        if (adjuntoMensaje.children.length > 0) {
-            adjuntoMensaje = `
-                <div class="mt-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-text" viewBox="0 0 16 16">
-                        <path d="M5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1zM5 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5"/>
-                        <path d="M9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.5zm0 1v2A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z"/>
-                    </svg>
-                    <small>Archivo citado</small>
+export function responderMensajes() {
+    const cajaResponderMensajes = document.querySelectorAll('.responder-mensaje')
+
+    cajaResponderMensajes.forEach(cajaResponderMensaje => {
+        cajaResponderMensaje.addEventListener('click', (e) => {
+            // Verificar si ya hay mensajes citados y eliminarlos
+            const mensajeCitados = form.parentElement.querySelectorAll('.caja-citar-chat')
+            if (mensajeCitados.length > 0) {
+                mensajeCitados.forEach(mensajeCitado => mensajeCitado.remove())
+                const mentioned = document.getElementById('chat-mentioned')
+                mentioned.value = ''
+            }
+            // Crear el mensaje citado
+            const cajaMensaje = e.target.closest('.caja-mensaje-chat');
+            const cabeceraMensaje = cajaMensaje.querySelector('.mensaje-cabecera').textContent
+            const contenidoMensaje = cajaMensaje.querySelector('.mensaje-contenido').textContent
+            let adjuntoMensaje = cajaMensaje.querySelector('.mensaje-adjunto')
+            if (adjuntoMensaje.children.length > 0) {
+                adjuntoMensaje = `
+                    <div class="mt-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-text" viewBox="0 0 16 16">
+                            <path d="M5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1zM5 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5"/>
+                            <path d="M9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.5zm0 1v2A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z"/>
+                        </svg>
+                        <small>Archivo citado</small>
+                    </div>
+                `
+            } else {
+                adjuntoMensaje = ''
+            }
+            const htmlMensaje = `
+                <div class="d-flex flex-column">
+                    <small class="fw-medium">${cabeceraMensaje}</small>
+                    <small>${contenidoMensaje}</small>
+                    ${adjuntoMensaje}
                 </div>
+                <button type="button" class="btn btn-close btn-sm position-absolute top-0 end-0 mt-1 me-1" aria-label="Close"></button>
             `
-        } else {
-            adjuntoMensaje = ''
-        }
-        const htmlMensaje = `
-            <div class="d-flex flex-column">
-                <small class="fw-medium">${cabeceraMensaje}</small>
-                <small>${contenidoMensaje}</small>
-                ${adjuntoMensaje}
-            </div>
-            <button type="button" class="btn btn-close btn-sm position-absolute top-0 end-0 mt-1 me-1" aria-label="Close"></button>
-        `
-        const div = document.createElement('div')
-        div.classList.add('caja-citar-chat', 'bg-body-secondary', 'border', 'rounded', 'p-2', 'mb-2', 'position-relative')
-        div.innerHTML = htmlMensaje
-        form.parentElement.insertBefore(div, form);
-        // Botón para cancelar mensaje citado
-        form.parentElement.querySelector('.btn-close').addEventListener('click', () => div.remove())
+            const div = document.createElement('div')
+            div.classList.add('caja-citar-chat', 'bg-body-secondary', 'border', 'rounded', 'p-2', 'mb-2', 'position-relative')
+            div.innerHTML = htmlMensaje
+            form.parentElement.insertBefore(div, form);
+            // Colocar el id del chat citado en el formulario
+            const mentioned = document.getElementById('chat-mentioned')
+            mentioned.value = cajaMensaje.id
+            // Botón para cancelar mensaje citado
+            form.parentElement.querySelector('.btn-close').addEventListener('click', () => {
+                div.remove()
+                document.querySelector('#chat-mentioned').value = ''
+            })
+        })
     })
-})
+}
 
 form.addEventListener('submit', (e) => {
     e.preventDefault()
@@ -145,7 +159,7 @@ form.addEventListener('submit', (e) => {
             'integracion': integracion,
             'ambiente': ambiente,
             'media': '',
-            'mencion': mentioned
+            'mencion': mentioned.value
         }
 
         if (files.length > 0) {
@@ -176,10 +190,34 @@ form.addEventListener('submit', (e) => {
 
         messageInputDom.value = '';
         inputFilesDom.value = ''
+        const mensajeCitados = form.parentElement.querySelectorAll('.caja-citar-chat')
+        if (mensajeCitados.length > 0) {
+            mensajeCitados.forEach(mensajeCitado => mensajeCitado.remove())
+            mentioned.value = ''
+        }
     }
 });
+
+/* Animación mensaje citado */
+const referenciaCitadas = document.querySelectorAll('.referencia-citada')
+referenciaCitadas.forEach(referenciaCitada => {
+    referenciaCitada.addEventListener('click', () => {
+        let idCitado = referenciaCitada.dataset.mentioned
+        const mensajeCitado = document.getElementById(idCitado)
+        const animacionClase = mensajeCitado.dataset.side == 'right'? 'animacion-mensaje-citado-derecha': 'animacion-mensaje-citado-izquierda'
+        const bgOriginal = mensajeCitado.dataset.side == 'right'? 'bg-union': 'bg-white'
+        mensajeCitado.classList.add(animacionClase)
+        mensajeCitado.classList.remove(bgOriginal)
+        setTimeout(() => {
+            mensajeCitado.classList.remove(animacionClase);
+            mensajeCitado.classList.add(bgOriginal)
+        }, "1000");
+    })
+})
 
 window.addEventListener('load', function() {
     document.querySelector('#chat-message-input').focus();
     scrollAlFinal();
+    responderMensajes();
 })
+

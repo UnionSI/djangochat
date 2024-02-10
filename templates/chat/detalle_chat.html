@@ -125,8 +125,8 @@
   {{ integracion|json_script:"json-integracion" }}
   {{ debug|json_script:"json-debug" }}
   <script id="json-ambiente" type="application/json">"Produccion"</script>
-  <script type="" src="{% static 'js/chatWebSocket.js' %}"></script>
+  <script type="module" src="{% static 'js/chatWebSocket.js' %}"></script>
   <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
-  <script type="" src="{% static 'js/chatFuncionalidades.js' %}"></script>
+  <script type="module" src="{% static 'js/chatFuncionalidades.js' %}"></script>
   <script type="module" src="{% static 'js/cargarMasMensajes.js' %}"></script>
 {% endblock %}
