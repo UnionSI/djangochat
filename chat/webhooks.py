@@ -99,7 +99,7 @@ def waapi_api_webhook(request):
                 contacto_integracion = ContactoIntegracion.objects.create(contacto=contacto, integracion=integracion_whatsapp)
                 sector_chat_inicial = SectorTarea.objects.get(nombre='Chat inicial')
                 ContactoTarea.objects.create(contacto_integracion=contacto_integracion, sector_tarea=sector_chat_inicial)
-                mensaje = Mensaje.objects.create(contacto_integracion=contacto_integracion, contenido=contenido_mensaje, id_integracion=mensaje_id)            
+                mensaje = Mensaje.objects.create(contacto_integracion=contacto_integracion, contenido=contenido_mensaje, id_integracion=mensaje_id)          
             
             if data['data']['message']['hasMedia']:
                 archivo = guardar_archivo_adjunto(request, mensaje, media, contacto)

@@ -4,6 +4,8 @@ from django.db import models
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
+from django.db.models import Max
+
 
 class Integracion(models.Model):
     nombre = models.CharField(max_length=100)
@@ -29,10 +31,19 @@ class Sector(models.Model):
 class SectorTarea(models.Model):
     sector = models.ForeignKey(Sector, on_delete=models.CASCADE)
     nombre = models.CharField(max_length=100)
-    activo = models.BooleanField()  # Para que no se pierda las asignadas a un mensaje anterior si sacan una tarea
+    activo = models.BooleanField(default=True)  # Para que no se pierda las asignadas a un mensaje anterior si sacan una tarea
+    orden = models.PositiveIntegerField(null=True, blank=True)
 
     def __str__(self):
         return f'{self.sector} - {self.nombre}'
+
+    def save(self,*args, **kwargs):
+        if not self.orden:
+            #cantidad = len(SectorTarea.objects.all())
+            sectores_tarea = SectorTarea.objects.filter(sector=self.sector)
+            max_orden = sectores_tarea.aggregate(Max('orden'))['orden__max']
+            self.orden = max_orden + 1 if max_orden is not None else 1
+        super(SectorTarea, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name_plural = 'Sectores tareas'

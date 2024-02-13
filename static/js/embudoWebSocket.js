@@ -59,10 +59,13 @@ function manejarErrores(titulo, mensaje) {
 function manejarUltimoMensaje(data) {
     const contacto = document.querySelector(`[data-contacto="${data.contacto}"]`)
     console.log('recibiendo mensaje de room', data.contacto, '-', data.mensaje)
+    console.log(data)
     console.log(contacto)
+    const formattedDate = data.fecha_hora? data.fecha_hora: formatoFecha(new Date());
     if (contacto) {
         contacto.querySelector('[data-usuario]').innerText = `${data.usuario}: `
         contacto.querySelector('[data-mensaje]').innerText = data.mensaje;
+        contacto.querySelector('[data-fecha]').innerText = formattedDate;
     }
 }
 
