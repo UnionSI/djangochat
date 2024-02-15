@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %} Embudos | {% endblock %}
+
+{% block content %}
+
+{% include 'navbar.html' %}
+
+{% include 'dashboard/admin/admin_navbar.html' %}
+
+<div class="flex-grow-1 d-flex align-items-center justify-content-center bg-body-tertiary">
+  <p class="text-secondary">Seleccione una opción para administrar</p>
+</div>
+
+{% endblock %}
