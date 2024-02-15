@@ -6,9 +6,9 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.contrib.auth.views import PasswordChangeView
 from .forms import SectorForm, SectorTareaForm, CrearUsuarioForm, ActualizarUsuarioForm, AdminCambiarContraseñaForm
 from django.contrib.auth.models import User
-from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm
 from chat.models import Sector, SectorTarea
+from django.db.models import Q
 
 
 @login_required
@@ -92,8 +92,32 @@ class SectorDeleteView(DeleteView):
 
 class SectorTareaListView(ListView):
     model = SectorTarea
-    paginate_by = 10
+    paginate_by = 20
     template_name = 'dashboard/admin/tarea/list.html'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        sector_id = self.request.GET.get('sector')
+        ordenar = self.request.GET.get('ordenar')
+        if sector_id:
+            lookup = Q(sector__id=sector_id)
+            queryset = queryset.filter(lookup)
+        if ordenar:
+            queryset = queryset.order_by(ordenar)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.GET.get('sector'):
+            context['sector'] = self.request.GET.get('sector')
+        if self.request.GET.get('ordenar'):
+            context['ordenar'] = self.request.GET.get('ordenar')
+        context.update({
+            'titulo_vista': 'Crear Tarea',
+            'descripcion_vista': 'Nuevo registro',
+            'sectores': Sector.objects.all()
+        })
+        return context
 
 class SectorTareaDetailView(DetailView):
     model = SectorTarea
@@ -109,7 +133,7 @@ class SectorTareaCreateView(CreateView):
         context = super().get_context_data(**kwargs)
         context.update({
             'titulo_vista': 'Crear Tarea',
-            'descripcion_vista': 'Nuevo registro'
+            'descripcion_vista': 'Nuevo registro',
         })
         return context
 
@@ -140,6 +164,30 @@ class UsuarioListView(ListView):
     model = User
     paginate_by = 10
     template_name = 'dashboard/admin/usuario/list.html'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        #perfil_id = self.request.GET.get('perfil')
+        ordenar = self.request.GET.get('ordenar')
+        """ if perfil_id:
+            lookup = Q(perfil__id=perfil_id)
+            queryset = queryset.filter(lookup) """
+        if ordenar:
+            queryset = queryset.order_by(ordenar)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.GET.get('perfil'):
+            context['perfil'] = self.request.GET.get('perfil')
+        if self.request.GET.get('ordenar'):
+            context['ordenar'] = self.request.GET.get('ordenar')
+        context.update({
+            'titulo_vista': 'Crear Tarea',
+            'descripcion_vista': 'Nuevo registro',
+            #'perfiles': Sector.objects.all()
+        })
+        return context
 
 class UsuarioDetailView(DetailView):
     model = User
@@ -192,7 +240,7 @@ class AdminCambiarContraseñaView(PasswordChangeView):
         context = super().get_context_data(**kwargs)
         user_id = self.kwargs.get('pk')
         print(user_id)
-        user = get_user_model().objects.get(pk=user_id)
+        user = User.objects.get(pk=user_id)
         print(user)
         context['username'] = user.username
         return context

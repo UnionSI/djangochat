@@ -3,14 +3,14 @@
 
       {% if page_obj.has_previous %}
         <li class="page-item">
-          <a class="page-link text-union" href="?page={{ page_obj.previous_page_number }}">&laquo; Previous</a>
+          <a class="page-link text-union" href="?page={{ page_obj.previous_page_number }}">&laquo; Anterior</a>
         </li>
         <li class="page-item">
           <a class="page-link text-union" href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
         </li>
       {% else %}
         <li class="page-item disabled">
-          <p class="page-link text-union">&laquo; Previous</p>
+          <p class="page-link text-union">&laquo; Anterior</p>
         </li>
       {% endif %}
 
@@ -23,11 +23,11 @@
           <a class="page-link text-union" href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
         </li>
         <li class="page-item">
-          <a class="page-link text-union" href="?page={{ page_obj.next_page_number }}">Next &raquo;</a>
+          <a class="page-link text-union" href="?page={{ page_obj.next_page_number }}">Siguiente &raquo;</a>
         </li>
       {% else %}
         <li class="page-item disabled">
-          <p class="page-link text-union">Next &raquo;</p>
+          <p class="page-link text-union">Siguiente &raquo;</p>
         </li>
       {% endif %}
 

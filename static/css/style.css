@@ -43,6 +43,16 @@
     color: #f5f5f5;
 }
 
+.bg-union-no-hover {
+    background-color: var(--primary-color);
+    color: #f5f5f5;
+}
+
+.bg-union-no-hover:hover {
+    background-color: var(--primary-color);
+    color: #f5f5f5;
+}
+
 .bg-union-light {
     background-color: var(--primary-light-color)
 }

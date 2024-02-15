@@ -28,42 +28,88 @@
     </div>
   </div>
 
-  <div class="d-flex flex-column gap-2 bg-body-secondary p-3 h-100 overflow-y-scroll">
+  <div class="d-flex flex-row gap-4 bg-body-secondary p-3 h-100 overflow-y-scroll">
 
-    <table class="table table-bordered bg-light rounded-3">
-      <thead>
-        <tr class="">
-          <th class="text-center" scope="col" style="width: 50px;">#</th>
-          <th scope="col">Usuario</th>
-          <th scope="col">Nombre</th>
-          <th scope="col">Apellido</th>
-          <th scope="col">Roles</th>
-          <th class="text-center"scope="col">Activo</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for object in object_list %}
-        <tr class="tr-linea" data-href="{% url 'usuario-detalle' object.pk %}">
-          <th class="text-center" scope="row">{{ object.id }}</th>
-          <td>{{ object.username }}</td>
-          <td>{{ object.first_name }}</td>
-          <td>{{ object.last_name }}</td>
-          <td>{{ object.groups }}</td>
-          {% if object.is_active %}
-            <td class="text-center">
-              <span class="badge bg-success-subtle text-success">Sí</span>
-            </td>
-          {% else %}
-            <td class="text-center">
-              <span class="badge bg-danger-subtle text-danger">No</span>
-            </td>
-          {% endif %}
-        </tr>
+    <div class="flex-grow-1">
+      <table class="table table-bordered bg-light rounded-3">
+        <thead>
+          <tr class="">
+            <th class="text-center" scope="col" style="width: 50px;">#</th>
+            <th scope="col">
+              <a href="?perfil={{perfil}}&{% if ordenar != 'username' %}ordenar=username{% else %}ordenar=-username{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
+                Usuario
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+                </svg>
+              </a>
+            </th>
+            <th scope="col">
+              <a href="?perfil={{perfil}}&{% if ordenar != 'first_name' %}ordenar=first_name{% else %}ordenar=-first_name{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
+                Nombre
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+                </svg>
+              </a>
+            </th>
+            <th scope="col">
+              <a href="?perfil={{perfil}}&{% if ordenar != 'last_name' %}ordenar=last_name{% else %}ordenar=-last_name{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
+                Apellido
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+                </svg>
+              </a>
+            </th>
+            <th scope="col">
+              <a href="?perfil={{perfil}}&{% if ordenar != 'perfil' %}ordenar=perfil{% else %}ordenar=-perfil{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
+                Perfil
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+                </svg>
+              </a>
+            </th>
+            <th scope="col">
+              <a href="?perfil={{perfil}}&{% if ordenar != 'is_active' %}ordenar=is_active{% else %}ordenar=-is_active{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
+                Activo
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+                </svg>
+              </a>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for object in object_list %}
+          <tr class="tr-linea" data-href="{% url 'usuario-detalle' object.pk %}">
+            <th class="text-center" scope="row">{{ object.id }}</th>
+            <td>{{ object.username }}</td>
+            <td>{{ object.first_name }}</td>
+            <td>{{ object.last_name }}</td>
+            <td></td>
+            {% if object.is_active %}
+              <td class="text-center">
+                <span class="badge bg-success-subtle text-success">Sí</span>
+              </td>
+            {% else %}
+              <td class="text-center">
+                <span class="badge bg-danger-subtle text-danger">No</span>
+              </td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% include 'paginator.html' %}
+    </div>
+
+    <div id="filter" style="width: 250px;">
+      <div class="list-group">
+        <a class="list-group-item list-group-item-action border-light-subtle bg-union-no-hover" aria-disabled="true">Filtrar por perfiles</a>
+        <a href="?" class="list-group-item list-group-item-action border-light-subtle" aria-current="true"><small>Todos</small></a>
+        {% for perfil in perfiles %}
+          <a href="?sector={{ sector.id }}" class="list-group-item list-group-item-action border-light-subtle"><small>{{ perfil.nombre }}</small></a>
         {% endfor %}
-      </tbody>
-    </table>
-
-    {% include 'paginator.html' %}
+      </div>
+    </div>
 
   </div>
 </div>
