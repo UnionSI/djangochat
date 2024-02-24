@@ -1,4 +1,5 @@
-from django.contrib.auth.models import User
+#from django.contrib.auth.models import User
+from usuario.models import Usuario
 from django.db import models
 
 from channels.layers import get_channel_layer
@@ -78,7 +79,7 @@ class ContactoTarea(models.Model):
     #contacto = models.ForeignKey(Room, related_name='contacto_tarea', on_delete=models.CASCADE)
     contacto_integracion = models.ForeignKey(ContactoIntegracion, related_name='contacto_tareas', on_delete=models.CASCADE)
     sector_tarea = models.ForeignKey(SectorTarea, on_delete=models.CASCADE)
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, null=True)
     fecha_hora = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
@@ -91,7 +92,7 @@ class ContactoTarea(models.Model):
 class Mensaje(models.Model):
     #contacto = models.ForeignKey(Room, related_name='messages', on_delete=models.CASCADE)
     contacto_integracion = models.ForeignKey(ContactoIntegracion, related_name='mensajes', on_delete=models.CASCADE)
-    usuario = models.ForeignKey(User, related_name='mensajes', on_delete=models.CASCADE, blank=True, null=True)
+    usuario = models.ForeignKey(Usuario, related_name='mensajes', on_delete=models.CASCADE, blank=True, null=True)
     contenido = models.TextField()
     id_integracion = models.CharField(max_length=36, null=True, blank=True)  # ID del mensaje de la integración para citarlo
     mensaje_citado = models.ForeignKey('self', related_name='mensajes_citados', on_delete=models.CASCADE, blank=True, null=True)

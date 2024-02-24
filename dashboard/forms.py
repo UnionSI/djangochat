@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from usuario.models import Usuario
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, AdminPasswordChangeForm
 from chat.models import Sector, SectorTarea
 from django.utils.translation import gettext, gettext_lazy as _
@@ -31,8 +32,8 @@ class SectorTareaForm(forms.ModelForm):
 
 class CrearUsuarioForm(UserCreationForm):
     class Meta:
-        model = User
-        fields = ('username', 'password1', 'password2', 'first_name', 'last_name', 'email', 'groups', 'is_active')
+        model = Usuario
+        fields = ('username', 'password1', 'password2', 'perfil', 'first_name', 'last_name', 'email', 'groups', 'is_active')
         #fields = ('__all__')
 
     def __init__(self, *args, **kwargs):
@@ -46,7 +47,7 @@ class ActualizarUsuarioForm(UserChangeForm):
     password = None
 
     class Meta:
-        model = User
+        model = Usuario
         fields = ('username', 'first_name', 'last_name', 'email', 'groups', 'is_active')
         #fields = ('__all__')
 
@@ -57,9 +58,9 @@ class ActualizarUsuarioForm(UserChangeForm):
             self.fields['is_active'].widget = forms.CheckboxInput(attrs={'class': 'form-check-input'})
 
 
-class AdminCambiarContraseñaForm(AdminPasswordChangeForm):
+class AdminCambiarClaveForm(AdminPasswordChangeForm):
     class Meta:
-        model = User
+        model = Usuario
         #fields = ('__all__')
 
     def __init__(self, *args, **kwargs):

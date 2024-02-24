@@ -1,7 +1,0 @@
-POST https://http://127.0.0.1:8000/contacto/waapi_api_webhook_test
-content-type: application/json
-
-{
-    "name": "sample",
-    "time": "Wed, 21 Oct 2015 18:27:50 GMT"
-}

@@ -31,7 +31,7 @@
   <div class="d-flex flex-row gap-4 bg-body-secondary p-3 h-100 overflow-y-scroll">
 
     <div class="flex-grow-1">
-      <table class="table table-bordered bg-light rounded-3">
+      <table id="myTable" class="table table-bordered bg-light rounded-3">
         <thead>
           <tr class="">
             <th class="text-center" scope="col" style="width: 50px;">#</th>
@@ -108,4 +108,5 @@
 
 {% block scripts %}
 <script src="{% static 'js/redireccionTabla.js' %}"></script>
+<!-- <script src="{% static 'js/dataTables.js' %}"></script> -->
 {% endblock %}

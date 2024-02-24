@@ -8,6 +8,7 @@ from django.http import JsonResponse
 
 from .models import Sector, SectorTarea, Contacto, Mensaje, ContactoTarea, ContactoIntegracion
 from django.contrib.auth.models import User
+from usuario.models import Usuario
 
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
@@ -64,7 +65,7 @@ def chat(request, id):
             Mensaje.objects.filter(contacto_integracion=OuterRef('pk')).values('usuario__username').order_by('-fecha_hora')[:1]
         )
     )
-    nombres_usuarios = list(User.objects.values_list('username', flat=True))
+    nombres_usuarios = list(Usuario.objects.values_list('username', flat=True))
     context = {
         'contacto': contacto,
         'contacto_mensajes': contacto_mensajes,

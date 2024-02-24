@@ -11,11 +11,13 @@ class AdminSector(admin.ModelAdmin):
 
 @admin.register(SectorTarea)
 class AdminSectorTarea(admin.ModelAdmin):
-    list_display = ('nombre', 'sector', 'activo')
+    list_display = ('nombre', 'sector', 'activo', 'orden')
 
 @admin.register(Contacto)
 class AdminContacto(admin.ModelAdmin):
-    list_display = ('nombre',)
+    list_display = ('nombre', 'apellido', 'dni', 'telefono', 'email', 'nro_socio')
+    search_fields = ('nombre', 'apellido', 'dni', 'telefono', 'email', 'nro_socio')
+    ordering = ('dni',)
 
 @admin.register(ContactoIntegracion)
 class AdminContactoIntegracion(admin.ModelAdmin):
@@ -28,7 +30,9 @@ class AdminContactoTarea(admin.ModelAdmin):
 @admin.register(Mensaje)
 class AdminMensaje(admin.ModelAdmin):
     list_display = ('contacto_integracion', 'usuario', 'contenido', 'mensaje_citado', 'fecha_hora', 'recibido', 'leido', 'id_integracion', 'mostrar_mensaje_adjunto')
-    list_filter = ('contacto_integracion__contacto__nombre', 'contacto_integracion__integracion__nombre')
+    list_filter = ('contacto_integracion', 'usuario', 'fecha_hora', 'id_integracion')
+    search_fields = ('contacto_integracion__contacto__nombre', 'contacto_integracion__contacto__apellido', 'usuario')
+
 
     def mostrar_mensaje_adjunto(self, obj):
         # Obtener el primer mensaje adjunto asociado a este mensaje
@@ -42,5 +46,7 @@ class AdminMensaje(admin.ModelAdmin):
 class AdminMensajeAdjunto(admin.ModelAdmin):
     #list_display = ('url', 'mensaje')
     list_display = ('archivo', 'formato', 'mensaje')
+    list_filter = ('formato',)
+
 
     

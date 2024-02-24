@@ -5,6 +5,7 @@ const adjuntos = document.querySelector('#file-attached')
 const cantidadAdjuntos = document.querySelector('#amount-files')
 const toastAdjuntos = document.querySelector('#toast-attached')
 const enviarMensaje = document.querySelector('#chat-message-submit')
+const claseBotonAdjuntoOn = 'btn-success'
 
 /* Toast Adjuntos */
 const toastLiveExample = document.getElementById('liveToast')
@@ -18,18 +19,22 @@ botonAgregarAdjunto.addEventListener('click', () => {
 // Borra los archivos adjuntos
 botonBorrarAdjunto.addEventListener('click', () => {
   adjuntos.value = '';
-  cantidadAdjuntos.innerHTML = 'Sin archivos adjuntos'
+  cantidadAdjuntos.innerHTML = 'Archivos adjuntos: 0'
   toastAdjuntos.innerHTML = 'Se eliminaron todos los adjuntos'
   toastBootstrap.show()
   botonAdjuntar.classList.add('btn-light')
-  botonAdjuntar.classList.remove('btn-secondary')
+  botonAdjuntar.classList.remove(claseBotonAdjuntoOn)
+  const nombreAdjuntos = document.querySelectorAll('.nombre-archivos')
+  nombreAdjuntos.forEach(adjunto => {adjunto.remove()})
 })
 
 // Borra los archivos adjuntos al enviar mensaje
 enviarMensaje.addEventListener('click', () => {
-  cantidadAdjuntos.innerHTML = 'Sin archivos adjuntos'
+  cantidadAdjuntos.innerHTML = 'Archivos adjuntos: 0'
+  const nombreAdjuntos = document.querySelectorAll('.nombre-archivos')
+  nombreAdjuntos.forEach(adjunto => {adjunto.remove()})
   botonAdjuntar.classList.add('btn-light')
-  botonAdjuntar.classList.remove('btn-secondary')
+  botonAdjuntar.classList.remove(claseBotonAdjuntoOn)
 })
 
 // Informa la cantidad de adjuntos
@@ -39,7 +44,24 @@ adjuntos.addEventListener('change', () => {
     toastAdjuntos.innerHTML = `Archivos adjuntos: ${numArchivos}`
     toastBootstrap.show()
     botonAdjuntar.classList.remove('btn-light')
-    botonAdjuntar.classList.add('btn-secondary')
+    botonAdjuntar.classList.add(claseBotonAdjuntoOn )
+    
+    /*
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x text-danger" viewBox="0 0 16 16">
+    <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
+    </svg>
+    */
+
+    Array.from(adjuntos.files).forEach(adjunto => {
+      const archivoAdjunto = `
+          <li class="nombre-archivos">
+              <p class="dropdown-item" href="#">
+                  ${adjunto.name}
+              </p>
+          </li>
+      `;
+      cantidadAdjuntos.parentNode.insertAdjacentHTML('beforeend', archivoAdjunto);
+    })
   })
 
 /* 

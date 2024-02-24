@@ -25,6 +25,6 @@ urlpatterns = [
     path('administracion/usuario/detalle/<int:pk>', views.UsuarioDetailView.as_view(), name='usuario-detalle'),
     path('administracion/usuario/actualizar/<int:pk>', views.UsuarioUpdateView.as_view(), name='usuario-actualizar'),
     path('administracion/usuario/borrar/<int:pk>', views.UsuarioDeleteView.as_view(), name='usuario-borrar'),
-    path('administracion/usuario/cambiar-contraseña/<int:pk>/', views.AdminCambiarContraseñaView.as_view(), name='cambiar-contraseña'),
+    path('administracion/usuario/cambiar-clave/<int:pk>/', views.AdminCambiarClaveView.as_view(), name='cambiar-clave'),
 
 ]

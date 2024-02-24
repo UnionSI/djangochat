@@ -1,6 +1,7 @@
 import httpx, json, mimetypes, base64, os, uuid
 
 from django.contrib.auth.models import User
+from usuario.models import Usuario
 from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import sync_to_async
 from django.core.files.base import ContentFile
@@ -166,7 +167,7 @@ class GlobalConsumer(AsyncWebsocketConsumer):
 
     @sync_to_async
     def guardar_mensaje(self, usuario, contacto, mensaje, media, mencion):
-        usuario = User.objects.filter(username=usuario)
+        usuario = Usuario.objects.filter(username=usuario)
         usuario = usuario.first() if usuario.exists() else None
         contacto = Contacto.objects.get(id=contacto)
         contacto_integracion = ContactoIntegracion.objects.get(contacto=contacto)

@@ -4,8 +4,9 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.views import PasswordChangeView
-from .forms import SectorForm, SectorTareaForm, CrearUsuarioForm, ActualizarUsuarioForm, AdminCambiarContraseñaForm
+from .forms import SectorForm, SectorTareaForm, CrearUsuarioForm, ActualizarUsuarioForm, AdminCambiarClaveForm
 from django.contrib.auth.models import User
+from usuario.models import Usuario
 from django.contrib.auth.forms import AuthenticationForm
 from chat.models import Sector, SectorTarea
 from django.db.models import Q
@@ -161,7 +162,7 @@ class SectorTareaDeleteView(DeleteView):
 """ Vistas ABM Usuarios """
 
 class UsuarioListView(ListView):
-    model = User
+    model = Usuario
     paginate_by = 10
     template_name = 'dashboard/admin/usuario/list.html'
 
@@ -190,11 +191,11 @@ class UsuarioListView(ListView):
         return context
 
 class UsuarioDetailView(DetailView):
-    model = User
+    model = Usuario
     template_name = 'dashboard/admin/usuario/detail.html'
 
 class UsuarioCreateView(CreateView):
-    model = User
+    model = Usuario
     form_class = CrearUsuarioForm
     template_name = 'dashboard/admin/usuario/form.html'
     success_url = reverse_lazy('usuario-lista')
@@ -208,7 +209,7 @@ class UsuarioCreateView(CreateView):
         return context
 
 class UsuarioUpdateView(UpdateView):
-    model = User
+    model = Usuario
     form_class = ActualizarUsuarioForm
     template_name = 'dashboard/admin/usuario/form.html'
     success_url = reverse_lazy('usuario-lista')
@@ -222,14 +223,14 @@ class UsuarioUpdateView(UpdateView):
         return context
 
 class UsuarioDeleteView(DeleteView):
-    model = User
+    model = Usuario
     template_name = 'dashboard/admin/usuario/delete.html'
     success_url = reverse_lazy('usuario-lista')
 
-class AdminCambiarContraseñaView(PasswordChangeView):
-    model = User
-    form_class = AdminCambiarContraseñaForm
-    template_name = 'dashboard/admin/usuario/cambiar_contraseña.html'
+class AdminCambiarClaveView(PasswordChangeView):
+    model = Usuario
+    form_class = AdminCambiarClaveForm
+    template_name = 'dashboard/admin/usuario/cambiar_clave.html'
     success_url = reverse_lazy('usuario-lista')
 
     def form_valid(self, form):
@@ -240,7 +241,7 @@ class AdminCambiarContraseñaView(PasswordChangeView):
         context = super().get_context_data(**kwargs)
         user_id = self.kwargs.get('pk')
         print(user_id)
-        user = User.objects.get(pk=user_id)
+        user = Usuario.objects.get(pk=user_id)
         print(user)
         context['username'] = user.username
         return context

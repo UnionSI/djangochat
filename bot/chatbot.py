@@ -1,5 +1,6 @@
 from chat.models import Mensaje, SectorTarea, ContactoTarea
 from django.contrib.auth.models import User
+from usuario.models import Usuario
 
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync, sync_to_async
@@ -30,7 +31,7 @@ def responde_chatbot(conversacion_nueva, contacto_integracion, mensaje_recibido,
             mensaje_a_enviar = 'No entiendo su respuesta. Por favor, conteste solamente con las opciones indicadas'
     
     # Guardar mensaje en la base de datos
-    usuario_chatbot = User.objects.get(username='Chatbot')
+    usuario_chatbot = Usuario.objects.get(username='Chatbot')
     Mensaje.objects.create(contacto_integracion=contacto_integracion, usuario=usuario_chatbot, contenido=mensaje_a_enviar)
 
     try:
