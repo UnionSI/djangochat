@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %} Embudos | {% endblock %}
+
+{% block content %}
+
+{% include 'navbar.html' %}
+
+<div class="d-flex flex-column justify-content-between w-100 scroll-white position-relative">
+    
+  <div class="d-flex justify-content-between align-items-center gap-3 text-decoration-none p-3 border-bottom bg-body-tertiary" style="height: 63px">
+    <div>
+      <h5 class="m-0">Reportes</h5>
+      <p class="m-0 text-secondary"><small>Filtrar y obtener reportes de mensajes</small></p>
+    </div>
+    <div>
+      <a class="btn btn-success" href="{% url 'exportar-csv' %}?{% if filtro_desde %}desde={{ filtro_desde|urlencode }}&{% endif %}{% if filtro_hasta %}hasta={{ filtro_hasta|urlencode }}&{% endif %}{% for sector_id in filtro_sectores %}sector={{ sector_id }}&{% endfor %}{% for usuario_id in filtro_usuarios %}usuario={{ usuario_id }}&{% endfor %}">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
+          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+          <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+        </svg>
+        Exportar
+      </a>
+    </div>
+  </div>
+
+  <div class="d-flex flex-row gap-4 bg-body-secondary p-3 h-100 overflow-y-scroll">
+
+    <div class="flex-grow-1">
+      <table id="myTable" class="table table-bordered bg-light rounded-3">
+        <thead>
+          <tr class="">
+            <th class="text-center" scope="col" style="width: 50px;">#</th>
+            <th scope="col">
+              <a href="?sector={{sector}}&{% if ordenar != 'nombre' %}ordenar=nombre{% else %}ordenar=-nombre{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
+                Sector
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+                </svg>
+              </a>
+            </th>
+            <th scope="col">
+              <a href="?sector={{sector}}&{% if ordenar != 'sector' %}ordenar=sector{% else %}ordenar=-sector{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
+                Tarea
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+                </svg>
+              </a>
+            </th>
+            <th scope="col">
+              <a href="?sector={{sector}}&{% if ordenar != 'orden' %}ordenar=orden{% else %}ordenar=-orden{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
+                Contacto
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+                </svg>
+              </a>
+            </th>
+            <th scope="col">
+              <a href="?sector={{sector}}&{% if ordenar != 'orden' %}ordenar=orden{% else %}ordenar=-orden{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
+                Contenido
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+                </svg>
+              </a>
+            </th>
+            <th scope="col">
+              <a href="?sector={{sector}}&{% if ordenar != 'activo' %}ordenar=activo{% else %}ordenar=-activo{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
+                Enviado por
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+                </svg>
+              </a>
+            </th>
+            <th scope="col">
+              <a href="?sector={{sector}}&{% if ordenar != 'activo' %}ordenar=activo{% else %}ordenar=-activo{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
+                Fecha y hora
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+                </svg>
+              </a>
+            </th>
+            <th scope="col">
+              <a href="?sector={{sector}}&{% if ordenar != 'activo' %}ordenar=activo{% else %}ordenar=-activo{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
+                Integracion
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+                </svg>
+              </a>
+            </th>
+            <th scope="col">
+              <a href="?sector={{sector}}&{% if ordenar != 'activo' %}ordenar=activo{% else %}ordenar=-activo{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
+                DNI
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+                </svg>
+              </a>
+            </th>
+            <th scope="col">
+              <a href="?sector={{sector}}&{% if ordenar != 'activo' %}ordenar=activo{% else %}ordenar=-activo{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
+                Teléfono
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+                </svg>
+              </a>
+            </th>
+            <th scope="col">
+              <a href="?sector={{sector}}&{% if ordenar != 'activo' %}ordenar=activo{% else %}ordenar=-activo{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
+                Empresa
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+                </svg>
+              </a>
+            </th>
+            <th scope="col">
+              <a href="?sector={{sector}}&{% if ordenar != 'activo' %}ordenar=activo{% else %}ordenar=-activo{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
+                Nº de socio
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+                </svg>
+              </a>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for object in object_list %}
+          <tr class="tr-linea" data-href="{% url 'contacto:chat' object.contacto_integracion.contacto.pk %}">
+            <th class="text-center" scope="row">{{ object.id }}</th>
+            <td>{{ object.contacto_integracion.contacto_tareas.first.sector_tarea.sector }}</td>
+            <td>{{ object.contacto_integracion.contacto_tareas.first.sector_tarea.nombre }}</td>
+            <td>{{ object.contacto_integracion.contacto.nombre|add:" "|add:object.contacto_integracion.contacto.apellido }}</td>
+            <td contenteditable="true">{{ object.contenido }}</td>
+            {% if object.usuario %}
+              <td>{{ object.usuario }}</td>
+            {% else %}
+              <td>{{ object.contacto_integracion.contacto.nombre }} {{ object.contacto_integracion.contacto.apellido }}</td>
+            {% endif %}
+            <td>{{ object.fecha_hora }}</td>
+            <td>{{ object.contacto_integracion.integracion.nombre }}</td>
+            <td>{{ object.contacto_integracion.contacto.dni }}</td>
+            <td>{{ object.contacto_integracion.contacto.telefono }}</td>
+            <td>{{ object.contacto_integracion.contacto.empresa }}</td>
+            <td>{{ object.contacto_integracion.contacto.nro_socio }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% include 'paginator.html' %}
+    </div>
+
+    <div id="filter">
+      <div class="list-group">
+        <h6 class="list-group-item border-light text-center" aria-disabled="true">Filtros de búsqueda</h6>
+
+        <form method="get">
+
+          <ul class="list-group border-light">
+              <li class="list-group-item border-white px-3 pt-2 pb-1 d-flex justify-content-between align-items-center gap-2">
+                <label class="form-check-label" style="font-size: 14px">Desde:</label>
+                <input class="form-control me-1" type="date" name="desde" id="desde" value="{{ filtro_desde }}" style="font-size: 14px; width: 150px;">
+              </li>
+              <li class="list-group-item border-white px-3 py-1 d-flex justify-content-between align-items-center gap-2">
+                <label class="form-check-label" style="font-size: 14px">Hasta:</label>
+                <input class="form-control me-1" type="date" name="hasta" id="hasta" value="{{ filtro_hasta }}" style="font-size: 14px; width: 150px;">
+              </li>
+            </ul>
+
+          <ul class="list-group border-light">
+            <li class="list-group-item border-white px-3 py-1" aria-disabled="true">Sectores:</li>
+          {% for sector in sectores %}
+              <li class="list-group-item border-white px-3 py-1">
+                <input class="form-check-input me-1" type="checkbox" name="sector" id="{{ sector.id }}" value="{{ sector.id }}" style="width: 16px !important"
+                {% for filtro_sector in filtro_sectores %} {% if filtro_sector == sector.id|stringformat:"s" %} checked {% endif %} {% endfor %}>
+                <label class="form-check-label" style="font-size: 14px">{{ sector }}</label>
+              </li>
+            </ul>
+          {% endfor %}
+
+          <ul class="list-group border-light">
+            <li class="list-group-item border-white px-3 py-1" aria-disabled="true">Tareas:</li>
+          {% for tarea in tareas %}
+              <li class="list-group-item border-white px-3 py-1">
+                <input class="form-check-input me-1 " type="checkbox" name="tarea" id="{{ tarea.id }}" value="{{ tarea.id }}"
+                {% for filtro_tarea in filtro_tareas %} {% if filtro_tarea == tarea.id|stringformat:"s" %} checked {% endif %} {% endfor %}>
+                <label class="form-check-label" style="font-size: 14px">{{ tarea.nombre }}</label>
+              </li>
+            </ul>
+          {% endfor %}
+        
+          <ul class="list-group border-light">
+            <li class="list-group-item border-white px-3 py-1" aria-disabled="true">Usuarios:</li>
+          {% for usuario in usuarios %}
+              <li class="list-group-item border-white px-3 py-1">
+                <input class="form-check-input me-1 " type="checkbox"  name="usuario" id="{{ usuario.id }}" value="{{ usuario.id }}"
+                {% for filtro_usuario in filtro_usuarios %} {% if filtro_usuario == usuario.id|stringformat:"s" %} checked {% endif %} {% endfor %}>
+                <label class="form-check-label" style="font-size: 14px">{{ usuario.username }}</label>
+              </li>
+            </ul>
+          {% endfor %}
+
+          <div class="d-flex justify-content-between gap-2 mt-2">
+            <button class="w-100 btn btn-primary">Filtrar</button>
+            <a href="?" class="w-100 btn btn-danger">Limpiar</a>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/redireccionTabla.js' %}"></script>
+{% endblock %}

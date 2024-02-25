@@ -6,10 +6,13 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.contrib.auth.views import PasswordChangeView
 from .forms import SectorForm, SectorTareaForm, CrearUsuarioForm, ActualizarUsuarioForm, AdminCambiarClaveForm
 from django.contrib.auth.models import User
-from usuario.models import Usuario
+from usuario.models import Usuario, Perfil
 from django.contrib.auth.forms import AuthenticationForm
-from chat.models import Sector, SectorTarea
+from chat.models import Sector, SectorTarea, Mensaje
 from django.db.models import Q
+import csv, datetime
+from django.http import HttpResponse
+from datetime import datetime
 
 
 @login_required
@@ -41,6 +44,145 @@ def drawflow(request):
 def administracion(request):
     return render(request, 'dashboard/admin/admin.html')
 
+""" ---------------"""
+""" Vista Reportes """
+
+def get_queryset_mensajes(request, queryset=Mensaje.objects.all()):
+    sectores_id = request.GET.getlist('sector')
+    tareas_id = request.GET.getlist('tarea')
+    usuarios_id = request.GET.getlist('usuario')
+    desde = request.GET.get('desde')
+    hasta = request.GET.get('hasta')
+    ordenar = request.GET.get('ordenar')
+
+    if desde:
+        desde_dt = datetime.strptime(desde, '%Y-%m-%d').replace(hour=0, minute=0, second=0)
+        queryset = queryset.filter(fecha_hora__gte=desde_dt)
+
+    if hasta:
+        hasta_dt = datetime.strptime(hasta, '%Y-%m-%d').replace(hour=23, minute=59, second=59)
+        queryset = queryset.filter(fecha_hora__lte=hasta_dt)
+
+    if sectores_id:
+        lookups = Q()
+        for sector_id in sectores_id:
+            lookup = Q(contacto_integracion__contacto_tareas__sector_tarea__sector__id=sector_id)
+            lookups |= lookup
+        queryset = queryset.filter(lookups)
+
+    if tareas_id:
+        lookups = Q()
+        for tarea_id in tareas_id:
+            lookup = Q(contacto_integracion__contacto_tareas__sector_tarea__id=tarea_id)
+            lookups |= lookup
+        queryset = queryset.filter(lookups)
+
+    if usuarios_id:
+        lookups = Q()
+        for usuario_id in usuarios_id:
+            lookup = Q(usuario__id=usuario_id)
+            lookups |= lookup
+        queryset = queryset.filter(lookups)
+
+    if ordenar:
+        queryset = queryset.order_by(ordenar)
+    
+    return queryset
+
+
+class MensajesListView(ListView):
+    model = Mensaje
+    paginate_by = 20
+    template_name = 'dashboard/reportes.html'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return get_queryset_mensajes(self.request, queryset)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        sectores_id = self.request.GET.getlist('sector')
+        tareas_id = self.request.GET.getlist('tarea')
+        usuarios_id = self.request.GET.getlist('usuario')
+        desde = self.request.GET.get('desde')
+        hasta = self.request.GET.get('hasta')
+        ordenar = self.request.GET.get('ordenar')
+
+        if sectores_id:
+            context['filtro_sectores'] = sectores_id
+        if tareas_id:
+            context['filtro_tareas'] = tareas_id
+        if usuarios_id:
+            context['filtro_usuarios'] = usuarios_id
+        if desde:
+            context['filtro_desde'] = desde
+        if hasta:
+            context['filtro_hasta'] = hasta
+        if ordenar:
+            context['filtro_ordenar'] = ordenar
+
+        context.update({
+            'sectores': Sector.objects.all(),
+            'tareas': SectorTarea.objects.all(),
+            'usuarios': Usuario.objects.all(),
+        })
+        return context
+
+
+def exportar_csv(request):
+    response = HttpResponse(content_type='text/csv', charset='utf-8')
+    now = str(datetime.now())
+    response['Content-Disposition'] = f'attachment; filename="{now}.csv"'
+    response.write(u'\ufeff'.encode('utf8'))
+
+    #queryset = Mensaje.objects.all()   
+    queryset = get_queryset_mensajes(request)
+
+    writer = csv.writer(response, delimiter=';')
+
+    # Encabezados de columna
+    writer.writerow([
+        'sector',
+        'tarea',
+        'nombre_contacto',
+        'contenido',
+        'enviado_por',
+        'mensaje_citado',
+        'recibido',
+        'leido',
+        'fecha_hora',
+        'integracion',
+        'dni', 
+        'telefono', 
+        'email', 
+        'empresa', 
+        'nro_socio'
+    ])
+
+    # Campos de datos
+    for objeto in queryset:
+        contacto = objeto.contacto_integracion.contacto
+        nombre_contacto = f'{contacto.nombre} {contacto.apellido}'
+        sector_tarea = objeto.contacto_integracion.contacto_tareas.first().sector_tarea
+        writer.writerow([
+            sector_tarea.sector,
+            sector_tarea.nombre,
+            nombre_contacto,
+            objeto.contenido,
+            objeto.usuario if objeto.usuario else nombre_contacto,
+            ' ',#objeto.mensaje_citado.contenido if objeto.mensaje_citado.contenido else '',
+            objeto.recibido,
+            objeto.leido,
+            objeto.fecha_hora,
+            objeto.contacto_integracion.integracion.nombre,
+            contacto.dni,
+            contacto.telefono,
+            contacto.email,
+            contacto.empresa,
+            contacto.nro_socio,
+        ])
+
+    return response
 
 """ --------------------- """
 """ Vista de ABM Sectores """
@@ -186,7 +328,7 @@ class UsuarioListView(ListView):
         context.update({
             'titulo_vista': 'Crear Tarea',
             'descripcion_vista': 'Nuevo registro',
-            #'perfiles': Sector.objects.all()
+            'perfiles': Perfil.objects.all()
         })
         return context
 

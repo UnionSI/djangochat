@@ -84,6 +84,7 @@
             <td>{{ object.username }}</td>
             <td>{{ object.first_name }}</td>
             <td>{{ object.last_name }}</td>
+            <td>{{ object.perfil }}</td>
             <td></td>
             {% if object.is_active %}
               <td class="text-center">
@@ -106,7 +107,7 @@
         <a class="list-group-item list-group-item-action border-light-subtle bg-union-no-hover" aria-disabled="true">Filtrar por perfiles</a>
         <a href="?" class="list-group-item list-group-item-action border-light-subtle" aria-current="true"><small>Todos</small></a>
         {% for perfil in perfiles %}
-          <a href="?sector={{ sector.id }}" class="list-group-item list-group-item-action border-light-subtle"><small>{{ perfil.nombre }}</small></a>
+          <a href="?perfil={{ perfil.id }}" class="list-group-item list-group-item-action border-light-subtle"><small>{{ perfil }}</small></a>
         {% endfor %}
       </div>
     </div>

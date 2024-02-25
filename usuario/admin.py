@@ -14,4 +14,9 @@ class AdminPerfil(admin.ModelAdmin):
     
 @admin.register(PerfilSector)
 class AdminPerfilSector(admin.ModelAdmin):
-    list_display = ('perfil', 'sector')
+    list_display = ('perfil', 'mostrar_sectores')
+
+    def mostrar_sectores(self, obj):
+        return ', '.join([str(sector) for sector in obj.sectores.all()])
+    
+    mostrar_sectores.short_description = 'Sectores'

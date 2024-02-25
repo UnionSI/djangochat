@@ -98,6 +98,21 @@
     cursor: pointer;
 }
 
+th {
+    resize: horizontal; /* Permite al usuario ajustar el ancho de la columna horizontalmente */
+    overflow: hidden; /* Oculta el texto que desborda la celda */
+    white-space: nowrap; /* Evita que el texto se envuelva */
+    font-size: 14px;
+}
+
+td {
+    white-space: nowrap; /* Evita que el texto se envuelva */
+    text-overflow: ellipsis;
+    overflow: hidden; /* Oculta el texto que desborda la celda */
+    max-width: 100px; /* Ancho máximo de la celda */
+    font-size: 14px;
+}
+
 /* Formularios */
 form > ul > li {
     font-size: 14px;

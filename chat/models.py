@@ -36,7 +36,7 @@ class SectorTarea(models.Model):
     orden = models.PositiveIntegerField(null=True, blank=True)
 
     def __str__(self):
-        return f'{self.sector} - {self.nombre}'
+        return self.nombre
 
     def save(self,*args, **kwargs):
         if not self.orden:

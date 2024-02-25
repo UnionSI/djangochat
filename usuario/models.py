@@ -23,12 +23,9 @@ class Usuario(AbstractUser):
 
 
 class PerfilSector(models.Model):
-    perfil = models.ForeignKey(Perfil, on_delete=models.CASCADE, null=True, blank=True)
-    sector = models.ForeignKey('chat.Sector', on_delete=models.CASCADE, null=True, blank=True)
+    perfil = models.ForeignKey(Perfil, on_delete=models.CASCADE)
+    sectores = models.ManyToManyField('chat.Sector')
 
     class Meta:
         verbose_name = 'Perfil sector'
         verbose_name_plural = 'Perfiles sectores'
-
-    def __str__(self):
-        return f'{self.perfil} - {self.sector}'
