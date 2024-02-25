@@ -136,6 +136,11 @@ ul.errorlist > li {
     color: rgb(108,117,125)
 }
 
+.input-buscar:focus {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
 /* Animaciones */
 
 .animacion-mensaje-citado-izquierda {

@@ -10,7 +10,7 @@
 
 {% include 'dashboard/admin/admin_navbar.html' %}
 
-<div class="d-flex flex-column justify-content-between w-100 scroll-white position-relative">
+<div class="d-flex flex-column justify-content-between w-100 scroll-white position-relative bg-body-secondary">
     
   <div class="d-flex justify-content-between align-items-center gap-3 text-decoration-none p-3 border-bottom bg-body-tertiary" style="height: 63px">
     <div>
@@ -27,8 +27,9 @@
       </a>
     </div>
   </div>
-
-  <div class="d-flex flex-column gap-2 bg-body-secondary p-3 h-100 overflow-y-scroll">
+  
+  <div class="d-flex flex-column overflow-y-scroll p-3 h-100">
+    <div class="bg-body-secondary" style="max-width: 800px;">
 
     <table class="table table-bordered bg-light rounded-3">
       <thead>
@@ -49,7 +50,9 @@
 
     {% include 'paginator.html' %}
 
+    </div>
   </div>
+
 </div>
 {% endblock %}
 

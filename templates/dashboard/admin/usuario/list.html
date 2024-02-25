@@ -84,8 +84,7 @@
             <td>{{ object.username }}</td>
             <td>{{ object.first_name }}</td>
             <td>{{ object.last_name }}</td>
-            <td>{{ object.perfil }}</td>
-            <td></td>
+            <td>{{ object.perfil|default:'' }}</td>
             {% if object.is_active %}
               <td class="text-center">
                 <span class="badge bg-success-subtle text-success">Sí</span>
@@ -105,11 +104,11 @@
     <div id="filter" style="width: 250px;">
       <div class="list-group">
         <a class="list-group-item list-group-item-action border-light-subtle bg-union-no-hover" aria-disabled="true">Filtrar por perfiles</a>
-        <a href="?" class="list-group-item list-group-item-action border-light-subtle" aria-current="true"><small>Todos</small></a>
         {% for perfil in perfiles %}
           <a href="?perfil={{ perfil.id }}" class="list-group-item list-group-item-action border-light-subtle"><small>{{ perfil }}</small></a>
         {% endfor %}
       </div>
+        <a href="?" class="btn btn-danger mt-1"><small>Limpiar filtros</small></a>
     </div>
 
   </div>

@@ -1,12 +1,13 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from django.db.models import Max, Prefetch, Subquery, OuterRef
+from django.db.models import Max, Prefetch, Subquery, OuterRef, Q
 from django.core import serializers
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import JsonResponse
 
 from .models import Sector, SectorTarea, Contacto, Mensaje, ContactoTarea, ContactoIntegracion
+
 from django.contrib.auth.models import User
 from usuario.models import Usuario
 
@@ -25,7 +26,13 @@ def chats(request):
         Prefetch('messages', queryset=Mensaje.objects.order_by('-fecha_hora').first(), to_attr='last_mensaje')
     )
     '''
-    contactos = Contacto.objects.annotate(
+    query = request.GET.get('buscar')
+    if query:
+        contactos = Contacto.objects.filter(Q(nombre__icontains=query) | Q(apellido__icontains=query) | Q(nro_socio=query) | Q(dni=query))
+    else :
+        contactos = Contacto.objects.all()
+
+    contactos = contactos.annotate(
         last_message_content=Subquery(
             Mensaje.objects.filter(contacto_integracion=OuterRef('pk')).values('contenido').order_by('-fecha_hora')[:1]
         ),

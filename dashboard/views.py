@@ -85,7 +85,27 @@ def get_queryset_mensajes(request, queryset=Mensaje.objects.all()):
         queryset = queryset.filter(lookups)
 
     if ordenar:
-        queryset = queryset.order_by(ordenar)
+        mapeo = {
+            'sector': 'contacto_integracion__contacto_tareas__sector_tarea__sector__nombre',
+            '-sector': '-contacto_integracion__contacto_tareas__sector_tarea__sector__nombre',
+            'tarea': 'contacto_integracion__contacto_tareas__sector_tarea__nombre',
+            '-tarea': '-contacto_integracion__contacto_tareas__sector_tarea__nombre',
+            'contacto': 'contacto_integracion__contacto__nombre',
+            '-contacto': '-contacto_integracion__contacto__nombre',
+            'integracion': 'contacto_integracion__integracion__nombre',
+            '-integracion': '-contacto_integracion__integracion__nombre',
+            'dni': 'contacto_integracion__contacto__dni',
+            '-dni': '-contacto_integracion__contacto__dni',
+            'telefono': 'contacto_integracion__contacto__telefono',
+            '-telefono': '-contacto_integracion__contacto__telefono',
+            'empresa': 'contacto_integracion__contacto__empresa',
+            '-empresa': '-contacto_integracion__contacto__empresa',
+            'nro_socio': 'contacto_integracion__contacto__nro_socio',
+            '-nro_socio': '-contacto_integracion__contacto__nro_socio',
+        }
+
+        ordenar_mapeado = mapeo.get(ordenar, ordenar)
+        queryset = queryset.order_by(ordenar_mapeado)
     
     return queryset
 
@@ -121,10 +141,15 @@ class MensajesListView(ListView):
         if ordenar:
             context['filtro_ordenar'] = ordenar
 
+        query_params = self.request.GET.dict()
+        if 'ordenar' in query_params:
+            del query_params['ordenar']
+
         context.update({
             'sectores': Sector.objects.all(),
             'tareas': SectorTarea.objects.all(),
             'usuarios': Usuario.objects.all(),
+            'query_params': '&'.join([f'{key}={value}' for key, value in query_params.items()])
         })
         return context
 
@@ -310,11 +335,11 @@ class UsuarioListView(ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        #perfil_id = self.request.GET.get('perfil')
+        perfil_id = self.request.GET.get('perfil')
         ordenar = self.request.GET.get('ordenar')
-        """ if perfil_id:
+        if perfil_id:
             lookup = Q(perfil__id=perfil_id)
-            queryset = queryset.filter(lookup) """
+            queryset = queryset.filter(lookup)
         if ordenar:
             queryset = queryset.order_by(ordenar)
         return queryset

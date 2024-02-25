@@ -55,9 +55,9 @@ adjuntos.addEventListener('change', () => {
     Array.from(adjuntos.files).forEach(adjunto => {
       const archivoAdjunto = `
           <li class="nombre-archivos">
-              <p class="dropdown-item" href="#">
+              <spam class="dropdown-item" href="#">
                   ${adjunto.name}
-              </p>
+              </spam>
           </li>
       `;
       cantidadAdjuntos.parentNode.insertAdjacentHTML('beforeend', archivoAdjunto);

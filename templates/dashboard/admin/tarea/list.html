@@ -95,11 +95,12 @@
     <div id="filter" style="width: 250px;">
       <div class="list-group">
         <a class="list-group-item list-group-item-action border-light-subtle bg-union-no-hover" aria-disabled="true">Filtrar por sectores</a>
-        <a href="?" class="list-group-item list-group-item-action border-light-subtle" aria-current="true"><small>Todos</small></a>
+        <!-- <a href="?" class="list-group-item list-group-item-action border-light-subtle" aria-current="true"><small>Todos</small></a> -->
         {% for sector in sectores %}
           <a href="?sector={{ sector.id }}" class="list-group-item list-group-item-action border-light-subtle"><small>{{ sector.nombre }}</small></a>
         {% endfor %}
       </div>
+      <a href="?" class="btn btn-danger mt-1"><small>Limpiar filtros</small></a>
     </div>
 
   </div>

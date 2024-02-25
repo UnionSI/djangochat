@@ -27,14 +27,13 @@
   </div>
 
   <div class="d-flex flex-row gap-4 bg-body-secondary p-3 h-100 overflow-y-scroll">
-
     <div class="flex-grow-1">
       <table id="myTable" class="table table-bordered bg-light rounded-3">
         <thead>
           <tr class="">
             <th class="text-center" scope="col" style="width: 50px;">#</th>
             <th scope="col">
-              <a href="?sector={{sector}}&{% if ordenar != 'nombre' %}ordenar=nombre{% else %}ordenar=-nombre{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
+              <a href="?{{ query_params }}&{% if filtro_ordenar != 'sector' %}ordenar=sector{% else %}ordenar=-sector{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
                 Sector
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
@@ -42,7 +41,7 @@
               </a>
             </th>
             <th scope="col">
-              <a href="?sector={{sector}}&{% if ordenar != 'sector' %}ordenar=sector{% else %}ordenar=-sector{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
+              <a href="?{{ query_params }}&{% if filtro_ordenar != 'tarea' %}ordenar=tarea{% else %}ordenar=-tarea{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
                 Tarea
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
@@ -50,7 +49,7 @@
               </a>
             </th>
             <th scope="col">
-              <a href="?sector={{sector}}&{% if ordenar != 'orden' %}ordenar=orden{% else %}ordenar=-orden{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
+              <a href="?{{ query_params }}&{% if filtro_ordenar != 'contacto' %}ordenar=contacto{% else %}ordenar=-contacto{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
                 Contacto
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
@@ -58,7 +57,7 @@
               </a>
             </th>
             <th scope="col">
-              <a href="?sector={{sector}}&{% if ordenar != 'orden' %}ordenar=orden{% else %}ordenar=-orden{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
+              <a href="?{{ query_params }}&{% if filtro_ordenar != 'contenido' %}ordenar=contenido{% else %}ordenar=-contenido{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
                 Contenido
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
@@ -66,7 +65,7 @@
               </a>
             </th>
             <th scope="col">
-              <a href="?sector={{sector}}&{% if ordenar != 'activo' %}ordenar=activo{% else %}ordenar=-activo{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
+              <a href="?{{ query_params }}&{% if filtro_ordenar != 'usuario' %}ordenar=usuario{% else %}ordenar=-usuario{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
                 Enviado por
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
@@ -74,7 +73,7 @@
               </a>
             </th>
             <th scope="col">
-              <a href="?sector={{sector}}&{% if ordenar != 'activo' %}ordenar=activo{% else %}ordenar=-activo{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
+              <a href="?{{ query_params }}&{% if filtro_ordenar != 'fecha_hora' %}ordenar=fecha_hora{% else %}ordenar=-fecha_hora{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
                 Fecha y hora
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
@@ -82,7 +81,7 @@
               </a>
             </th>
             <th scope="col">
-              <a href="?sector={{sector}}&{% if ordenar != 'activo' %}ordenar=activo{% else %}ordenar=-activo{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
+              <a href="?{{ query_params }}&{% if filtro_ordenar != 'integracion' %}ordenar=integracion{% else %}ordenar=-integracion{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
                 Integracion
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
@@ -90,7 +89,7 @@
               </a>
             </th>
             <th scope="col">
-              <a href="?sector={{sector}}&{% if ordenar != 'activo' %}ordenar=activo{% else %}ordenar=-activo{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
+              <a href="?{{ query_params }}&{% if filtro_ordenar != 'dni' %}ordenar=dni{% else %}ordenar=-dni{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
                 DNI
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
@@ -98,7 +97,7 @@
               </a>
             </th>
             <th scope="col">
-              <a href="?sector={{sector}}&{% if ordenar != 'activo' %}ordenar=activo{% else %}ordenar=-activo{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
+              <a href="?{{ query_params }}&{% if filtro_ordenar != 'telefono' %}ordenar=telefono{% else %}ordenar=-telefono{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
                 Teléfono
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
@@ -106,7 +105,7 @@
               </a>
             </th>
             <th scope="col">
-              <a href="?sector={{sector}}&{% if ordenar != 'activo' %}ordenar=activo{% else %}ordenar=-activo{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
+              <a href="?{{ query_params }}&{% if filtro_ordenar != 'empresa' %}ordenar=empresa{% else %}ordenar=-empresa{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
                 Empresa
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
@@ -114,7 +113,7 @@
               </a>
             </th>
             <th scope="col">
-              <a href="?sector={{sector}}&{% if ordenar != 'activo' %}ordenar=activo{% else %}ordenar=-activo{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
+              <a href="?{{ query_params }}&{% if filtro_ordenar != 'nro_socio' %}ordenar=nro_socio{% else %}ordenar=-nro_socio{% endif %}" class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
                 Nº de socio
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
