@@ -2,11 +2,13 @@ from django.contrib.auth import login
 from django.urls import reverse, reverse_lazy
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.views import PasswordChangeView
 from .forms import SectorForm, SectorTareaForm, CrearUsuarioForm, ActualizarUsuarioForm, AdminCambiarClaveForm
 from django.contrib.auth.models import User
 from usuario.models import Usuario, Perfil
+from usuario.decorators import administrador_requirido
 from django.contrib.auth.forms import AuthenticationForm
 from chat.models import Sector, SectorTarea, Mensaje
 from django.db.models import Q
@@ -36,11 +38,14 @@ def signup(request):
     return render(request, 'dashboard/signup.html', {'form': form})
 
 
+@administrador_requirido
 def drawflow(request):
     nodos = ['Facebook', 'Github', 'Twitter']
     return render(request, 'dashboard/drawflow.html', {'nodos': nodos})
 
 
+
+@administrador_requirido
 def administracion(request):
     return render(request, 'dashboard/admin/admin.html')
 
@@ -154,6 +159,7 @@ class MensajesListView(ListView):
         return context
 
 
+@administrador_requirido
 def exportar_csv(request):
     response = HttpResponse(content_type='text/csv', charset='utf-8')
     now = str(datetime.now())

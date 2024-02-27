@@ -98,7 +98,7 @@
     cursor: pointer;
 }
 
-th {
+thead > tr > th {
     resize: horizontal; /* Permite al usuario ajustar el ancho de la columna horizontalmente */
     overflow: hidden; /* Oculta el texto que desborda la celda */
     white-space: nowrap; /* Evita que el texto se envuelva */

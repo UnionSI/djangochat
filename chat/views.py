@@ -26,11 +26,20 @@ def chats(request):
         Prefetch('messages', queryset=Mensaje.objects.order_by('-fecha_hora').first(), to_attr='last_mensaje')
     )
     '''
+    lookups = Q()
+    sectores_permitidos = request.user.sectores_permitidos()
+
+    if sectores_permitidos:
+        for sector_permitido in sectores_permitidos:
+            lookups |= Q(contacto_integraciones__contacto_tareas__sector_tarea__sector=sector_permitido)
+
+    contactos_permitidos = Contacto.objects.filter(lookups) if sectores_permitidos else Contacto.objects.none()
+    
     query = request.GET.get('buscar')
     if query:
-        contactos = Contacto.objects.filter(Q(nombre__icontains=query) | Q(apellido__icontains=query) | Q(nro_socio=query) | Q(dni=query))
-    else :
-        contactos = Contacto.objects.all()
+        contactos = contactos_permitidos(Q(nombre__icontains=query) | Q(apellido__icontains=query) | Q(nro_socio=query) | Q(dni=query))
+    else:
+        contactos = contactos_permitidos
 
     contactos = contactos.annotate(
         last_message_content=Subquery(
@@ -52,7 +61,12 @@ def chats(request):
 
 @login_required
 def chat(request, id):
+    sectores_permitidos = request.user.sectores_permitidos()
+    
     contacto = get_object_or_404(Contacto.objects.prefetch_related('contacto_integraciones__integracion'), id=id)
+    if not contacto.contacto_integraciones.first().contacto_tareas.first().sector_tarea.sector in sectores_permitidos:
+        return render(request, 'restringido.html')
+
     contacto_integracion = contacto.contacto_integraciones.first()
     integracion = contacto_integracion.integracion.nombre
     contacto_tarea = contacto_integracion.contacto_tareas.first()
@@ -92,14 +106,24 @@ def chat(request, id):
 
 @login_required
 def embudos(request):
-    embudos = Sector.objects.all()
-    return render(request, 'chat/embudos.html', {'embudos': embudos, 'debug': DEBUG})
+    #embudos = Sector.objects.all()
+    sectores_permitidos = request.user.sectores_permitidos()
+
+    if not sectores_permitidos:
+        return render(request, 'restringido.html',)
+    
+    return render(request, 'chat/embudos.html', {'embudos': sectores_permitidos, 'debug': DEBUG})
 
 
 @login_required
 def embudo(request, id):
     sector = get_object_or_404(Sector, id=id)
-    sectores = Sector.objects.prefetch_related('sectortarea_set').all()    
+    sectores_permitidos = request.user.sectores_permitidos()
+
+    if not sector in sectores_permitidos:
+        return render(request, 'restringido.html',)
+
+    #sectores = Sector.objects.prefetch_related('sectortarea_set').all()
     #sector_tareas = SectorTarea.objects.filter(sector=sector).prefetch_related('contactotarea_set__contacto__mensajes').all()
     sector_tareas = SectorTarea.objects.filter(sector=sector).prefetch_related('contactotarea_set__contacto_integracion__mensajes').all().order_by('orden')
     '''
@@ -110,7 +134,7 @@ def embudo(request, id):
             last_message = contacto_tarea.contacto.messages.order_by('-fecha_hora').first()
             contacto_tarea.last_message = last_message
     '''
-    context = {'embudo': sector, 'embudos': sectores, 'sector_tareas': sector_tareas, 'debug': DEBUG}
+    context = {'embudo': sector, 'embudos': sectores_permitidos, 'sector_tareas': sector_tareas, 'debug': DEBUG}
     return render(request, 'chat/embudos.html', context)
     
 
@@ -149,6 +173,7 @@ def mover_de_sector(request, contacto_id, sector_tarea_id):
     return redirect('contacto:chat', contacto_id)
 
 
+@login_required
 def cargar_mas_mensajes(request, id, page):
     contacto = get_object_or_404(Contacto.objects.prefetch_related('contacto_integraciones__integracion'), id=id)
     contacto_mensajes = Mensaje.objects.filter(contacto_integracion__contacto=contacto)

@@ -48,7 +48,7 @@ class ActualizarUsuarioForm(UserChangeForm):
 
     class Meta:
         model = Usuario
-        fields = ('username', 'first_name', 'last_name', 'email', 'groups', 'is_active')
+        fields = ('username', 'perfil', 'first_name', 'last_name', 'email', 'groups', 'is_active')
         #fields = ('__all__')
 
     def __init__(self, *args, **kwargs):

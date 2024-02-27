@@ -35,7 +35,11 @@
     {% include 'chat/components/caja_chat.html' %}
   {% else %}
     <div class="flex-grow-1 d-flex align-items-center justify-content-center bg-body-tertiary">
-      <p class="text-secondary">Seleccione un chat para enviar mensajes</p>
+      {% if mensaje_error %}
+        <p class="alert alert-danger">{{ mensaje_error }}</p>
+      {% else %}
+        <p class="text-secondary">Seleccione un chat para enviar mensajes</p>
+      {% endif %}
     </div>
   {% endif %}
 

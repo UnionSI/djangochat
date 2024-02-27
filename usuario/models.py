@@ -20,11 +20,16 @@ class Usuario(AbstractUser):
 
     def __str__(self):
         return self.username
+    
+    def sectores_permitidos(self):
+        if self.perfil:
+            return self.perfil.perfiles_sectores.first().sectores.all()
+
 
 
 class PerfilSector(models.Model):
-    perfil = models.ForeignKey(Perfil, on_delete=models.CASCADE)
-    sectores = models.ManyToManyField('chat.Sector')
+    perfil = models.ForeignKey(Perfil, related_name="perfiles_sectores", on_delete=models.CASCADE)
+    sectores = models.ManyToManyField('chat.Sector', related_name='perfiles_sectores')
 
     class Meta:
         verbose_name = 'Perfil sector'
