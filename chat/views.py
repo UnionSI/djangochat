@@ -199,6 +199,8 @@ def cargar_mas_mensajes(request, id, page):
                 'url_adjunto': mensaje.mensaje_citado.mensajes_adjuntos.first().archivo.url if mensaje.mensaje_citado.mensajes_adjuntos.first() else '',
                 'mensaje': mensaje.mensaje_citado.contenido,
             }
+        if mensaje.mensajes_adjuntos.first():
+            print(mensaje.mensajes_adjuntos.first().archivo.url)
         mensajes_data.append({
             'mensaje': mensaje.contenido,
             'fecha_hora': mensaje.fecha_hora.strftime('%d/%m/%Y %H:%M'),

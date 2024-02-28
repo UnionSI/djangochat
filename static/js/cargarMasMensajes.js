@@ -28,6 +28,7 @@ async function cargarMasMensajes() {
         .then(data => {
             if (data.status == 'success') {
                 data.mensajes.forEach(async dataMensaje => {
+                    console.log(dataMensaje)
                     const elemento = await manejarMensajeRecibido(dataMensaje, ambiente, cajaChat, false, usuariosArray)
                     cajaChat.scrollTop = elemento.scrollHeight - alturaOriginal
                 })

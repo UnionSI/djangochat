@@ -96,7 +96,8 @@ export async function manejarMensajeRecibido(data='', ambiente='Homologacion', c
     }
 
     let adjunto = null
-    if (data.url_adjunto.includes('.')) {
+    //if (data.url_adjunto.includes('.')) {
+    if (data.url_adjunto) {
         const formatosImagenes = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp', 'tiff', 'tif']
         const formatosAudio = ['mp3', 'ogg', 'acc', 'wav', 'oga']
         const extension = data.url_adjunto.substring(data.url_adjunto.lastIndexOf('.') + 1);
@@ -132,6 +133,8 @@ export async function manejarMensajeRecibido(data='', ambiente='Homologacion', c
         adjunto = ''
     }
 
+    const adjuntoFinal = await Promise.all([adjunto]);
+
     const dropdown = `
         <div class="dropdown dropdown-start position-absolute top-0" style="right: 5px">
             <button class="btn py-0 px-2 dropdown-toggle text-white" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border: none !important; outline: none;"></button>
@@ -160,7 +163,7 @@ export async function manejarMensajeRecibido(data='', ambiente='Homologacion', c
                         <small class="${textColor}">${data.usuario}</small>
                     </div>
                     ${mensajeCitado}
-                    <div class="mensaje-adjunto">${adjunto}</div>
+                    <div class="mensaje-adjunto">${adjuntoFinal}</div>
                     <small class="mensaje-contenido">${mensajeConEspacios}</small>
                     ${dropdown}
                 </div>
