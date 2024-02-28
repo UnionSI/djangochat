@@ -26,13 +26,11 @@ SECRET_KEY_DJANGO = 'django-insecure-!79n+mp+d)1-=z7w5ee9f5*74mhqbene^c*89j@(1gs
 SECRET_KEY = os.environ.get('SECRET_KEY', default=SECRET_KEY_DJANGO)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = 'RENDER' not in os.environ
 
-ALLOWED_HOSTS = []
+DEBUG = True
 
-RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
-if RENDER_EXTERNAL_HOSTNAME:
-    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+ALLOWED_HOSTS = ['*']
+
 
 LOGOUT_REDIRECT_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
@@ -99,15 +97,8 @@ CHANNEL_LAYERS = {
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 DATABASES = None
-if not DEBUG:
-    RENDER_POSTGRE_DB = {
-        'default': dj_database_url.config(
-            default='postgresql://postgres:postgres@localhost:5432/mysite',
-            conn_max_age=600
-        )
-    }
-    DATABASES = RENDER_POSTGRE_DB
-else:
+
+if DEBUG:
     SQL_LITE_DB = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -115,6 +106,18 @@ else:
         }
     }
     DATABASES = SQL_LITE_DB
+else:
+    POSTGRE_DB = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql_psycopg2',
+                'NAME': 'djangochat',
+                'USER': 'postgres',
+                'PASSWORD': 'db_ameport_1973',
+                'HOST': 'localhost',
+                'PORT': '5432',
+            }
+        }
+    DATABASES = POSTGRE_DB
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -145,7 +148,6 @@ TIME_ZONE = 'America/Argentina/Buenos_Aires'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/

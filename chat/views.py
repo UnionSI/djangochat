@@ -126,6 +126,8 @@ def embudo(request, id):
     #sectores = Sector.objects.prefetch_related('sectortarea_set').all()
     #sector_tareas = SectorTarea.objects.filter(sector=sector).prefetch_related('contactotarea_set__contacto__mensajes').all()
     sector_tareas = SectorTarea.objects.filter(sector=sector).prefetch_related('contactotarea_set__contacto_integracion__mensajes').all().order_by('orden')
+
+
     '''
     # ¿Mejora la performance si se obtiene el último mensaje en la vista en lugar de pasarle todos los mensajes al template?
     # Agregar el último mensaje a cada Contacto

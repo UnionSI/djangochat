@@ -72,6 +72,8 @@ function manejarUltimoMensaje(data) {
 function manejarActualizacionContacto(data) {
     // Si existe la tarjeta en este cliente, eliminarla
     const tarjetaContactoExistente = document.querySelector(`[data-contacto="${data.contacto}"]`)
+    console.log('imprimir la tarjeta')
+    console.log(tarjetaContactoExistente)
     if (tarjetaContactoExistente) {
         tarjetaContactoExistente.remove()
     }
@@ -82,6 +84,7 @@ function manejarActualizacionContacto(data) {
         if (sectorTarea) {
             const tarjetaDefault = document.querySelector('#tarjeta-default')
             const nuevaTarjetaContacto = tarjetaDefault.cloneNode(true)
+            nuevaTarjetaContacto.id = ''
             nuevaTarjetaContacto.dataset.contacto = data.contacto
             nuevaTarjetaContacto.querySelector('[data-slug]').href = data.slug;
             if (!data.no_leido) {
