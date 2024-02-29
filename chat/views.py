@@ -125,7 +125,41 @@ def embudo(request, id):
 
     #sectores = Sector.objects.prefetch_related('sectortarea_set').all()
     #sector_tareas = SectorTarea.objects.filter(sector=sector).prefetch_related('contactotarea_set__contacto__mensajes').all()
+    #sorted(sectores_tareas.contactotarea_set.contacto_integracion.contacto, key=lambda x: x.contacto_integraciones.first().mensajes.all().order_by('-fecha_hora').first().fecha_hora, reverse=True)
+
+    # Obtener tareas
     sector_tareas = SectorTarea.objects.filter(sector=sector).prefetch_related('contactotarea_set__contacto_integracion__mensajes').all().order_by('orden')
+
+    # Iterar sobre cada sector tarea y ordenar los contactos en función de la fecha_hora de su último mensaje
+    #sector_tareas = SectorTarea.objects.filter(sector=sector).prefetch_related(
+    #    Prefetch('contactotarea_set__contacto_integracion__mensajes', queryset=Mensaje.objects.order_by('-fecha_hora'))
+    #).order_by('orden')
+
+    sectores_tareas_preparadas = []
+
+    for sector_tarea in sector_tareas:
+        sector_tarea_info = {
+            'id': sector_tarea.id,
+            'nombre': sector_tarea.nombre,
+            'contactos': []
+        }
+        for contacto_tarea in sector_tarea.contactotarea_set.all():
+            contacto_integracion = contacto_tarea.contacto_integracion
+            ultimo_mensaje = contacto_integracion.mensajes.last(),
+            contacto_info = {
+                'contacto_integracion_id': contacto_integracion.id,
+                'nombre': contacto_integracion.contacto.nombre,
+                'apellido': contacto_integracion.contacto.apellido,
+                'nro_socio': contacto_integracion.contacto.nro_socio,
+                'telefono': contacto_integracion.contacto.telefono,
+                'dni': contacto_integracion.contacto.dni,
+                'ultimo_mensaje_fecha_hora': ultimo_mensaje[0].fecha_hora if ultimo_mensaje else None,
+                'ultimo_mensaje_usuario': ultimo_mensaje[0].usuario if ultimo_mensaje else None,
+                'ultimo_mensaje_contenido': ultimo_mensaje[0].contenido if ultimo_mensaje else None,
+            }
+            sector_tarea_info['contactos'].append(contacto_info)
+        sector_tarea_info['contactos'].sort(key=lambda x: x['ultimo_mensaje_fecha_hora'], reverse=True)
+        sectores_tareas_preparadas.append(sector_tarea_info)
 
 
     '''
@@ -136,7 +170,7 @@ def embudo(request, id):
             last_message = contacto_tarea.contacto.messages.order_by('-fecha_hora').first()
             contacto_tarea.last_message = last_message
     '''
-    context = {'embudo': sector, 'embudos': sectores_permitidos, 'sector_tareas': sector_tareas, 'debug': DEBUG}
+    context = {'embudo': sector, 'embudos': sectores_permitidos, 'sector_tareas': sector_tareas, 'debug': DEBUG, 'sectores_tareas_preparadas': sectores_tareas_preparadas}
     return render(request, 'chat/embudos.html', context)
     
 

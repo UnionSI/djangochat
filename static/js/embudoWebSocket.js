@@ -72,8 +72,6 @@ function manejarUltimoMensaje(data) {
 function manejarActualizacionContacto(data) {
     // Si existe la tarjeta en este cliente, eliminarla
     const tarjetaContactoExistente = document.querySelector(`[data-contacto="${data.contacto}"]`)
-    console.log('imprimir la tarjeta')
-    console.log(tarjetaContactoExistente)
     if (tarjetaContactoExistente) {
         tarjetaContactoExistente.remove()
     }
@@ -97,11 +95,42 @@ function manejarActualizacionContacto(data) {
             nuevaTarjetaContacto.querySelector('[data-mensaje]').innerText = data.mensaje;
             nuevaTarjetaContacto.querySelector('[data-fecha]').innerText = data.fecha;
             nuevaTarjetaContacto.classList.remove('display-none-important')
-            sectorTarea.appendChild(nuevaTarjetaContacto)
+
+            const contactos = sectorTarea.querySelectorAll('[data-contacto]');
+            const fechaNuevaTarjeta =  obtenerFecha(data.fecha)
+            let insertado = false;
+
+            // Iterar sobre los contactos existentes para encontrar el lugar adecuado para insertar el nuevo contacto
+            for (let i = 0; i < contactos.length; i++) {
+                console.log(contactos[i])
+                const fecha = contactos[i].querySelector('[data-fecha]').innerText;
+                const fechaContacto =  obtenerFecha(fecha)
+                if (fechaNuevaTarjeta > fechaContacto) {
+                    sectorTarea.insertBefore(nuevaTarjetaContacto, contactos[i]);
+                    insertado = true;
+                    break
+                }
+            }
+    
+            // Si no se ha insertado en ningún lugar, agregar al final
+            if (!insertado) {
+                sectorTarea.appendChild(nuevaTarjetaContacto);
+            }
+
+            //sectorTarea.appendChild(nuevaTarjetaContacto)
             const forms = nuevaTarjetaContacto.querySelectorAll('.form-sector-change')
             forms.forEach( form => escucharCambioSector(form))
         }
     }
+}
+
+function obtenerFecha(fecha) {
+    // Dividir la cadena en partes (día, mes, año, hora, minuto)
+    const fechaDividida = fecha.split(/[\s/]/);
+    // Construir la cadena de fecha en formato ISO 8601 (YYYY-MM-DDTHH:MM)
+    const fechaISO = fechaDividida[2] + "-" + fechaDividida[1] + "-" + fechaDividida[0] + "T" + fechaDividida[3];
+    // Crear un objeto Date a partir de la cadena de fecha ISO 8601
+    return new Date(fechaISO);
 }
 
 function escucharCambioSector(form) {
