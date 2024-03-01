@@ -1,4 +1,4 @@
-export async function manejarMensajeRecibido(data='', ambiente='Homologacion', cajaChat, colocarAlFinal=true, usuariosArray=[]) {
+export async function manejarMensajeRecibido(data='', ambiente='Homologacion', cajaChat=null, colocarAlFinal=true, usuariosArray=[]) {
     const formattedDate = data.fecha_hora? data.fecha_hora: formatoFecha(new Date());
     let alignMessage, alignThumbnail, bgColor, textColor, bgSecondaryColor, bgColorMentioned, side
 
@@ -151,7 +151,6 @@ export async function manejarMensajeRecibido(data='', ambiente='Homologacion', c
             </ul>
         </div>
     `
-    
     const mensajeConEspacios = data.mensaje.replaceAll('\n', '<br>')
     const html = `
         <div style="max-width: 60%;" class="${alignMessage} d-flex flex-column">

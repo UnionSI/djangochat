@@ -6,6 +6,7 @@ from django.conf import settings
 urlpatterns = [
     path('', include('dashboard.urls')),
     path('contacto/', include('chat.urls')),
+    path('bot/', include('bot.urls')),
     path('admin/', admin.site.urls),
 ]
 

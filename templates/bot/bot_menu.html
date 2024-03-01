@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %} Embudos | {% endblock %}
+
+{% block content %}
+
+{% include 'navbar.html' %}
+
+{% include 'bot/bot_navbar.html' %}
+
+  <div class="flex-grow-1 d-flex align-items-center justify-content-center bg-body-tertiary">
+    
+    <p class="text-secondary">Seleccione una opción del menú</p>
+
+  </div>
+{% endblock %}

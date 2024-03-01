@@ -1,0 +1,23 @@
+! version = 2.0 -> CAC
+
+! local concat = newline
+
+// Opciones Menu Principal
+> topic opc_menu_ppal
+
+  // Afiliaciones
+  + 1
+  - 1 - Me quiero afiliar<br>
+  ^ 2 - No me interesa<br>
+  ^ 3 - Quiero salir<br> {topic=opc_afiliaciones}
+
+  // Ayudas
+  + 2
+  - 1 - Ayuda Especial<br>
+  ^ 2 - Ayuda Ordinaria<br>
+  ^ 3 - Quiero salir<br> {topic=opc_ayudas}
+
+  + *
+  - Chau.
+
+< topic

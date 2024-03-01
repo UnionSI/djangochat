@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %} Embudos | {% endblock %}
+
+{% block content %}
+
+{% include 'navbar.html' %}
+
+{% include 'bot/bot_navbar.html' %}
+
+<div class="d-flex flex-column justify-content-between w-100 scroll-white position-relative">
+    
+    <div class="d-flex align-items-center gap-3 text-decoration-none p-3 border-bottom bg-body-tertiary" style="height: 63px">
+        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor" class="bi bi-robot text-union" viewBox="0 0 16 16">
+            <path d="M6 12.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5M3 8.062C3 6.76 4.235 5.765 5.53 5.886a26.58 26.58 0 0 0 4.94 0C11.765 5.765 13 6.76 13 8.062v1.157a.933.933 0 0 1-.765.935c-.845.147-2.34.346-4.235.346-1.895 0-3.39-.2-4.235-.346A.933.933 0 0 1 3 9.219zm4.542-.827a.25.25 0 0 0-.217.068l-.92.9a24.767 24.767 0 0 1-1.871-.183.25.25 0 0 0-.068.495c.55.076 1.232.149 2.02.193a.25.25 0 0 0 .189-.071l.754-.736.847 1.71a.25.25 0 0 0 .404.062l.932-.97a25.286 25.286 0 0 0 1.922-.188.25.25 0 0 0-.068-.495c-.538.074-1.207.145-1.98.189a.25.25 0 0 0-.166.076l-.754.785-.842-1.7a.25.25 0 0 0-.182-.135Z"/>
+            <path d="M8.5 1.866a1 1 0 1 0-1 0V3h-2A4.5 4.5 0 0 0 1 7.5V8a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1v-.5A4.5 4.5 0 0 0 10.5 3h-2zM14 7.5V13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7.5A3.5 3.5 0 0 1 5.5 4h5A3.5 3.5 0 0 1 14 7.5"/>
+        </svg>
+      <div>
+        <h6 class="m-0">CHATBOT</h6>
+        <p class="m-0 text-secondary"><small>Interface para testear el comportamiento del chatbot</small></p>
+      </div>
+    </div>
+
+    <div id="chat-messages" class="d-flex flex-column gap-2 bg-body-secondary p-2 h-100 overflow-y-scroll">
+        
+        <div style="max-width: 60%;" class="align-self-start d-flex flex-column">
+            <div class="d-flex flex-row gap-1 ">
+            <img src="/static/img/logo.png" alt="ameport_logo" width="24" height="24" class="mt-1 rounded-circle">
+                <div id="undefined" class="bg-white caja-mensaje-chat position-relative" data-side="left">
+                    <div class="mensaje-cabecera">
+                        <small class="text-secondary"></small>
+                        <small class="text-secondary">ChatBot:</small>
+                    </div>
+                    
+                    <div class="mensaje-adjunto"></div>
+                    <small class="mensaje-contenido">
+                        ¡Hola! Te doy la bienvenida 👋<br>
+                        Soy tu asistente virtual de Mutual Agropecuaria.<br><br>
+                        ❌NO atendemos llamados ni audios<br>
+                        ✅ÚNICAMENTE mensajes por escrito<br><br>
+                        ¡Muchas gracias!
+                    </small>
+                    
+                    <div class="dropdown dropdown-start position-absolute top-0" style="right: 5px">
+                        <button class="btn py-0 px-2 dropdown-toggle text-white" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border: none !important; outline: none;"></button>
+                        <ul class="dropdown-menu dropdown-menu-end" style="">
+                            <li><h6 class="dropdown-header">Opciones:</h6></li>
+                            <li>
+                                <a href="#" class="dropdown-item responder-mensaje">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-reply" viewBox="0 0 16 16">
+                                        <path d="M6.598 5.013a.144.144 0 0 1 .202.134V6.3a.5.5 0 0 0 .5.5c.667 0 2.013.005 3.3.822.984.624 1.99 1.76 2.595 3.876-1.02-.983-2.185-1.516-3.205-1.799a8.7 8.7 0 0 0-1.921-.306 7 7 0 0 0-.798.008h-.013l-.005.001h-.001L7.3 9.9l-.05-.498a.5.5 0 0 0-.45.498v1.153c0 .108-.11.176-.202.134L2.614 8.254l-.042-.028a.147.147 0 0 1 0-.252l.042-.028zM7.8 10.386q.103 0 .223.006c.434.02 1.034.086 1.7.271 1.326.368 2.896 1.202 3.94 3.08a.5.5 0 0 0 .933-.305c-.464-3.71-1.886-5.662-3.46-6.66-1.245-.79-2.527-.942-3.336-.971v-.66a1.144 1.144 0 0 0-1.767-.96l-3.994 2.94a1.147 1.147 0 0 0 0 1.946l3.994 2.94a1.144 1.144 0 0 0 1.767-.96z"></path>
+                                    </svg>
+                                    Responder
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+    
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="bg-body-tertiary p-3 border-top">
+        <form id="form-chat-submit" class="d-flex justify-content-center align-items-center gap-2" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input class="form-control" type="text" id="chat-message-input" placeholder="Escribe un mensaje...">
+
+            <button id="chat-message-submit" class="btn btn-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-send-fill" viewBox="0 0 16 16">
+                    <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z"/>
+                </svg>
+            </button>
+        </form>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+  <script type="module" src="{% static 'js/chatbotTest.js' %}"></script>
+{% endblock %}
