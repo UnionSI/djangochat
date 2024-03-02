@@ -37,14 +37,23 @@ enviarMensaje.addEventListener('click', () => {
   botonAdjuntar.classList.remove(claseBotonAdjuntoOn)
 })
 
+const informarCantidadAdjuntos = () => {
+  const numArchivos = adjuntos.files.length;
+  cantidadAdjuntos.innerHTML = `Archivos adjuntos: ${numArchivos}`
+  toastAdjuntos.innerHTML = `Archivos adjuntos: ${numArchivos}`
+  toastBootstrap.show()
+  if (numArchivos > 0) {
+    botonAdjuntar.classList.remove('btn-light')
+    botonAdjuntar.classList.add(claseBotonAdjuntoOn)
+  } else {
+    botonAdjuntar.classList.add('btn-light')
+    botonAdjuntar.classList.remove(claseBotonAdjuntoOn)
+  }
+} 
+
 // Informa la cantidad de adjuntos
 adjuntos.addEventListener('change', () => {
-    const numArchivos = adjuntos.files.length;
-    cantidadAdjuntos.innerHTML = `Archivos adjuntos: ${numArchivos}`
-    toastAdjuntos.innerHTML = `Archivos adjuntos: ${numArchivos}`
-    toastBootstrap.show()
-    botonAdjuntar.classList.remove('btn-light')
-    botonAdjuntar.classList.add(claseBotonAdjuntoOn )
+    informarCantidadAdjuntos()
     
     /*
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x text-danger" viewBox="0 0 16 16">
@@ -54,14 +63,36 @@ adjuntos.addEventListener('change', () => {
 
     Array.from(adjuntos.files).forEach(adjunto => {
       const archivoAdjunto = `
-          <li class="nombre-archivos">
-              <spam class="dropdown-item" href="#">
-                  ${adjunto.name}
-              </spam>
+          <li class="nombre-archivos" data-adjunto="${adjunto.name}">
+              <button type="button" class="dropdown-item">
+                  • ${adjunto.name}
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x text-danger" viewBox="0 0 16 16" style="margin-bottom: 3px">
+                    <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
+                  </svg>
+              </button>
           </li>
       `;
       cantidadAdjuntos.parentNode.insertAdjacentHTML('beforeend', archivoAdjunto);
     })
+
+    const listaAdjuntos = document.querySelectorAll(".nombre-archivos")
+    listaAdjuntos.forEach(liAdjunto => liAdjunto.addEventListener('click', () => {
+        // Eliminar el adjunto del input
+        const nombreAdjunto = liAdjunto.getAttribute('data-adjunto');
+        const nuevosArchivos = Array.from(adjuntos.files).filter(adjunto => adjunto.name !== nombreAdjunto);
+        // Crear un nuevo objeto FileList
+        const nuevoFileList = new DataTransfer();
+        nuevosArchivos.forEach(adjunto => nuevoFileList.items.add(adjunto));
+
+        // Asignar el nuevo FileList al input de archivos
+        adjuntos.files = nuevoFileList.files;
+
+        // Eliminar de la lista
+        liAdjunto.remove();
+
+        informarCantidadAdjuntos()
+    }))
+
   })
 
 /* 
