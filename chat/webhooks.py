@@ -84,6 +84,7 @@ def waapi_api_webhook(request):
             nombre = data['data']['message']['_data']['notifyName']
             timestamp = data['data']['message']['timestamp']
             media = data['data']['media']
+
             
         integracion_whatsapp = Integracion.objects.get(nombre='WhatsApp')
 
@@ -115,7 +116,9 @@ def waapi_api_webhook(request):
                     'contacto': contacto_integracion.id,
                     'mensaje': contenido_mensaje,
                     'usuario': contacto.nombre if contacto.nombre else contacto.telefono,
-                    'url_adjunto': archivo.archivo.url if archivo else ''
+                    'url_adjunto': archivo.archivo.url if archivo else '',
+                    'id_integracion': mensaje_id,
+                    'mencion': ''
                 }
             )
         return JsonResponse({'status': 'success'})
