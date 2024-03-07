@@ -27,7 +27,9 @@ SECRET_KEY = os.environ.get('SECRET_KEY', default=SECRET_KEY_DJANGO)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-DEBUG = True
+#DEBUG = True
+DEBUG = 'RENDER' not in os.environ
+
 
 ALLOWED_HOSTS = ['*']
 
@@ -117,7 +119,14 @@ else:
                 'PORT': '5432',
             }
         }
-    DATABASES = POSTGRE_DB
+    RENDER = {
+        'default': dj_database_url.config(
+            # Replace this value with your local database's connection string.
+            default='postgresql://postgres:postgres@localhost:5432/mysite',
+            conn_max_age=600
+        )
+    }
+    DATABASES = RENDER
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
