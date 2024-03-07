@@ -98,7 +98,7 @@ def waapi_api_webhook(request):
             else:
                 contacto = Contacto.objects.create(telefono = telefono)
                 contacto_integracion = ContactoIntegracion.objects.create(contacto=contacto, integracion=integracion_whatsapp)
-                sector_chat_inicial = SectorTarea.objects.get(nombre='Chat inicial')
+                sector_chat_inicial = SectorTarea.objects.get(nombre='Contacto inicial')
                 ContactoTarea.objects.create(contacto_integracion=contacto_integracion, sector_tarea=sector_chat_inicial)
                 mensaje = Mensaje.objects.create(contacto_integracion=contacto_integracion, contenido=contenido_mensaje, id_integracion=mensaje_id)          
             
@@ -130,7 +130,8 @@ def guardar_archivo_adjunto(request, mensaje, media, contacto):
     try:
         archivo64 = base64.b64decode(media['data'])
         mimetype = media['mimetype']  #"mimetype": "image/jpeg",
-        mimetype, codecs = mimetype.split(';', 1) # a veces, mimetype viene así: "audio/ogg; codecs=opus"
+        if ';' in mimetype:
+          mimetype, _ = mimetype.split(';', 1)
         formato, extension = mimetype.split('/')
         extension = extension.split(';')[0] 
         nombre_archivo = f'{str(uuid.uuid4())}.{extension}'
