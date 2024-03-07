@@ -20,9 +20,11 @@ staticfiles/
 
 # Django migration files
 *.py[eo]
-*/migrations/*.py
-*/migrations/*.pyc
-*/migrations/__pycache__/
+#*/migrations/*.py
+#*/migrations/*.pyc
+#*/migrations/__pycache__/
+**/migrations/*
+!**/migrations/__init__.py
 
 # Secret keys and other sensitive data
 *.key
