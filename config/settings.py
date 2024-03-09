@@ -100,7 +100,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("https://djangochat-1.onrender.com", 6379)],
+            "hosts": [("0.0.0.0", 6379)],
         },
     },
 }
