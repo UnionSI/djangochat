@@ -89,13 +89,14 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 ASGI_APPLICATION = 'config.asgi.application'
 
-""" 
+
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels.layers.InMemoryChannelLayer'
     }
 }
- """
+
+""" 
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
@@ -104,7 +105,7 @@ CHANNEL_LAYERS = {
         },
     },
 }
-
+ """
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
