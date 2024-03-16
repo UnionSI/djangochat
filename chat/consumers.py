@@ -12,6 +12,9 @@ from config import settings
 from .whatsapp import enviar_mensaje_greenapi, enviar_mensaje_waapi, enviar_adjunto_waapi
 from bot.chatbot import logica_chatbot
 
+import logging
+logger = logging.getLogger(__name__)
+
 class GlobalConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         await self.channel_layer.group_add('global', self.channel_name)
@@ -43,6 +46,8 @@ class GlobalConsumer(AsyncWebsocketConsumer):
         respuesta = None
         chequear_chatbot = None
 
+        logger.debug(f'[] {usuario}: {mensaje}')
+
         usuario, contacto, contacto_integracion, mensaje, media, mencion = await self.guardar_mensaje(usuario, contacto, mensaje, media, mencion)
         url_adjunto = media.archivo.url if media else ''
 
@@ -65,8 +70,6 @@ class GlobalConsumer(AsyncWebsocketConsumer):
             await sync_to_async(mensaje.save)()
             estado = 'success'
             subestado = 'success'
-
-
 
         if estado == 'success' and subestado == 'success':
             await self.enviar_mensaje_chat_ws(tipo='chat_message', contacto=contacto.id, mensaje=mensaje.contenido, usuario=usuario, url_adjunto=url_adjunto, id_integracion= mensaje.id_integracion, mencion=mencion)
@@ -194,9 +197,6 @@ class GlobalConsumer(AsyncWebsocketConsumer):
             if not extension:
                 extension = f'.{extension_temp}'
             nombre_archivo = f'{str(uuid.uuid4())}{extension}'
-            print(mimetype)
-            print(extension)
-            print(nombre_archivo)
             archivo_temporal = ContentFile(base64.b64decode(media64), name=nombre_archivo)
             media = MensajeAdjunto.objects.create(archivo=archivo_temporal, formato=formato, mensaje=mensaje)
         usuario = usuario.username if usuario else contacto_integracion.contacto.nombre
