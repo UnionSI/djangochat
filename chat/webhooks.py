@@ -10,71 +10,14 @@ from config import settings
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
+import logging
+logger = logging.getLogger(__name__)
 
-@csrf_exempt
-def green_api_webhook(request):
-    # WaApi
-    # key: ETBu4KVOMXT2KCL1t9SGRIJ7Ra8zEPFM60QINdAp3GjD5Ba
-    # XtkLU4toIS8PzXdZGjQIUFOUzhFzxxmcUqoVCRwUd46d9dc9
-    if request.method == 'POST':
-        data = json.loads(request.body.decode('utf-8'))
-
-        if data:
-            idMessage = data['idMessage']
-            instanceData = data['instanceData']['typeInstance']
-            phoneNumberRaw = data['senderData']['sender']
-            phoneNumber = phoneNumberRaw.split('@')[0]
-            name = data['senderData']['chatName']
-            contentMessage = data['messageData']['extendedTextMessageData']['text']
-            timestamp = data['timestamp']
-
-        IntegracionWhatsApp = Integracion.objects.get(nombre=instanceData)
-
-        if IntegracionWhatsApp:
-            contacto = Contacto.objects.filter(telefono=phoneNumber).first()
-            if contacto:
-                Mensaje.objects.create(contacto=contacto, contenido=contentMessage)
-            else:
-                contacto = Contacto.objects.create(
-                    nombre = name,
-                    apellido = name,
-                    dni = phoneNumber[:9],
-                    telefono = phoneNumber,
-                    email = phoneNumberRaw,
-                    empresa = name,
-                    nro_socio = int(phoneNumber[:9]),
-                    integracion = IntegracionWhatsApp,
-                    slug = phoneNumber,
-                )
-                sector_chat_inicial = SectorTarea.objects.get(nombre='Chat inicial')
-                ContactoTarea.objects.create(contacto_integracion=contacto, sector_tarea=sector_chat_inicial)
-                Mensaje.objects.create(contacto=contacto, contenido=contentMessage)
-            
-            ''' Verificar si se tiene que activar un bot si el msg esta en un sector de bot '''
-
-            # Enviar mensaje al canal de WebSocket
-            channel_layer = get_channel_layer()
-            async_to_sync(channel_layer.group_send)(
-                'global',
-                {
-                    'type': 'chat_message',
-                    'contacto': contacto.id,
-                    'mensaje': contentMessage,
-                    'usuario': contacto.nombre
-                }
-            )
-
-        return JsonResponse({'status': 'success'})
-    else:
-        return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
-  
-  
 @csrf_exempt
 def waapi_api_webhook(request):
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
         if data:
-            print(data)
             evento = data['event']
             #instancia_id = data['instanceId']
             mensaje_id = data['data']['message']['id']['id']
@@ -87,6 +30,8 @@ def waapi_api_webhook(request):
 
             
         integracion_whatsapp = Integracion.objects.get(nombre='WhatsApp')
+
+        logger.debug(f'[{mensaje_id}] {nombre}: {contenido_mensaje}')
 
         if integracion_whatsapp:
             contacto = Contacto.objects.filter(telefono=telefono).first()
@@ -143,12 +88,70 @@ def guardar_archivo_adjunto(request, mensaje, media, contacto):
         #    f.write(archivo64)
         archivo_temporal = ContentFile(archivo64, name=nombre_archivo)
         archivo = MensajeAdjunto.objects.create(archivo=archivo_temporal, formato=formato, mensaje=mensaje)
-        print(archivo.archivo.url)
         #url_completa = f'{request.scheme}://{request.get_host()}/media/{url_relativa}'
         #return url_completa
         return archivo
     except Exception as e:
         print(str(e))
+
+'''
+@csrf_exempt
+def green_api_webhook(request):
+    # WaApi
+    # key: ETBu4KVOMXT2KCL1t9SGRIJ7Ra8zEPFM60QINdAp3GjD5Ba
+    # XtkLU4toIS8PzXdZGjQIUFOUzhFzxxmcUqoVCRwUd46d9dc9
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+
+        if data:
+            idMessage = data['idMessage']
+            instanceData = data['instanceData']['typeInstance']
+            phoneNumberRaw = data['senderData']['sender']
+            phoneNumber = phoneNumberRaw.split('@')[0]
+            name = data['senderData']['chatName']
+            contentMessage = data['messageData']['extendedTextMessageData']['text']
+            timestamp = data['timestamp']
+
+        IntegracionWhatsApp = Integracion.objects.get(nombre=instanceData)
+
+        if IntegracionWhatsApp:
+            contacto = Contacto.objects.filter(telefono=phoneNumber).first()
+            if contacto:
+                Mensaje.objects.create(contacto=contacto, contenido=contentMessage)
+            else:
+                contacto = Contacto.objects.create(
+                    nombre = name,
+                    apellido = name,
+                    dni = phoneNumber[:9],
+                    telefono = phoneNumber,
+                    email = phoneNumberRaw,
+                    empresa = name,
+                    nro_socio = int(phoneNumber[:9]),
+                    integracion = IntegracionWhatsApp,
+                    slug = phoneNumber,
+                )
+                sector_chat_inicial = SectorTarea.objects.get(nombre='Chat inicial')
+                ContactoTarea.objects.create(contacto_integracion=contacto, sector_tarea=sector_chat_inicial)
+                Mensaje.objects.create(contacto=contacto, contenido=contentMessage)
+            
+            # Enviar mensaje al canal de WebSocket
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                'global',
+                {
+                    'type': 'chat_message',
+                    'contacto': contacto.id,
+                    'mensaje': contentMessage,
+                    'usuario': contacto.nombre
+                }
+            )
+
+        return JsonResponse({'status': 'success'})
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
+'''
+
+
 '''
 def guardar_archivo_adjunto(request, mensaje, media, contacto):
     try:
