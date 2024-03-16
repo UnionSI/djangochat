@@ -69,12 +69,13 @@
                                     </div>
                                 </div>
                             </a>
-                            <div class="dropdown position-absolute top-0 end-0">
+                            <div class="dropdown scroll-white position-absolute top-0 end-0">
                                 <button class="btn py-0 px-2 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border: none !important; outline: none;"></button>
-                                <ul class="dropdown-menu">
-                                    <li><span class="dropdown-item disabled">Mover a ...</span></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    {% for sector in embudos %}
+                                <ul class="dropdown-menu overflow-y-scroll" style="max-height: 400px; position: relative; padding-top: 0;">
+                                    <li style="position: sticky; top: 0; z-index: 2; background-color: #fff; padding-top: 8px;"><span class="dropdown-item disabled">Mover a ...</span>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    {% for sector in todos_los_sectores %}
                                         <li>
                                             <span class="dropdown-header">{{ sector }}</span>
                                             <ul class="list-unstyled">

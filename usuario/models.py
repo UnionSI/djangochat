@@ -13,7 +13,7 @@ class Perfil(models.Model):
 
 
 class Usuario(AbstractUser):
-    perfil = models.ForeignKey(Perfil, related_name="usuarios",on_delete=models.CASCADE, null=True, blank=True)
+    perfil = models.ForeignKey(Perfil, related_name="usuarios", on_delete=models.SET_NULL, null=True, blank=True)
     
     class Meta:
         verbose_name_plural = 'Usuarios'
@@ -23,7 +23,10 @@ class Usuario(AbstractUser):
     
     def sectores_permitidos(self):
         if self.perfil:
-            return self.perfil.perfiles_sectores.first().sectores.all()
+            if self.perfil.perfiles_sectores.first():
+                return self.perfil.perfiles_sectores.first().sectores.all()
+        return []
+        
 
 
 

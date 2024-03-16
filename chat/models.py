@@ -7,6 +7,8 @@ from asgiref.sync import async_to_sync
 
 from django.db.models import Max
 
+from config import settings
+
 
 class Integracion(models.Model):
     nombre = models.CharField(max_length=100)

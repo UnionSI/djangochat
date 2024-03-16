@@ -32,6 +32,8 @@ def chats(request):
     if sectores_permitidos:
         for sector_permitido in sectores_permitidos:
             lookups |= Q(contacto_integraciones__contacto_tareas__sector_tarea__sector=sector_permitido)
+    else:
+        return render(request, 'restringido.html')
 
     contactos_permitidos = Contacto.objects.filter(lookups) if sectores_permitidos else Contacto.objects.none()
     
@@ -123,7 +125,7 @@ def embudo(request, id):
     if not sector in sectores_permitidos:
         return render(request, 'restringido.html',)
 
-    #sectores = Sector.objects.prefetch_related('sectortarea_set').all()
+    todos_los_sectores = Sector.objects.prefetch_related('sectortarea_set').all()
     #sector_tareas = SectorTarea.objects.filter(sector=sector).prefetch_related('contactotarea_set__contacto__mensajes').all()
     #sorted(sectores_tareas.contactotarea_set.contacto_integracion.contacto, key=lambda x: x.contacto_integraciones.first().mensajes.all().order_by('-fecha_hora').first().fecha_hora, reverse=True)
 
@@ -170,7 +172,7 @@ def embudo(request, id):
             last_message = contacto_tarea.contacto.messages.order_by('-fecha_hora').first()
             contacto_tarea.last_message = last_message
     '''
-    context = {'embudo': sector, 'embudos': sectores_permitidos, 'sector_tareas': sector_tareas, 'debug': DEBUG, 'sectores_tareas_preparadas': sectores_tareas_preparadas}
+    context = {'embudo': sector, 'embudos': sectores_permitidos, 'todos_los_sectores': todos_los_sectores, 'sector_tareas': sector_tareas, 'debug': DEBUG, 'sectores_tareas_preparadas': sectores_tareas_preparadas}
     return render(request, 'chat/embudos.html', context)
     
 

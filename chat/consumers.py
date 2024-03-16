@@ -31,6 +31,11 @@ class GlobalConsumer(AsyncWebsocketConsumer):
         elif tipo_mensaje == 'sector_change':
             await self.procesar_cambio_de_sector(data)
 
+    async def ip_servidor(self):
+        for header in self.scope['headers']:
+            if header[0] == b'origin':
+                return header[1].decode('utf-8') 
+
     async def procesar_mensaje_chat(self, data):
         mensaje = data['mensaje']
         usuario = data['usuario']
@@ -45,14 +50,16 @@ class GlobalConsumer(AsyncWebsocketConsumer):
         subestado = None
         respuesta = None
         chequear_chatbot = None
+        url_adjunto = None
 
         logger.debug(f'[] {usuario}: {mensaje}')
 
         usuario, contacto, contacto_integracion, mensaje, media, mencion = await self.guardar_mensaje(usuario, contacto, mensaje, media, mencion)
-        url_adjunto = media.archivo.url if media else ''
 
         if integracion == 'WhatsApp':
-            if url_adjunto:
+            if media:
+                servidor = await self.ip_servidor()
+                url_adjunto = servidor + media.archivo.url
                 respuesta = await enviar_adjunto_waapi(chat_id=telefono, mensaje=mensaje.contenido, url_adjunto=url_adjunto)
                 mensaje.id_integración = respuesta['data']['data']['id']['id']
             else:
@@ -62,6 +69,7 @@ class GlobalConsumer(AsyncWebsocketConsumer):
             estado = respuesta['status'] # Cuando la conexión a la API está OK
             subestado = respuesta['data']['status']  # Cuando no puede descargar la imagen, el error del estado es 'success' pero el subestado es 'error'. 
         elif integracion == 'Test':
+            url_adjunto = media.archivo.url if media else ''
             mensaje.id_integracion = str(uuid.uuid4())
             if ambiente == 'Homologacion':
                 usuario = contacto.nombre
