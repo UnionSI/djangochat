@@ -1,12 +1,10 @@
 import httpx, json
 from config import settings
 
-
-id_instance = "4315"
-api_name = "customer-service"
-api_token_instance = "ipiOhK708cW4DuUHNtd234FnnnsfWyujgjV2S7THeac23b4f"
+id_instance = "6732"
+api_name = "djangochat"
+api_token_instance = "C2tzhbuFxdzIIoHfhPHtbh5D881u0t2znmKen3vZ7541f8e2"
 # webhook: https://djangochat-1.onrender.com/contacto/waapi_api_webhook/
-
 
 async def enviar_mensaje_waapi(chat_id, mensaje):
     url = f'https://waapi.app/api/v1/instances/{id_instance}/client/action/send-message'

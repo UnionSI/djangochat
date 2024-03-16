@@ -28,8 +28,11 @@ SECRET_KEY = os.environ.get('SECRET_KEY', default=SECRET_KEY_DJANGO)
 # SECURITY WARNING: don't run with debug turned on in production!
 
 DEBUG = True
+#DEBUG = False
 
 ALLOWED_HOSTS = ['*']
+#ALLOWED_HOSTS = ['200.45.208.110']
+
 
 
 LOGOUT_REDIRECT_URL = '/login/'
@@ -56,7 +59,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Para Whitenoise (static files)
+    #'whitenoise.middleware.WhiteNoiseMiddleware',  # Para Whitenoise (static files)
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -92,6 +95,17 @@ CHANNEL_LAYERS = {
         'BACKEND': 'channels.layers.InMemoryChannelLayer'
     }
 }
+
+'''
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("localhost", 6379)],
+        },
+    },
+}
+'''
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
@@ -154,9 +168,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # si no funciona cambiar a static_root
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'  # Para whitenoise
+#STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # si no funciona cambiar a static_root
+#STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'  # Para whitenoise
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -168,8 +182,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = "usuario.Usuario"
 
 LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
+    'version': 1,
+    'disable_existing_loggers': False,
     "formatters": {
         "verbose": {
             "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
@@ -185,38 +199,34 @@ LOGGING = {
             "()": "django.utils.log.RequireDebugTrue",
         },
     },
-    "handlers": {
+    'handlers': { 
+        # Log to a text file that can be rotated by logrotate
+        'logfile': {
+            'class': 'logging.handlers.WatchedFileHandler',            
+            'filename': os.path.join(BASE_DIR, 'ErrorLog.log'),            
+        },
         "console": {
-            "level": "DEBUG",
             "filters": ["require_debug_true"],
             "class": "logging.StreamHandler",
             "formatter": "simple",
         },
-        "file": {
-            "level": "DEBUG",
-            "class": "logging.FileHandler",
-            "filename": "debug.log",
-        },
-        "channels_console": {
-            "level": "DEBUG",
-            "class": "logging.StreamHandler",
-            "formatter": "simple",
-        },
     },
-    "loggers": {
-        "django": {
-            "handlers": ["console"],
-            "propagate": True,
+    'loggers': {
+        # Might as well log any errors anywhere else in Django
+        'django': {
+            'handlers': ["console", 'logfile'],
+            'level': 'ERROR',
+            'propagate': True,
         },
-        "django.request": {
-            "handlers": ["console", "file"],
-            "level": "ERROR",
-            "propagate": False,
+        'daphne': {
+            'handlers': ["console", 'logfile'],
+            'level': 'ERROR',
+            'propagate': True,
         },
-        __name__: {
-            "handlers": ["channels_console", "file"],  # Añade aquí el manejador "channels_console"
-            "level": "DEBUG",
-            "propagate": False,
+        'channels': {            
+            'handlers': ["console", 'logfile'],
+            'level': 'ERROR',
+            'propagate': True,
         },
     },
 }
